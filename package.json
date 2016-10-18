@@ -11,15 +11,14 @@
     "ngc:prod": "ngc -p ./tsconfig-prod.json",
     "webpack:prod": "webpack --progress --config webpack-prod.js --optimize-minimize",
     "start:prod": "npm run ngc:prod && npm run webpack:prod && webpack-dev-server --config webpack-prod.js --port 3000",
-    "build:prod": "npm run ngc:prod && npm run webpack:prod"
+    "build:prod": "npm run ngc:prod && npm run webpack:prod",
+    "start:worker": "nodemon worker/worker.ts",
+    "start:server": "nodemon server/server.ts"
   },
   "keywords": [
     "angular2",
     "typescript",
     "webpack"
-  ],
-  "authors": [
-    "Raúl Jiménez <elecash@gmail.com>"
   ],
   "license": "MIT",
   "devDependencies": {
@@ -28,6 +27,7 @@
     "@angular/compiler-cli": "0.6.2",
     "@angular/core": "2.0.0",
     "@angular/forms": "^2.0.0",
+    "@angular/http": "~2.0.0",
     "@angular/platform-browser": "2.0.0",
     "@angular/platform-browser-dynamic": "2.0.0",
     "@angular/platform-server": "2.0.0",
@@ -62,5 +62,16 @@
     "webpack-dev-server": "1.15.1",
     "webpack-merge": "0.14.1",
     "zone.js": "0.6.21"
+  },
+  "dependencies": {
+    "@types/node": "^6.0.38",
+    "angularfire2": "^2.0.0-beta.5",
+    "body-parser": "^1.15.2",
+    "cors": "^2.8.1",
+    "express": "^4.14.0",
+    "firebase": "^3.5.0",
+    "morgan": "^1.7.0",
+    "multer": "^1.2.0",
+    "ts-node": "^1.6.0"
   }
 }
