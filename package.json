@@ -12,7 +12,8 @@
     "webpack:prod": "webpack --progress --config webpack-prod.js --optimize-minimize",
     "start:prod": "npm run ngc:prod && npm run webpack:prod && webpack-dev-server --config webpack-prod.js --port 3000",
     "build:prod": "npm run ngc:prod && npm run webpack:prod",
-    "start:worker": "nodemon worker/worker.js"
+    "start:worker": "nodemon worker/worker.js",
+    "start:server": "nodemon server/server.js"
   },
   "keywords": [
     "angular2",
@@ -62,6 +63,11 @@
     "zone.js": "0.6.21"
   },
   "dependencies": {
-    "firebase": "^3.5.0"
+    "body-parser": "^1.15.2",
+    "cors": "^2.8.1",
+    "express": "^4.14.0",
+    "firebase": "^3.5.0",
+    "morgan": "^1.7.0",
+    "multer": "^1.2.0"
   }
 }
