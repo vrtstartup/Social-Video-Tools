@@ -11,15 +11,13 @@
     "ngc:prod": "ngc -p ./tsconfig-prod.json",
     "webpack:prod": "webpack --progress --config webpack-prod.js --optimize-minimize",
     "start:prod": "npm run ngc:prod && npm run webpack:prod && webpack-dev-server --config webpack-prod.js --port 3000",
-    "build:prod": "npm run ngc:prod && npm run webpack:prod"
+    "build:prod": "npm run ngc:prod && npm run webpack:prod",
+    "start:worker": "nodemon worker/worker.js"
   },
   "keywords": [
     "angular2",
     "typescript",
     "webpack"
-  ],
-  "authors": [
-    "Raúl Jiménez <elecash@gmail.com>"
   ],
   "license": "MIT",
   "devDependencies": {
@@ -62,5 +60,8 @@
     "webpack-dev-server": "1.15.1",
     "webpack-merge": "0.14.1",
     "zone.js": "0.6.21"
+  },
+  "dependencies": {
+    "firebase": "^3.5.0"
   }
 }

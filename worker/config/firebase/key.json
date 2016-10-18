@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "socialvideotool",
+  "private_key_id": "d3bc9444cab69af4be656b15a856d9bfaa2e6af1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCm7YNQL7AHG1Xb\nTDF3TG4zqHap218Z8pBpdy5gmSLOTI6cQPDCYlc4Tbz/mvSSaHn0wJR6k2w+4uJb\nITgNhn25aKflq0cnET3RyoD+9Lmmq4WAG6Tz/aRFL4Qfu9aBCU/TAdm+rkeMURn5\nnEvcyGmzm1Vopjzk9MBC7txCFbvjpn76+r0KXLbOt6A/I/Kil9fFb3fXiGsWB9ib\n2XS3KUMAAsB6KlzmvvrgHcui1o3FQVUwFcmJEawqkN91t0uCVNIcgoQiCT2qjd2T\nmMcb5lHd5PqiD/GJYQrH+UDbj0PbThamV17RE86UlwOPiYNJcIbGR/bz5y7aHZIo\nqNcG37Q9AgMBAAECggEAfI9I6CHdgUAVjeFKHBItPWDcwxyN12fX+MrVEYHTpgsc\nc15GCVambL4dZMI087cAIfE+GkU9haN5crTUBcuwrxR4DHoFSxKjhZNNNHJawhLF\nOHXoXaSL2pB9T8yzYHAZX4PG/nE/tGWkM008ko/9x+cGEWPSlqpHeOqR8sITBOg4\n20bqyhXNDG/pWL5Re8OT1E1QbzS86hHbzPRWbd9RDncEtP0gyQFJaSUJRoA0mUR+\nLjGR5EGlEcvsBToS1vZJg7jBFxD/joda2mjsAb0aHq245BCK8rLzmA/WByPd/RMT\ny1T4mJQsmzzZon62j5jxsep6nmceFazIGly6vt8aIQKBgQDQ8/CFbi2CFmpn+2k5\n+QcY89VaIgcPsxsDcewkqyn5Y62Tb1byDteXu21LqMCbvYVxFzjabx7X2Fo3KNpy\nYI+Av8cfY0ToHdZ6XYgix2iFB1b4ocMP+de8p61W1qyYcGQDJ3htsQh0PPrQIfAB\nT1gBeRkl8ZdNP40tGZWcQZ6d+QKBgQDMgz5DBE7Jf5kRlgc7lenYPrzLCEHHcKWY\n9BdPVXWQbcy6hk0aSex+i6bEIGsEOV13tg0e0A5I02IvqYuWUxUZhvnR9KNqBpGI\nRnIvnD1ezXpyiojoudb3yaRLLu1VEwP+neoudtw/rHmmysCEfkdFiq5XAuuwWaGy\nde4tPZKpZQKBgQDPZ0L3fmxHcq59tew1sfychPLh+2Kc77/BhKPLpeYM+CbDcEGS\nFK9kmZKcBc3hCJZasZ0qHCA2STcLB08FNtlaB4HDowozh+JrJUnKk7ooSSfHtPDk\ne67rQFhrGLzKtsxe4R/FaXKlxh2C2Bzdf/8vvx76Lbpr38fm2z1Ik025KQKBgQCW\nit2gE2GzrbuNWHTGhdn3Fmd+xPs2xlL/vl4SRgQeZtTXUNkcyuHNXRtLL9nW6CtH\nXblWvyxkq0WRdCqOY2YavmLTDFPmTiN+vux643XBfVvvSM7zESmOiN3pggeuIitE\nmBW0UkZakKmT/5ercBEiva0L29iGndQLPAgxQSveiQKBgBoNiHQrD7J6sNGIdQ3g\nFourPtAj/UYXJrv+GuY9t6bDtyuqN1+jTFbfCZYpRJ8nASNyS+VNLRX8+eT/Cx1M\nNlFtpuovBxDBDr/+8YDLRxr0Z15EBgHIH0o6+8cl0Pk+3XYwt7Tst/PEpleLLM3B\n/f6yid2mOBar3G4hvp34pGqC\n-----END PRIVATE KEY-----\n",
+  "client_email": "node-director@socialvideotool.iam.gserviceaccount.com",
+  "client_id": "115644650283732020995",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/node-director%40socialvideotool.iam.gserviceaccount.com"
+}
