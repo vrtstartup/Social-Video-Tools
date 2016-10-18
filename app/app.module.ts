@@ -11,11 +11,11 @@ import {VgBufferingModule} from "videogular2/buffering";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
-import { BoundPlayer } from "./views/public/subtitles/components/bound-player";
+import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
 import { SimplePlayer } from "./views/public/subtitles/components/simple-player";
 
 import { VrtAppsComponent } from './views/public/subtitles/components/vrtapps.component';
-import { SubtitlesComponent } from './views/public/subtitles/components/subtitles.component';
+import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 
 import { AngularFireModule } from 'angularfire2';
 import { HttpModule } from '@angular/http';
@@ -32,7 +32,7 @@ export const firebaseConfig = {
 @NgModule({
     declarations: [
         AppComponent,
-        BoundPlayer,
+        VrtVideoPlayer,
         SimplePlayer,
         VrtAppsComponent,
         SubtitlesComponent,
