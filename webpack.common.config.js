@@ -3,7 +3,6 @@ const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-
 module.exports = function () {
     return {
 
@@ -33,13 +32,20 @@ module.exports = function () {
                     exclude: [/\.(spec|e2e)\.ts$/]
                 },
                 {
-                    test: /\.(html|css)$/,
+                    test: /\.(html)$/,
                     loader: 'raw-loader',
                     exclude: ['app/index.html']
-                }
+                },
+                {
+                    test: /\.scss$/,
+                    loaders: ["style", "css", "sass"],
+                    exclude: ['app/index.html']
+                },
             ]
         },
-
+        sassLoader: {
+            includePaths: [path.resolve(__dirname, "./some-folder")]
+        },
         resolve: {
             root: [path.resolve(__dirname, 'app')],
             extensions: ['', '.ts', '.js']
@@ -52,7 +58,7 @@ module.exports = function () {
             }),
             new CopyWebpackPlugin([
                 { from: 'node_modules/videogular2/fonts', to: 'fonts' }
-            ])
+            ]),
         ],
 
         devtool: false,
