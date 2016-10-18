@@ -6,11 +6,11 @@
     "ngc": "ngc",
     "ngc:dev": "ngc -p ./tsconfig.json",
     "webpack": "webpack --progress --config webpack-dev.js --optimize-minimize",
-    "start": "npm run ngc:dev && npm run webpack && webpack-dev-server --config webpack-dev.js --port 4202",
+    "start": "npm run ngc:dev && npm run webpack && webpack-dev-server --config webpack-dev.js --port 3000",
     "build": "npm run ngc:dev && npm run webpack",
     "ngc:prod": "ngc -p ./tsconfig-prod.json",
     "webpack:prod": "webpack --progress --config webpack-prod.js --optimize-minimize",
-    "start:prod": "npm run ngc:prod && npm run webpack:prod && webpack-dev-server --config webpack-prod.js --port 4202",
+    "start:prod": "npm run ngc:prod && npm run webpack:prod && webpack-dev-server --config webpack-prod.js --port 3000",
     "build:prod": "npm run ngc:prod && npm run webpack:prod"
   },
   "keywords": [
