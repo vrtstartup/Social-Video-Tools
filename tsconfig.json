@@ -3,6 +3,9 @@
   "buildOnSave": false,
   "compilerOptions": {
     "target": "es5",
+    "typeRoots": [
+      "../node_modules/@types"
+    ],
     "module": "commonjs",
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -13,7 +16,9 @@
       "node"
     ]
   },
-  "files": [],
+  "files": [
+    "firebase.d.ts"
+  ],
   "exclude": [
     "node_modules",
     "dist"
