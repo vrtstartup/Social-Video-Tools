@@ -11,9 +11,14 @@ import './subtitles.component.scss';
     templateUrl: 'subtitles.component.html',
 })
 export class SubtitlesComponent implements OnInit {
+
     uploadFile: any;
     projectId: string;
     toProcess: FirebaseListObservable<any[]>;
+
+    subStart: number = 0.2;
+    subEnd: number = 1.2;
+    movieLength: number = 1.6;
 
     constructor(
       private http: Http,
