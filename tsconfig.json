@@ -16,6 +16,9 @@
       "node"
     ]
   },
+  "files": [
+    "node_modules/angularfire2/node_modules/firebase/firebase.d.ts"
+  ],
   "exclude": [
     "node_modules",
     "dist"

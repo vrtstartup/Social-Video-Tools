@@ -17,6 +17,7 @@ const project = JSON.parse(fs.readFileSync(mockfile, 'utf8'));
 
 // store project
 const refProjects = db.ref('projects');
+
 refProjects.push(project);
 
 
@@ -27,8 +28,20 @@ const refProcess = db.ref('to-process');
 // Attach an asynchronous callback to read the data at our posts reference
 refProcess.on('value', (snapshot) => {
   // this runs when a new job is created in the queue.
-  // DO: Client has marked this project as ready-to-process, throw it on the processing queue
-  console.log(snapshot.val());
+  let docs = snapshot.val();
+
+  if(docs) {
+    for (first in docs) break;
+    const objProject = docs[first];
+
+    // get project ref
+    const refProject = db.ref(`projects/${objProject.projectId}`);
+    // #todo: projectId frontend request
+    console.log(objProject.projectId);
+    refProject.on('value', (snapshot) => {
+      console.log(snapshot.val());
+    })
+  }  
 }, (errorObject) => {
   console.log(`The read failed: ${errorObject.code}`);
 });
