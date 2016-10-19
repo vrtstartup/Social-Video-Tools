@@ -63,4 +63,5 @@ export class SubtitlesComponent implements OnInit {
 
     return text;
   }
+
 }

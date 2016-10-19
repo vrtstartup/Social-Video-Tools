@@ -2,24 +2,27 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import {NgModule} from '@angular/core';
-import {VgCore} from "videogular2/core";
-import {VgControlsModule} from "videogular2/controls";
-import {VgOverlayPlayModule} from "videogular2/overlay-play";
-import {VgBufferingModule} from "videogular2/buffering";
+import { NgModule } from '@angular/core';
+import { VgCore } from "videogular2/core";
+import { VgControlsModule } from "videogular2/controls";
+import { VgOverlayPlayModule } from "videogular2/overlay-play";
+import { VgBufferingModule } from "videogular2/buffering";
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
 import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
-import { SimplePlayer } from "./views/public/subtitles/components/simple-player";
+//import { SimplePlayer } from "./views/public/subtitles/components/simple-player";
 
 import { VrtAppsComponent } from './views/public/subtitles/components/vrtapps.component';
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
+import { JqtestComponent } from './views/public/jqtest/jqtest.component';
+
+//import { Ng2SliderComponent } from 'ng2-slider-component/ng2-slider.component';
 
 import { AngularFireModule } from 'angularfire2';
 import { HttpModule } from '@angular/http';
-import {ExtBrowserXhr} from './common/extends/extBrowserXhr';
+import { ExtBrowserXhr } from './common/extends/extBrowserXhr';
 
 // Must export the config
 export const firebaseConfig = {
@@ -33,9 +36,11 @@ export const firebaseConfig = {
     declarations: [
         AppComponent,
         VrtVideoPlayer,
-        SimplePlayer,
+        //SimplePlayer,
         VrtAppsComponent,
         SubtitlesComponent,
+        //Ng2SliderComponent,
+        JqtestComponent
     ],
     imports: [
         BrowserModule, 
