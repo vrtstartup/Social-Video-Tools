@@ -16,9 +16,6 @@
       "node"
     ]
   },
-  "files": [
-    "firebase.d.ts"
-  ],
   "exclude": [
     "node_modules",
     "dist"
