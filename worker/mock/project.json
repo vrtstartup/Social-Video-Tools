@@ -1,13 +1,13 @@
 {
  
-  "userID": "-KOFPhrLhYrlEncKDvZx",
+  "userId": "-KOFPhrLhYrlEncKDvZx",
   "date": "1415463675",
   "name": "This is a recognizable string",
-  "projectUrl":  "path/to/the/project/folder",
+  "projectPath":  "path/to/the/project/folder",
 
   "clip": {
-    "lowUrl": "path/to/big_buck_bunny_LOWRES.mp4",
-    "highUrl": "path/to/big_buck_bunny_HIGHRES.mp4",
+    "lowResUrl": "path/to/big_buck_bunny_LOWRES.mp4",
+    "highResUrl": "path/to/big_buck_bunny_HIGHRES.mp4",
     "fileName": "big_buck_bunny.mp4",
     "duration": "360",
     "mime": "video/MPEG",
