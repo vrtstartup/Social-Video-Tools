@@ -1,0 +1,18 @@
+range-slider {
+    position: absolute;
+    bottom: 50px;
+    left: 0;
+    width: 100%;
+    z-index: 301;
+    background: $drd-main-bg-color;
+    padding: 1rem 0;
+    .range-slider__wrapper {
+        margin: 0 230px 0 170px;
+    }
+    .range-slider__value {
+        color: white;
+    }
+    .noUi-connect { 
+        background: $drd-main-color;
+    }
+}
