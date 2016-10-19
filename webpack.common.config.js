@@ -21,7 +21,7 @@ module.exports = function () {
         },
 
         output: {
-            filename: '[name].bundle.js'
+            filename: '[name].bundle.js',
         },
 
         module: {
