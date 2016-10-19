@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, OnInit, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ElementRef, AfterViewInit } from '@angular/core';
 
 //import * as $ from 'jquery';
 
@@ -14,6 +14,7 @@ const noUiSlider = require('nouislider');
 })
 export class RangeSliderComponent implements OnInit, AfterViewInit {
     @Input() subMeta: any;
+    @Output() change = new EventEmitter();
 
     rangeSlider: any;
 
@@ -38,11 +39,14 @@ export class RangeSliderComponent implements OnInit, AfterViewInit {
 
             this.subMeta.start = this.rangeSlider.noUiSlider.get()[0]
             this.subMeta.end = this.rangeSlider.noUiSlider.get()[1]
+
+            this.change.emit(Object.assign({}, this.subMeta));
             
         });
     }
 
-    ngAfterViewInit() {}
+    ngAfterViewInit() {
+    }
 }
 
 

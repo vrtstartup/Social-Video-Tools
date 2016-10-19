@@ -33,7 +33,7 @@ export class SubtitlesComponent implements OnInit {
     
     
 
-    constructor(
+  constructor(
       private http: Http,
       private service: UploadService,
       af: AngularFire
@@ -47,10 +47,14 @@ export class SubtitlesComponent implements OnInit {
         console.log(`progress = ${data}`);
       });
 
-    }
+  }
 
+  onChange(event) {
+    //console.log('event', event);
+    this.subMeta = event;
+  }
+  
   ngOnInit() {
-    console.log('init');
   }
 
   newProject() {

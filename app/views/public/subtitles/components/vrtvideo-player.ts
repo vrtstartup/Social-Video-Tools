@@ -15,27 +15,34 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
     api:VgAPI;
     fsAPI:VgFullscreenAPI;
 
-    constructor() {
+    constructor(api:VgAPI) {
         this.fsAPI = VgFullscreenAPI;
 
+        this.api = api;
+        console.log(api);
     }
 
     ngOnInit(){
-
     }
     ngAfterViewInit(){
 
     }
 
-    // ngOnChanges(changes: {[subMeta: any]: any} ){
-    //     console.log( 'changes =', changes );
-    // }
+    ngOnChanges(){
+        //console.log('onchange', this.subMeta);
+        //console.log( parseFloat(this.subMeta.start) );
+        let seektime = ( parseFloat(this.subMeta.start) / parseFloat(this.subMeta.movielength) * 100 ) ;
+        console.log(seektime);
 
-    onPlayerReady(api:VgAPI) {
-        console.log('this.subMeta.start ====', this.subMeta)
-        this.api = api;
-        this.api.seekTime( this.subMeta.start );
+        this.api.seekTime( seektime );
         this.api.play();
+    }
+
+    onPlayerReady() {
+        // this.api = api;
+        // console.log(api);
+        // this.api.seekTime( this.subMeta.start );
+        // this.api.play();
     }
 
 }
