@@ -20,7 +20,8 @@ module.exports = function (env) {
             })
         ],
         devServer: {
-            contentBase: 'dist/dev'
+            contentBase: 'dist/dev',
+            historyApiFallback: true,
         }
     });
 };
