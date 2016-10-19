@@ -32,7 +32,7 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
         //console.log('onchange', this.subMeta);
         //console.log( parseFloat(this.subMeta.start) );
         let seektime = ( parseFloat(this.subMeta.start) / parseFloat(this.subMeta.movielength) * 100 ) ;
-        console.log(seektime);
+        //console.log(seektime);
 
         this.api.seekTime( seektime );
         this.api.play();
