@@ -2,9 +2,11 @@
 
 	<div class="sub-menu" style="display:flex; flex-direction:row; flex: 0 1 auto;">
 		<div class="" style=":;">
-			<button type="button" class="btn btn-primary">New</button>
+			<button type="button" class="btn btn-primary" (click)="newProject()">New</button>
 			<button type="button" class="btn btn-secondary">Open</button>
-			<input type="file" name="video" (change)="upload($event)">
+			<input type="file" name="video" *ngIf="firebaseProject" (change)="upload($event)">
+			<input type="text" name="video-name" *ngIf="firebaseProject" [(ngModel)]="modelProject.name" (keyup)="update()">
+			<button *ngIf="firebaseProject" (click)="queue()">Render Movie</button>
 		</div>
 	</div>
 

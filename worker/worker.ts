@@ -29,7 +29,7 @@ const refProcess = db.ref('to-process');
 refProcess.on('value', (snapshot) => {
   // this runs when a new job is created in the queue.
   let docs = snapshot.val();
-
+  
   if(docs) {
     for (first in docs) break;
     const objProject = docs[first];
