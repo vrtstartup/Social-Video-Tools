@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, Input, EventEmitter, OnInit, ElementRef, AfterViewInit } from '@angular/core';
 
 //import * as $ from 'jquery';
 
@@ -8,14 +8,12 @@ const noUiSlider = require('nouislider');
     selector: 'range-slider',
     template: `
     <div class="range-slider__wrapper">
-        <div class="range-slider__value">{{subStart}}|{{subEnd}}</div> 
+        <div class="range-slider__value">{{subMeta.start}}|{{subMeta.end}}|{{subMeta.movielength}}</div> 
         <div id="range-slider"></div>
     </div>`,
 })
 export class RangeSliderComponent implements OnInit, AfterViewInit {
-    @Input() subStart: number;
-    @Input() subEnd: number;
-    @Input() movieLength: number;
+    @Input() subMeta: any;
 
     rangeSlider: any;
 
@@ -28,18 +26,18 @@ export class RangeSliderComponent implements OnInit, AfterViewInit {
         this.rangeSlider = document.getElementById('range-slider');
 
         noUiSlider.create(this.rangeSlider, {
-            start: [ this.subStart, this.subEnd ],
+            start: [ this.subMeta.start, this.subMeta.end ],
             // step: 1,
             behaviour: 'drag',
             connect: true,
-            range: { 'min':  0, 'max':  this.movieLength },
+            range: { 'min':  0, 'max':  this.subMeta.movielength },
             tooltips: true,
         });
 
         this.rangeSlider.noUiSlider.on('update', () => {
 
-            this.subStart = this.rangeSlider.noUiSlider.get()[0]
-            this.subEnd = this.rangeSlider.noUiSlider.get()[1]
+            this.subMeta.start = this.rangeSlider.noUiSlider.get()[0]
+            this.subMeta.end = this.rangeSlider.noUiSlider.get()[1]
             
         });
     }

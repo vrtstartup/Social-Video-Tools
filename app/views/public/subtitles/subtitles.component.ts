@@ -12,13 +12,21 @@ import './subtitles.component.scss';
 })
 export class SubtitlesComponent implements OnInit {
 
+    subMeta: any = {
+        start: 0.2,
+        end: 1.2,
+        movielength: 2.6,
+      };
+      
+    video: any = { 
+        src: "http://static.videogular.com/assets/videos/videogular.mp4",
+        type: "video/mp4",
+        loop: true,
+    };
+
     uploadFile: any;
     projectId: string;
     toProcess: FirebaseListObservable<any[]>;
-
-    subStart: number = 0.2;
-    subEnd: number = 1.2;
-    movieLength: number = 1.6;
 
     constructor(
       private http: Http,
@@ -34,6 +42,7 @@ export class SubtitlesComponent implements OnInit {
       this.service.progress$.subscribe(data => {
         console.log(`progress = ${data}`);
       });
+
     }
 
     ngOnInit() {
