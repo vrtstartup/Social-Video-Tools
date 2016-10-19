@@ -17,9 +17,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppComponent } from './app.component';
 import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
 
-import { VrtAppsComponent } from './views/public/subtitles/components/vrtapps.component';
+import { VrtAppsComponent } from './views/public/vrtapps.component';
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
-import { SliderComponent } from './views/public/jqtest/jqtest.component';
+import { SliderComponent } from './views/public/subtitles/components/slider.component';
 
 
 // Must export the config
@@ -50,7 +50,7 @@ export const firebaseConfig = {
         AngularFireModule.initializeApp(firebaseConfig),
         RouterModule.forRoot([
             { path: 'subtitles', component: SubtitlesComponent },
-            { path: '', component: VrtAppsComponent },
+            { path: '', component: SubtitlesComponent },
         ]),
     ],
     providers: [ExtBrowserXhr],

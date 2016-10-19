@@ -1,46 +1,37 @@
 import { Component, OnInit, ElementRef, AfterViewInit } from '@angular/core';
-//import * as $ from 'jquery';
 
+//import * as $ from 'jquery';
 //import noUiSlider from '../../../node_modules/nouislider/distribute/nouislider.js';
 //import * as noUiSlider from 'nouislider';
+
 const noUiSlider = require('nouislider');
 
-import '../../../../node_modules/nouislider/distribute/nouislider.css';
-
-//console.log('jquery =', $);
-console.log('noUiSlider =', noUiSlider);
-
 @Component({
-    selector: 'jqtest',
+    selector: 'range-slider',
     template: `
-    <button>jQtest button</button><br>
-    <div id="slider"></div>{{start}}|{{end}}
-    `,
+    <div class="range-slider__wrapper">
+        <div id="range-slider"></div>
+        {{start}}|{{end}}
+    </div>`,
 })
 export class SliderComponent implements OnInit, AfterViewInit {
     
     start: any;
     end: any;
-    theslider: any;
-    test: any;
+    rangeSlider: any;
 
     constructor(private el: ElementRef){
         this.start
         this.end
-        this.test
+        this.rangeSlider
     }
 
     ngOnInit() {
-        // $( this.el.nativeElement ).find('button').on('click', function(){
-        //     alert('it works');
-        // })
-    }
+        // $( this.el.nativeElement ).find('button').on('click', function(){ alert('it works'); })
 
-    ngAfterViewInit() {
+        this.rangeSlider = document.getElementById('range-slider');
 
-        this.test = document.getElementById('slider');
-
-        noUiSlider.create(this.test, {
+        noUiSlider.create(this.rangeSlider, {
             start: [ 20, 60 ],
             step: 1,
             behaviour: 'drag',
@@ -48,14 +39,15 @@ export class SliderComponent implements OnInit, AfterViewInit {
             range: { 'min':  0, 'max':  100 }
         });
 
-        this.test.noUiSlider.on('update', () => {
+        this.rangeSlider.noUiSlider.on('update', () => {
 
-            this.start = this.test.noUiSlider.get()[0]
-            this.end = this.test.noUiSlider.get()[1]
+            this.start = this.rangeSlider.noUiSlider.get()[0]
+            this.end = this.rangeSlider.noUiSlider.get()[1]
             
         });
-
     }
+
+    ngAfterViewInit() {}
 }
 
 
