@@ -1,20 +1,21 @@
 import { Component, OnInit, ElementRef, AfterViewInit } from '@angular/core';
 
-//import * as $ from 'jquery';
-//import noUiSlider from '../../../node_modules/nouislider/distribute/nouislider.js';
-//import * as noUiSlider from 'nouislider';
-
 const noUiSlider = require('nouislider');
+
+//import * as $ from 'jquery';
+
+import './range-slider.component.scss';
+
 
 @Component({
     selector: 'range-slider',
     template: `
     <div class="range-slider__wrapper">
-        <div id="range-slider"></div>
         {{start}}|{{end}}
+        <div id="range-slider"></div>
     </div>`,
 })
-export class SliderComponent implements OnInit, AfterViewInit {
+export class RangeSliderComponent implements OnInit, AfterViewInit {
     
     start: any;
     end: any;

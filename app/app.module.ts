@@ -19,7 +19,7 @@ import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-pla
 
 import { VrtAppsComponent } from './views/public/vrtapps.component';
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
-import { SliderComponent } from './views/public/subtitles/components/slider.component';
+import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 
 
 // Must export the config
@@ -36,7 +36,7 @@ export const firebaseConfig = {
         VrtVideoPlayer,
         VrtAppsComponent,
         SubtitlesComponent,
-        SliderComponent
+        RangeSliderComponent
     ],
     imports: [
         BrowserModule, 
