@@ -12,7 +12,7 @@ module.exports = function (env) {
             'prod': './app/bootstrap-prod.ts'
         },
         output: {
-            path: './dist/prod'
+            path: __dirname + '/dist/prod'
         },
         plugins: [
             new HtmlWebpackPlugin({

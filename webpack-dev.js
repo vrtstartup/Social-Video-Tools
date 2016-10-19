@@ -11,7 +11,7 @@ module.exports = function (env) {
             'dev': './app/bootstrap.ts'
         },
         output: {
-            path: './dist/dev'
+            path: __dirname + '/dist/dev'
         },
         plugins: [
             new HtmlWebpackPlugin({
@@ -24,3 +24,5 @@ module.exports = function (env) {
         }
     });
 };
+
+// console.log(module.exports());
