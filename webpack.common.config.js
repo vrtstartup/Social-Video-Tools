@@ -37,7 +37,7 @@ module.exports = function () {
                     exclude: ['app/index.html']
                 },
                 {
-                    test: /\.scss$/,
+                    test: /\.(scss|css)$/,
                     loaders: ["style", "css", "sass"],
                     exclude: ['app/index.html']
                 },
