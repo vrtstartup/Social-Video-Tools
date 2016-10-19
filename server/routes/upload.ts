@@ -1,6 +1,8 @@
-require('ts-node/register');
 
-const express = require('express');
+import * as express from 'express';
+
+// const express = require('express');
+
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -8,13 +10,12 @@ const fs = require('fs');
 const router = express.Router();
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    console.log(req.body);
-
     const dest = path.join(__dirname, '/../projects/', req.body.projectId);
+    
     let stat = null;
 
     try {
-      stat = fs.mkdirSync(dest);
+      stat = fs.statSync(dest);
     } catch (err) {
       fs.mkdirSync(dest);
     }
@@ -33,7 +34,7 @@ const upload = multer({
 
 const file = upload.fields([{ name: 'video' }]);
 
-router.post('/', file, (req, res) => {
+router.post('/', file, (req: any, res) => {
   res.json({
     success: true,
     file: req.files.video[0],
