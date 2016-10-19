@@ -12,6 +12,7 @@ import { Project } from '../../../../models/project.model'
     templateUrl: 'subtitles.component.html',
 })
 export class SubtitlesComponent implements OnInit {
+
     uploadFile: any;
     firebaseToProcess: FirebaseListObservable<any[]>;
     firebaseProjects:  FirebaseListObservable<any[]>;
@@ -19,6 +20,10 @@ export class SubtitlesComponent implements OnInit {
     modelProject: any;
     
     
+
+    subStart: number = 0.2;
+    subEnd: number = 1.2;
+    movieLength: number = 1.6;
 
     constructor(
       private http: Http,
