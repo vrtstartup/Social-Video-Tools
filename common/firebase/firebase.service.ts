@@ -13,5 +13,15 @@ export module FireBase {
     });
 
     return firebase.database(); 
-  } 
+  }
+
+  export function queue(projectId) {
+    const refQueue = database().ref('to-process');
+
+    refQueue.push({ 
+      "projectId": projectId,
+      "job": "lowres",
+      "status": "open"
+    });
+  }
 }
