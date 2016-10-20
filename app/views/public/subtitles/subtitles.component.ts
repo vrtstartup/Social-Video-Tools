@@ -69,8 +69,6 @@ export class SubtitlesComponent implements OnInit {
     this.service.makeFileRequest('http://localhost:8080/upload', this.uploadFile.files[0], this.modelProject.projectId)
       .subscribe((data) => {
         console.log(data);
-
-        
       });
   }
 
