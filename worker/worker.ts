@@ -1,6 +1,8 @@
 require('ts-node/register');
 
+import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
+import { ffprobe, ffmpeg } from './services/ffmpeg.service'
 
 // init database 
 const db = FireBase.database();
@@ -20,9 +22,17 @@ refProcess.on('value', (snapshot) => {
     const refProject = db.ref(`projects/${firstProject.projectId}`);
     // #todo: projectId frontend request
     refProject.on('value', (snapshot) => {
+      // we have metadata
       const project = snapshot.val();
 
-      console.log(project);
+      // now read the file from the disk
+      const filePath = `${project.baseDir}/${project.clip.fileName}`;
+      const fileMeta = fs.statSync(filePath);
+
+      // perform an ffprobe 
+      const probeData = ffprobe( console, filePath );
+      
+      console.log(fileMeta);
     })
   }  
 }, (errorObject) => {
