@@ -4,3 +4,4 @@ dist
 aot
 server/projects
 *.ngfactory.ts
+worker/bin

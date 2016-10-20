@@ -34,17 +34,20 @@ export module FireBase {
     const refProject = db.ref(`projects/${projectId}`);
 
     // firebaseRef returns a firebase.promise
-    return refProject.update({
-      "clip": {
-        "fileName": fileName
-      }
-    });
+    return refProject.child("clip/fileName").set(fileName);
+  }
+
+  export function setLowResFileName(projectId, fileName, firebaseDb?: any) {
+    const db = (typeof firebaseDb === 'undefined') ? database() : firebaseDb;
+    const refProject = db.ref(`projects/${projectId}`);
+
+    return refProject.child("clip/lowResUrl").set(fileName);
   }
 
   export function setProjectBaseDir(projectId, dir, firebaseDb?: any) {
     const db = (typeof firebaseDb === 'undefined') ? database() : firebaseDb;
     const refProject = db.ref(`projects/${projectId}`);
 
-    return refProject.update({ "baseDir": dir });
+    return refProject.child("baseDir").set(dir);
   }
 }

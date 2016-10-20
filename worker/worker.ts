@@ -24,15 +24,36 @@ refProcess.on('value', (snapshot) => {
     refProject.on('value', (snapshot) => {
       // we have metadata
       const project = snapshot.val();
+      const dir = project.baseDir;
+      const file = project.clip.fileName;
+      const projectId = snapshot.key;
 
       // now read the file from the disk
-      const filePath = `${project.baseDir}/${project.clip.fileName}`;
-      const fileMeta = fs.statSync(filePath);
+      const filePath = `${dir}/${file}`;
+
+      console.log(project);
+      console.log(file);
 
       // perform an ffprobe 
-      const probeData = ffprobe( console, filePath );
-      
-      console.log(fileMeta);
+      const probeData = ffprobe( console, filePath )
+      .then(() => {
+        console.log("valid stream found");
+        
+        // downsample video file
+        ffmpeg( console, file, dir)
+          .then((data:any) => {
+            const file = data.videoLowres;
+            FireBase.setLowResFileName(projectId, file, db);
+            // #todo
+            // resolveJob(projectId);
+          }, (err) => {
+            console.log("encode failed");
+            console.log(err);
+          })
+      }, () => {
+        console.log("no valid stream found");
+      });
+
     })
   }  
 }, (errorObject) => {

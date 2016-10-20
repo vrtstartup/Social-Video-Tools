@@ -1,4 +1,5 @@
-import {spawn, execFile} from 'child_process';
+import {spawn, spawnSync, execFile} from 'child_process';
+const path = require('path');
 const config = require('../config.js');
 
 /**
@@ -65,28 +66,38 @@ export function ffmpeg(logger, fileName, workingDir) {
 
   const scaleFilter = `scale='min(${config.videoMaxWidth.toString()}\\,iw):-2'`;
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve:any, reject) => {
+    const filePath = `${workingDir}/${fileName}`;
+    const videoLowres = `${fileName}_LO.${config.format.video.extension}`;
+    const thumbLowres = `${fileName}_LO.${config.format.image.extension}`;
+
     const args = [
-      '-y',
-      '-loglevel', 'warning',
-      '-i', workingDir + fileName,
-      '-c:a', 'copy',
+      '-i', filePath,
+      // '-c:a', 'copy',
       '-vf', scaleFilter,
-      '-movflags', '+faststart',
-      `${fileName}_LO.${config.format.video.extension}`,
-      '-vf', 'thumbnail',
-      '-vf', scaleFilter,
-      '-vframes', '1',
-      `${fileName}_LO.${config.format.image.extension}`
+      // '-movflags', '+faststart',
+      videoLowres,
+      // '-vf', 'thumbnail',
+      // '-vframes', '1',
+      // thumbLowres
     ];
+
+    console.log(args);
+
     const opts = {
       cwd: workingDir
     };
-    
-    spawn('ffmpeg', args, opts)
+
+  const data = {
+    'baseDir': filePath,
+    'videoLowres': videoLowres,
+    'thumb': thumbLowres
+  };
+
+  spawn('ffmpeg', args, opts)
       .on('message', msg => logger.log(msg))
       .on('error', reject)
-      .on('close', resolve);
+      .on('close', resolve(data));
   });
 }
 
