@@ -1,13 +1,11 @@
-// declare var require: any;
-// declare var process: any;
-// declare var __dirname: any;
-
 import * as express from 'express';
+
 const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
+// init server
 const server = express();
 const port = process.env.PORT || 8080;
 

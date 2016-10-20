@@ -1,7 +1,6 @@
 
 import * as express from 'express';
-
-// const express = require('express');
+import { FireBase } from '../../common/firebase/firebase.service';
 
 const multer = require('multer');
 const path = require('path');
@@ -35,9 +34,14 @@ const upload = multer({
 const file = upload.fields([{ name: 'video' }]);
 
 router.post('/', file, (req: any, res) => {
+  // queue this project for lowres rendering
+  FireBase.queue(req.body.projectId);
+  
+  // respond to client request
   res.json({
     success: true,
     file: req.files.video[0],
+    projectId: req.body.projectId,
   });
 });
 

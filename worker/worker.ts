@@ -1,6 +1,5 @@
 require('ts-node/register');
 
-// const fb = require('../common/firebase/firebase.service.ts');
 import { FireBase } from '../common/firebase/firebase.service';
 
 // init database 
@@ -16,11 +15,10 @@ refProcess.on('value', (snapshot) => {
 
   if(docs) {
     const firstProject = docs[Object.keys(docs)[0]];
-    
+
     // get project ref
     const refProject = db.ref(`projects/${firstProject.projectId}`);
     // #todo: projectId frontend request
-    console.log(firstProject.projectId);
     refProject.on('value', (snapshot) => {
       console.log(snapshot.val());
     })
