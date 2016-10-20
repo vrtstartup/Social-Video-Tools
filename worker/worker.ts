@@ -20,7 +20,9 @@ refProcess.on('value', (snapshot) => {
     const refProject = db.ref(`projects/${firstProject.projectId}`);
     // #todo: projectId frontend request
     refProject.on('value', (snapshot) => {
-      console.log(snapshot.val());
+      const project = snapshot.val();
+
+      console.log(project);
     })
   }  
 }, (errorObject) => {

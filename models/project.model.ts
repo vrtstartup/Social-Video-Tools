@@ -33,7 +33,7 @@ export class Project {
         "projectId": this.projectId,
         "userId": this.userId,
         "name": this.name,
-        "projectPath": this.projectPath,
+        "baseDir": this.projectPath,
         "clip": {
           "lowResUrl": this.clip.lowResUrl,
           "highResUrl": this.clip.highResUrl,

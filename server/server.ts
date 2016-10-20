@@ -1,9 +1,13 @@
 import * as express from 'express';
+import { FireBase } from '../common/firebase/firebase.service';
 
 const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+
+// init firebase
+const db = FireBase.database();
 
 // init server
 const server = express();
@@ -11,6 +15,7 @@ const port = process.env.PORT || 8080;
 
 const uploadRoutes = require('./routes/upload');
 
+server.set('db', db);
 server.use(bodyParser());
 
 // when getting root, serve angular client

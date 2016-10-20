@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 
 const router = express.Router();
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dest = path.join(__dirname, '/../projects/', req.body.projectId);
@@ -34,14 +35,27 @@ const upload = multer({
 const file = upload.fields([{ name: 'video' }]);
 
 router.post('/', file, (req: any, res) => {
+  const projectId = req.body.projectId;
+  const fileMeta = req.files.video[0];
+  const db = req.app.get('db');
+
+  // update project 
+  FireBase.setHighResFileName(projectId, fileMeta.filename, db).then(() => {
+      // Great success
+      console.log("Set Highres name");
+    }
+  );
+
+  FireBase.setProjectBaseDir(projectId, fileMeta.destination, db);
+
   // queue this project for lowres rendering
-  FireBase.queue(req.body.projectId);
-  
+  FireBase.queue(projectId, db);
+
   // respond to client request
   res.json({
     success: true,
-    file: req.files.video[0],
-    projectId: req.body.projectId,
+    file: fileMeta,
+    projectId: projectId,
   });
 });
 
