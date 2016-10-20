@@ -13,6 +13,18 @@ import { Project } from '../../../../models/project.model'
 })
 export class SubtitlesComponent implements OnInit {
 
+    subMeta: any = {
+        start: 0.2,
+        end: 1.2,
+        movielength: 2.6,
+      };
+      
+    video: any = { 
+        src: "http://static.videogular.com/assets/videos/videogular.mp4",
+        type: "video/mp4",
+        loop: true,
+    };
+
     uploadFile: any;
     firebaseToProcess: FirebaseListObservable<any[]>;
     firebaseProjects:  FirebaseListObservable<any[]>;
@@ -21,11 +33,7 @@ export class SubtitlesComponent implements OnInit {
     
     
 
-    subStart: number = 0.2;
-    subEnd: number = 1.2;
-    movieLength: number = 1.6;
-
-    constructor(
+  constructor(
       private http: Http,
       private service: UploadService,
       af: AngularFire
@@ -38,10 +46,15 @@ export class SubtitlesComponent implements OnInit {
       this.service.progress$.subscribe(data => {
         console.log(`progress = ${data}`);
       });
-    }
 
+  }
+
+  onChange(event) {
+    //console.log('event', event);
+    this.subMeta = event;
+  }
+  
   ngOnInit() {
-    console.log('init');
   }
 
   newProject() {
