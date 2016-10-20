@@ -12,7 +12,7 @@
     "webpack:prod": "webpack --progress --config webpack-prod.js --optimize-minimize",
     "start:prod": "npm run ngc:prod && npm run webpack:prod && webpack-dev-server --config webpack-prod.js --port 3000",
     "build:prod": "npm run ngc:prod && npm run webpack:prod",
-    "start:worker": "nodemon worker/worker.ts",
+    "start:worker": "nodemon worker",
     "start:server": "nodemon server"
   },
   "keywords": [
