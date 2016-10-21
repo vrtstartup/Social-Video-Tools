@@ -1,4 +1,5 @@
 import {spawn, spawnSync, execFile} from 'child_process';
+var FfmpegCommand = require('fluent-ffmpeg');
 const path = require('path');
 const config = require('../config.js');
 
@@ -12,7 +13,7 @@ const config = require('../config.js');
  */
 export function ffprobe (logger, filePath ) {
   logger.log('Starting FFprobe');
-
+  
   return new Promise((resolve, reject) => {
 
       const args = [
@@ -53,50 +54,36 @@ export function ffprobe (logger, filePath ) {
   });
 };
 
-/**
- * Runs the FFmpeg executable
- *
- * @param {!{log: !function}} logger - The platform logger
- * @param filePath - full path to file
- * @param workingDir - directory containing target file
- * @returns {Promise}
- */
-export function ffmpeg(logger, fileName, workingDir) {
-  logger.log('Starting FFmpeg');
+export function scaleDown(logger, fileName, workingDir) {
+    const filePath = path.resolve(workingDir,fileName);
+    const lowresName = `source-lowres.${config.format.video.extension}`;
+    const output = path.resolve(workingDir, lowresName);
+    const scaleFilter = `scale='min(${config.videoMaxWidth.toString()}\\,iw):-2'`;
 
-  const scaleFilter = `scale='min(${config.videoMaxWidth.toString()}\\,iw):-2'`;
-
-  return new Promise((resolve:any, reject) => {
-    const filePath = `${workingDir}/${fileName}`;
-    const videoLowres = `source-lowres.${config.format.video.extension}`;
-    const thumbLowres = `${fileName}_LO.${config.format.image.extension}`;
-
-    const args = [
-      '-i', filePath,
-      // '-c:a', 'copy',
-      '-vf', scaleFilter,
-      // '-movflags', '+faststart',
-      videoLowres,
-      // '-vf', 'thumbnail',
-      // '-vframes', '1',
-      // thumbLowres
-    ];
-
-    const opts = {
-      cwd: workingDir
+    const data = {
+      'baseDir': filePath,
+      'videoLowres': lowresName
     };
 
-  const data = {
-    'baseDir': filePath,
-    'videoLowres': videoLowres,
-    'thumb': thumbLowres
-  };
+    return new Promise((resolve:any, reject) => {
+      let command = new FfmpegCommand(filePath, { logger: logger})
+        .videoFilters(scaleFilter)
+        .output(output)
+        .on('error', (err) => { 
+          logger.log("error ocurred", err);
+          reject(err);
+        })
+        .on('start', (commandLine) => {logger.log('Spawned Ffmpeg with command: ' + commandLine)})
+        .on('progress', (msg) => { logger.log(msg)})
+        .on('end', () => {
+          logger.log("Done processing")
+          resolve(data);
+        })
+        .run();
+    });
+    
+    
 
-  spawn('ffmpeg', args, opts)
-      .on('message', msg => logger.log(msg))
-      .on('error', reject)
-      .on('close', resolve(data));
-  });
-}
+};
 
 

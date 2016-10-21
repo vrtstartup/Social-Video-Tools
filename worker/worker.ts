@@ -2,7 +2,7 @@ require('ts-node/register');
 
 import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
-import { ffprobe, ffmpeg } from './services/ffmpeg.service'
+import { ffprobe, ffmpeg, scaleDown } from './services/ffmpeg.service'
 
 // init database 
 // const db = FireBase.database();
@@ -32,9 +32,6 @@ refProcess.on('value', (snapshot) => {
       const file = project.clip.fileName;
       const projectId = snapshot.key;
 
-      console.log(project);
-      console.log(Object.keys(project.clip));
-      console.log(project.clip.fileName);
       // now read the file from the disk
       const filePath = `${dir}/${file}`;
 
@@ -42,18 +39,18 @@ refProcess.on('value', (snapshot) => {
       const probeData = ffprobe( console, filePath )
       .then(() => {
         console.log("valid stream found");
-        
-        // downsample video file
-        ffmpeg( console, file, dir)
+
+        scaleDown(console, file, dir)
           .then((data:any) => {
             const file = data.videoLowres;
             fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file);
             fireBase.resolveJob(jobKey);
+            console.log(data);
             console.log("job done.");
-          }, (err) => {
+          }, (err) =>{
             console.log("encode failed");
             console.log(err);
-          })
+          });
       }, () => {
         console.log("no valid stream found");
       });

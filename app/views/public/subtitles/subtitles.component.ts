@@ -20,7 +20,7 @@ export class SubtitlesComponent implements OnInit {
       };
       
     video: any = { 
-        src: "http://static.videogular.com/assets/videos/videogular.mp4",
+        src: null,
         type: "video/mp4",
         loop: true,
     };
@@ -81,7 +81,12 @@ export class SubtitlesComponent implements OnInit {
     // Post uploaded video
     this.service.makeFileRequest('http://localhost:8080/upload', this.uploadFile.files[0], this.modelProject.projectId)
       .subscribe((data) => {
+        // response holds link to owres video source
         console.log(data);
+        // #todo how do i know when the video is rendered?
+        setTimeout(() =>{
+           this.video.src = data.lowResUrl;
+        }, 3000);
       });
   }
 
