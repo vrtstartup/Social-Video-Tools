@@ -54,8 +54,7 @@ export class SubtitlesComponent implements OnInit {
     this.subMeta = event;
   }
   
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   newProject() {
     // isntantiate new project
@@ -67,6 +66,17 @@ export class SubtitlesComponent implements OnInit {
 
     // attach the new firebase key to the local model
     this.modelProject.projectId = this.firebaseProject.key; 
+
+    // listen for updates
+    this.firebaseProject.child('status/downscaled').on('value', (snapshot) => {
+      const val = snapshot.val();
+      console.log(val);
+      if(val){
+        // show video 
+        console.log(this.modelProject.clip.lowResUrl);
+        this.video.src =  this.modelProject.clip.lowResUrl;
+      }
+    });
   }
 
   update() {
@@ -82,11 +92,7 @@ export class SubtitlesComponent implements OnInit {
     this.service.makeFileRequest('http://localhost:8080/upload', this.uploadFile.files[0], this.modelProject.projectId)
       .subscribe((data) => {
         // response holds link to owres video source
-        console.log(data);
-        // #todo how do i know when the video is rendered?
-        setTimeout(() =>{
-           this.video.src = data.lowResUrl;
-        }, 3000);
+        this.modelProject.clip.lowResUrl = data.lowResUrl
       });
   }
 

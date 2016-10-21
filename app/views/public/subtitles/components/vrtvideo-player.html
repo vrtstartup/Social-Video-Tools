@@ -23,10 +23,12 @@
             </vg-controls>
 
             <video vg-media id="singleVideo" preload="auto" [controls]="controls">
-                <source *ngIf="video" [src]="video.src" [type]="video.type">
+                <source [src]="video.src" [type]="video.type">
             </video>
 
         </vg-player>
         
     </div>
 </div>
+
+subMeta in video-player {{subMeta | json}}

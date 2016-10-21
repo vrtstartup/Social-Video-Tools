@@ -46,9 +46,17 @@ refProcess.on('value', (snapshot) => {
         scaleDown(console, file, dir)
           .then((data:any) => {
             const file = data.videoLowres;
-            fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file);
-            fireBase.resolveJob(jobKey).then( busyProcessing = false );
-            console.log("job done.");
+
+            let operations = [];
+
+            // set properties in firebase
+            operations.push(fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file));
+            operations.push(fireBase.setProjectProperty(projectId, 'status/downscaled', true));
+
+            Promise.all(operations).then(
+              fireBase.resolveJob(jobKey).then(done)
+            );
+            
           }, (err) =>{
             console.log("encode failed");
             console.log(err);
@@ -62,3 +70,7 @@ refProcess.on('value', (snapshot) => {
 }, (errorObject) => {
   console.log(`The read failed: ${errorObject.code}`);
 });
+
+function done(){
+  busyProcessing = false;
+}

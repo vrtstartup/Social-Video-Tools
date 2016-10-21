@@ -5,6 +5,7 @@ export class Project {
     projectPath: string;
 
     clip: any;
+    status: any;
 
     constructor (project?: any) {
       this.projectId = (typeof project === 'undefined') ? "null" : project.projectId;
@@ -18,10 +19,11 @@ export class Project {
         "fileName": (typeof project === 'undefined') ? "null" : project.clip.fileName,
         "lowResFileName": (typeof project === 'undefined') ? "null" : project.clip.lowResFileName,
       }
-    }
 
-    test() {
-      console.log(this.projectId);
+      this.status = {
+        "uploaded": (typeof project === 'undefined') ? false : project.status.uploaded,
+        "downscaled": (typeof project === 'undefined') ? false : project.status.downscaled,
+      }
     }
 
     data() {
@@ -39,6 +41,10 @@ export class Project {
           "lowResUrl": this.clip.lowResUrl,
           "highResUrl": this.clip.highResUrl,
           "fileName": this.clip.fileName,
+        },
+        "status": {
+          "uploaded": this.status.uploaded,
+          "downscaled": this.status.downscaled,
         }
       };
     }
