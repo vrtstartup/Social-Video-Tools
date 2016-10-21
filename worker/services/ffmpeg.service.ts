@@ -82,8 +82,6 @@ export function ffmpeg(logger, fileName, workingDir) {
       // thumbLowres
     ];
 
-    console.log(args);
-
     const opts = {
       cwd: workingDir
     };

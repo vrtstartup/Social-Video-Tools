@@ -29,6 +29,14 @@ export module FireBase {
     });
   }
 
+  export function resolveJob(key, firebaseDb?: any) {
+    // has firebase been initialized? 
+    const db = (typeof firebaseDb === 'undefined') ? database() : firebaseDb;
+
+    // get reference 
+    return db.ref("to-process").child(key).remove();
+  }
+
   export function setHighResFileName(projectId, fileName, firebaseDb?: any) {
     const db = (typeof firebaseDb === 'undefined') ? database() : firebaseDb;
     const refProject = db.ref(`projects/${projectId}`);

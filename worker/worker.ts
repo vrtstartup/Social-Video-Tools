@@ -15,8 +15,10 @@ refProcess.on('value', (snapshot) => {
   // this runs when a new job is created in the queue.
   let docs = snapshot.val();
 
+  // does parsing return data? (e.g. not null etc)
   if(docs) {
-    const firstProject = docs[Object.keys(docs)[0]];
+    const jobKey = Object.keys(docs)[0];
+    const firstProject = docs[jobKey];
 
     // get project ref
     const refProject = db.ref(`projects/${firstProject.projectId}`);
@@ -46,6 +48,7 @@ refProcess.on('value', (snapshot) => {
             FireBase.setLowResFileName(projectId, file, db);
             // #todo
             // resolveJob(projectId);
+            FireBase.resolveJob(jobKey, db);
           }, (err) => {
             console.log("encode failed");
             console.log(err);
