@@ -38,14 +38,12 @@ router.post('/', file, (req: any, res) => {
   const projectId = req.body.projectId;
   const fileMeta = req.files.video[0];
   const fireBase = req.app.get('fireBase');
-
+  // #todo: fix link
+  const lowResUrl = `${req.protocol}://${req.host}:8080/api/video/${projectId}/low`; 
+  
   // update project 
-  fireBase.setHighResFileName(projectId, fileMeta.filename).then(() => {
-      // Great success
-      console.log("Set Highres name");
-    }
-  );
-
+  fireBase.setHighResFileName(projectId, fileMeta.filename);
+  fireBase.setLowResUrl(projectId, lowResUrl);
   fireBase.setProjectBaseDir(projectId, fileMeta.destination);
 
   // queue this project for lowres rendering
@@ -56,7 +54,7 @@ router.post('/', file, (req: any, res) => {
     success: true,
     file: fileMeta,
     projectId: projectId,
-    lowResUrl: `${req.protocol}://${req.host}:8080/api/video/${projectId}/low`, // #todo: fix link
+    lowResUrl: lowResUrl,
   });
 });
 

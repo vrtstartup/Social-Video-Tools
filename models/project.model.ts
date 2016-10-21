@@ -15,7 +15,8 @@ export class Project {
       this.clip = {
         "lowResUrl": (typeof project === 'undefined') ? "null" : project.clip.lowResUrl,
         "highResUrl": (typeof project === 'undefined') ? "null" : project.clip.highResUrl,
-        "fileName": (typeof project === 'undefined') ? "null" : project.clip.fileName
+        "fileName": (typeof project === 'undefined') ? "null" : project.clip.fileName,
+        "lowResFileName": (typeof project === 'undefined') ? "null" : project.clip.lowResFileName,
       }
     }
 

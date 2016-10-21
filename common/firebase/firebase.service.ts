@@ -47,7 +47,12 @@ export class FireBase {
 
   public setLowResFileName(projectId, fileName) {
     const refProject = this.database.ref(`projects/${projectId}`);
-    return refProject.child("clip/lowResUrl").set(fileName);
+    return refProject.child("clip/lowResFileName").set(fileName);
+  }
+
+  public setLowResUrl(projectId, url) {
+    const refProject = this.database.ref(`projects/${projectId}`);
+    return refProject.child("clip/lowResUrl").set(url);
   }
 
   setProjectBaseDir(projectId, dir) {
