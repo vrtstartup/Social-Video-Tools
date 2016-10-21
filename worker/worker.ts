@@ -2,7 +2,7 @@ require('ts-node/register');
 
 import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
-import { ffprobe, ffmpeg, scaleDown } from './services/ffmpeg.service'
+import { ffprobe, scaleDown } from './services/ffmpeg.service'
 
 // init database 
 // const db = FireBase.database();
@@ -12,13 +12,16 @@ const db = fireBase.getDatabase();
 // Listen to process queue
 const refProcess = db.ref('to-process');
 
+let busyProcessing = false;
+
 // Attach an asynchronous callback to read the data at our posts reference
 refProcess.on('value', (snapshot) => {
   // this runs when a new job is created in the queue.
   let docs = snapshot.val();
 
   // does parsing return data? (e.g. not null etc)
-  if(docs) {
+  if(docs && !busyProcessing) {
+    busyProcessing = true;
     const jobKey = Object.keys(docs)[0];
     const firstProject = docs[jobKey];
 
@@ -44,8 +47,7 @@ refProcess.on('value', (snapshot) => {
           .then((data:any) => {
             const file = data.videoLowres;
             fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file);
-            fireBase.resolveJob(jobKey);
-            console.log(data);
+            fireBase.resolveJob(jobKey).then( busyProcessing = false );
             console.log("job done.");
           }, (err) =>{
             console.log("encode failed");
