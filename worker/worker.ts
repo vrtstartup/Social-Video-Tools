@@ -32,11 +32,11 @@ refProcess.on('value', (snapshot) => {
       const file = project.clip.fileName;
       const projectId = snapshot.key;
 
+      console.log(project);
+      console.log(Object.keys(project.clip));
+      console.log(project.clip.fileName);
       // now read the file from the disk
       const filePath = `${dir}/${file}`;
-
-      console.log(project);
-      console.log(file);
 
       // perform an ffprobe 
       const probeData = ffprobe( console, filePath )
@@ -47,8 +47,9 @@ refProcess.on('value', (snapshot) => {
         ffmpeg( console, file, dir)
           .then((data:any) => {
             const file = data.videoLowres;
-            fireBase.setLowResFileName(projectId, file);
+            fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file);
             fireBase.resolveJob(jobKey);
+            console.log("job done.");
           }, (err) => {
             console.log("encode failed");
             console.log(err);

@@ -39,24 +39,27 @@ export class FireBase {
     return this.database.ref("to-process").child(key).remove();
   }
 
-  setHighResFileName(projectId, fileName) {
+  setProjectProperty(projectId, property, value) {
     const refProject = this.database.ref(`projects/${projectId}`);
-    // firebaseRef returns a firebase.promise
-    return refProject.child("clip/fileName").set(fileName);
+    return refProject.child(property).set(value);
   }
 
-  public setLowResFileName(projectId, fileName) {
+  setProjectProperties(projectId, properties) {
     const refProject = this.database.ref(`projects/${projectId}`);
-    return refProject.child("clip/lowResFileName").set(fileName);
+    return this.setReferenceData(refProject, properties);
   }
 
-  public setLowResUrl(projectId, url) {
-    const refProject = this.database.ref(`projects/${projectId}`);
-    return refProject.child("clip/lowResUrl").set(url);
-  }
-
-  setProjectBaseDir(projectId, dir) {
-    const refProject = this.database.ref(`projects/${projectId}`);
-    return refProject.child("baseDir").set(dir);
+  setReferenceData(firebaseRef, data){
+    // recursively update the properties of the data object on the firebase reference
+    // the update operation is destructive when used with nested object values
+    for(var i in data) {
+        if(data.hasOwnProperty(i)){
+          // prop has value 
+          const prop = i;
+          const val = data[i];
+          (typeof val === 'object') ?  this.setReferenceData(firebaseRef.child(i), val) : firebaseRef.child(i).set(val);
+        }
+    }
+    return null;
   }
 }

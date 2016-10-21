@@ -42,9 +42,13 @@ router.post('/', file, (req: any, res) => {
   const lowResUrl = `${req.protocol}://${req.host}:8080/api/video/${projectId}/low`; 
   
   // update project 
-  fireBase.setHighResFileName(projectId, fileMeta.filename);
-  fireBase.setLowResUrl(projectId, lowResUrl);
-  fireBase.setProjectBaseDir(projectId, fileMeta.destination);
+  fireBase.setProjectProperties(projectId, {
+    'baseDir': fileMeta.destination,
+    'clip': {
+      'fileName': fileMeta.filename,
+      'lowResUrl': lowResUrl,
+    }
+  });
 
   // queue this project for lowres rendering
   fireBase.queue(projectId);
