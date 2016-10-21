@@ -48,8 +48,6 @@ refProcess.on('value', (snapshot) => {
           .then((data:any) => {
             const file = data.videoLowres;
             fireBase.setLowResFileName(projectId, file);
-            // #todo
-            // resolveJob(projectId);
             fireBase.resolveJob(jobKey);
           }, (err) => {
             console.log("encode failed");

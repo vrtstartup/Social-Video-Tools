@@ -56,6 +56,7 @@ router.post('/', file, (req: any, res) => {
     success: true,
     file: fileMeta,
     projectId: projectId,
+    lowResUrl: `${req.protocol}://${req.host}:8080/api/video/${projectId}/low`, // #todo: fix link
   });
 });
 

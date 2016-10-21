@@ -68,7 +68,7 @@ export function ffmpeg(logger, fileName, workingDir) {
 
   return new Promise((resolve:any, reject) => {
     const filePath = `${workingDir}/${fileName}`;
-    const videoLowres = `${fileName}_LO.${config.format.video.extension}`;
+    const videoLowres = `source-lowres.${config.format.video.extension}`;
     const thumbLowres = `${fileName}_LO.${config.format.image.extension}`;
 
     const args = [
