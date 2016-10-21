@@ -4,23 +4,28 @@ const firebase = require('firebase');
 const path = require('path');
 const fs = require('fs'); 
 
-export module FireBase {
-  export function database() {
+export class FireBase {
+  public database: any;
+
+  constructor(){
     // this operation is synchronous
     firebase.initializeApp({
       serviceAccount: path.resolve(`./common/firebase/key.json`),
       databaseURL: 'https://socialvideotool.firebaseio.com',
     });
 
-    return firebase.database(); 
+    this.database = firebase.database(); 
   }
 
-  export function queue(projectId, firebaseDb?: any) {
+  getDatabase() {
+    return this.database;
+  }
+
+  queue(projectId, firebaseDb?: any) {
     // set a project up for processing in the firebase queue
 
     // has firebase been initialized? 
-    const db = (typeof firebaseDb === 'undefined') ? database() : firebaseDb;
-    const refQueue = db.ref('to-process');
+    const refQueue = this.database.ref('to-process');
 
     return refQueue.push({ 
       "projectId": projectId,
@@ -29,33 +34,24 @@ export module FireBase {
     });
   }
 
-  export function resolveJob(key, firebaseDb?: any) {
-    // has firebase been initialized? 
-    const db = (typeof firebaseDb === 'undefined') ? database() : firebaseDb;
-
+  resolveJob(key) {
     // get reference 
-    return db.ref("to-process").child(key).remove();
+    return this.database.ref("to-process").child(key).remove();
   }
 
-  export function setHighResFileName(projectId, fileName, firebaseDb?: any) {
-    const db = (typeof firebaseDb === 'undefined') ? database() : firebaseDb;
-    const refProject = db.ref(`projects/${projectId}`);
-
+  setHighResFileName(projectId, fileName) {
+    const refProject = this.database.ref(`projects/${projectId}`);
     // firebaseRef returns a firebase.promise
     return refProject.child("clip/fileName").set(fileName);
   }
 
-  export function setLowResFileName(projectId, fileName, firebaseDb?: any) {
-    const db = (typeof firebaseDb === 'undefined') ? database() : firebaseDb;
-    const refProject = db.ref(`projects/${projectId}`);
-
+  public setLowResFileName(projectId, fileName) {
+    const refProject = this.database.ref(`projects/${projectId}`);
     return refProject.child("clip/lowResUrl").set(fileName);
   }
 
-  export function setProjectBaseDir(projectId, dir, firebaseDb?: any) {
-    const db = (typeof firebaseDb === 'undefined') ? database() : firebaseDb;
-    const refProject = db.ref(`projects/${projectId}`);
-
+  setProjectBaseDir(projectId, dir) {
+    const refProject = this.database.ref(`projects/${projectId}`);
     return refProject.child("baseDir").set(dir);
   }
 }

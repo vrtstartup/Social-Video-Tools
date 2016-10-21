@@ -5,7 +5,9 @@ import { FireBase } from '../common/firebase/firebase.service';
 import { ffprobe, ffmpeg } from './services/ffmpeg.service'
 
 // init database 
-const db = FireBase.database();
+// const db = FireBase.database();
+const fireBase = new FireBase();
+const db = fireBase.getDatabase();
 
 // Listen to process queue
 const refProcess = db.ref('to-process');
@@ -45,10 +47,10 @@ refProcess.on('value', (snapshot) => {
         ffmpeg( console, file, dir)
           .then((data:any) => {
             const file = data.videoLowres;
-            FireBase.setLowResFileName(projectId, file, db);
+            fireBase.setLowResFileName(projectId, file);
             // #todo
             // resolveJob(projectId);
-            FireBase.resolveJob(jobKey, db);
+            fireBase.resolveJob(jobKey);
           }, (err) => {
             console.log("encode failed");
             console.log(err);

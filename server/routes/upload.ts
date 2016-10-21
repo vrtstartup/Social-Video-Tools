@@ -37,19 +37,19 @@ const file = upload.fields([{ name: 'video' }]);
 router.post('/', file, (req: any, res) => {
   const projectId = req.body.projectId;
   const fileMeta = req.files.video[0];
-  const db = req.app.get('db');
+  const fireBase = req.app.get('fireBase');
 
   // update project 
-  FireBase.setHighResFileName(projectId, fileMeta.filename, db).then(() => {
+  fireBase.setHighResFileName(projectId, fileMeta.filename).then(() => {
       // Great success
       console.log("Set Highres name");
     }
   );
 
-  FireBase.setProjectBaseDir(projectId, fileMeta.destination, db);
+  fireBase.setProjectBaseDir(projectId, fileMeta.destination);
 
   // queue this project for lowres rendering
-  FireBase.queue(projectId, db);
+  fireBase.queue(projectId);
 
   // respond to client request
   res.json({
