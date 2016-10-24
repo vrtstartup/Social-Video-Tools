@@ -52,8 +52,7 @@ export class SubtitlesComponent implements OnInit {
     this.modelProject = new Project();
 
     // store new project in Firebase
-    const projectData = this.modelProject.data(); // serialize project data
-    this.firebaseProject = this.firebaseProjects.push(projectData);
+    this.firebaseProject = this.firebaseProjects.push(this.modelProject);
 
     // attach the new firebase key to the local model
     this.modelProject.projectId = this.firebaseProject.key; 
