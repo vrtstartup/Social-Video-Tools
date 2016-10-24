@@ -35,7 +35,7 @@ export class RangeSliderComponent implements OnInit, AfterViewInit, OnChanges {
             // step: 1,
             behaviour: 'drag',
             connect: true,
-            range: { 'min':  0, 'max':  this.video.movielength },
+            range: { 'min':  0, 'max':  parseFloat(this.video.movieLength) },
             tooltips: true,
         });
 

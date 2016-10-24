@@ -13,20 +13,22 @@ import { Project } from '../../../../models/project.model'
 })
 export class SubtitlesComponent implements OnInit {
 
-  video: any = { 
-      src: "http://static.videogular.com/assets/videos/videogular.mp4",
-      type: "video/mp4",
-      loop: true,
-      movielength: 1.37,  
-  };
+    subAr: any = [
+      { start: '0.2', end: '1.2' },
+      ];
+      
+    video: any = { 
+        src: 'http://static.videogular.com/assets/videos/videogular.mp4',
+        type: "video/mp4",
+        loop: true,
+        movieLength: '1.7',
+    };
 
-  subAr: any = [];
-
-  uploadFile: any;
-  firebaseToProcess: FirebaseListObservable<any[]>;
-  firebaseProjects:  FirebaseListObservable<any[]>;
-  firebaseProject: any;
-  modelProject: any;
+    uploadFile: any;
+    firebaseToProcess: FirebaseListObservable<any[]>;
+    firebaseProjects:  FirebaseListObservable<any[]>;
+    firebaseProject: any;
+    modelProject: any;
 
   constructor(
       private http: Http,
@@ -39,17 +41,16 @@ export class SubtitlesComponent implements OnInit {
 
       // subscribe to service observable
       this.service.progress$.subscribe(data => {
-        console.log(`progress = ${data}`);
+        //console.log(`progress = ${data}`);
       });
   }
 
-  ngOnInit() {
-    this.addSub();
-  }
-
   onChange(event) {
-    this.subAr[0] = event;
+    const test = [ event ];
+    this.subAr = test;
   }
+  
+  ngOnInit() {}
 
   newProject() {
     // isntantiate new project
@@ -61,6 +62,15 @@ export class SubtitlesComponent implements OnInit {
 
     // attach the new firebase key to the local model
     this.modelProject.projectId = this.firebaseProject.key; 
+
+    // listen for updates
+    this.firebaseProject.child('status/downscaled').on('value', (snapshot) => {
+      const val = snapshot.val();
+      if(val){
+        // show video 
+        this.video.src = this.modelProject.clip.lowResUrl;
+      }
+    });
   }
 
   update() {
@@ -75,31 +85,13 @@ export class SubtitlesComponent implements OnInit {
     // Post uploaded video
     this.service.makeFileRequest('http://localhost:8080/upload', this.uploadFile.files[0], this.modelProject.projectId)
       .subscribe((data) => {
-        console.log(data);
+        // response holds link to owres video source
+        this.modelProject.clip.lowResUrl = data.lowResUrl
       });
   }
 
   queue() {
     // add a project ID to the 'to-process' list
     this.firebaseToProcess.push({ projectId: this.modelProject.projectId });
-  }
-
-  addSub() {
-    //let emptySub = { start: '0', end: '1.2'};
-    //console.log(typeof this.subAr)
-    console.log('this.subAr =', this.subAr)
-
-    this.subAr.push( { start: '0', end: '1.2'} );
-
-  }
-
-  makeChange(){
-    let subAr = [{start: '0.5', end: '1.2'}];
-    this.subAr = subAr;
-    //this.subAr = Object.assign({}, [{start: '0.5', end: '1.2'}]);
-
-    //  this.subAr = Object.assign(this.subAr, [{start: '0.8', end: '1.2'}] );
-    console.log(this.subAr)
-     //
   }
 }

@@ -2,7 +2,7 @@ require('ts-node/register');
 
 import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
-import { ffprobe, ffmpeg } from './services/ffmpeg.service'
+import { ffprobe, scaleDown } from './services/ffmpeg.service'
 
 // init database 
 // const db = FireBase.database();
@@ -12,13 +12,16 @@ const db = fireBase.getDatabase();
 // Listen to process queue
 const refProcess = db.ref('to-process');
 
+let busyProcessing = false;
+
 // Attach an asynchronous callback to read the data at our posts reference
 refProcess.on('value', (snapshot) => {
   // this runs when a new job is created in the queue.
   let docs = snapshot.val();
 
   // does parsing return data? (e.g. not null etc)
-  if(docs) {
+  if(docs && !busyProcessing) {
+    busyProcessing = true;
     const jobKey = Object.keys(docs)[0];
     const firstProject = docs[jobKey];
 
@@ -32,9 +35,6 @@ refProcess.on('value', (snapshot) => {
       const file = project.clip.fileName;
       const projectId = snapshot.key;
 
-      console.log(project);
-      console.log(Object.keys(project.clip));
-      console.log(project.clip.fileName);
       // now read the file from the disk
       const filePath = `${dir}/${file}`;
 
@@ -42,18 +42,25 @@ refProcess.on('value', (snapshot) => {
       const probeData = ffprobe( console, filePath )
       .then(() => {
         console.log("valid stream found");
-        
-        // downsample video file
-        ffmpeg( console, file, dir)
+
+        scaleDown(console, file, dir)
           .then((data:any) => {
             const file = data.videoLowres;
-            fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file);
-            fireBase.resolveJob(jobKey);
-            console.log("job done.");
-          }, (err) => {
+
+            let operations = [];
+
+            // set properties in firebase
+            operations.push(fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file));
+            operations.push(fireBase.setProjectProperty(projectId, 'status/downscaled', true));
+
+            Promise.all(operations).then(
+              fireBase.resolveJob(jobKey).then(done)
+            );
+            
+          }, (err) =>{
             console.log("encode failed");
             console.log(err);
-          })
+          });
       }, () => {
         console.log("no valid stream found");
       });
@@ -63,3 +70,7 @@ refProcess.on('value', (snapshot) => {
 }, (errorObject) => {
   console.log(`The read failed: ${errorObject.code}`);
 });
+
+function done(){
+  busyProcessing = false;
+}
