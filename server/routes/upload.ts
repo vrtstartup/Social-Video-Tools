@@ -1,4 +1,3 @@
-
 import * as express from 'express';
 import { FireBase } from '../../common/firebase/firebase.service';
 
@@ -8,10 +7,24 @@ const fs = require('fs');
 
 const router = express.Router();
 
+const projectsDir = path.join(__dirname, '../projects/');
+
+// create projectsdirectory if none exists
+if ( !fs.existsSync(projectsDir) ){
+    fs.mkdirSync(projectsDir);
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dest = path.join(__dirname, '/../projects/', req.body.projectId);
     
+    const dest = projectsDir + req.body.projectId;
+    
+    if ( !fs.existsSync(dest) ){
+      fs.mkdirSync(dest);
+    }
+
+    // not sure what this is doing
+    /*
     let stat = null;
 
     try {
@@ -23,14 +36,13 @@ const storage = multer.diskStorage({
     if (stat && !stat.isDirectory()) {
       throw new Error(`Directory cannot be created because an inode of a different type exists at "${dest }"`);
     }
+    */
 
     cb(null, dest);
   },
 });
-const upload = multer({
-  dest: path.join(__dirname, '/../projects'),
-  storage,
-});
+
+const upload = multer({ storage });
 
 const file = upload.fields([{ name: 'video' }]);
 
@@ -63,6 +75,7 @@ router.post('/', file, (req: any, res) => {
     projectId: projectId,
     lowResUrl: lowResUrl,
   });
+
 });
 
 module.exports = router;
