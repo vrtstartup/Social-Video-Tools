@@ -22,7 +22,7 @@
                 <vg-fullscreen></vg-fullscreen>
             </vg-controls>
 
-            <video vg-media id="singleVideo" preload="auto" [controls]="controls">
+            <video vg-media id="singleVideo" preload="auto" [controls]="controls" loop>
                 <source *ngIf="video" [src]="video.src" [type]="video.type">
             </video>
 
@@ -31,4 +31,4 @@
     </div>
 </div>
 
-subMeta in video-player {{subMeta | json}}
+subAr in video-player {{subAr | json}}

@@ -13,7 +13,8 @@
 	<div class="" style="display:flex; flex-direction:row; flex: 0 1 auto; background: #D2D2D2;">
 		<div class="" style=":;">
 			<input type="file" class="btn btn-secondary" name="video" (change)="upload($event)">
-			<button type="button" class="btn btn-secondary">Add Subtitle(U)</button>
+			<button type="button" class="btn btn-secondary" (click)="addSub()">Add Subtitle(U)</button>
+			<button (click)="makeChange()" >makeChange</button>
 		</div>
 	</div>
 
@@ -64,10 +65,10 @@
 		<!--video-->
 		<div class="" style="flex: 0 0 50%;">
 			<div class="" style="flex:1 1 0%; display:flex;flex-wrap:nowrap;flex-direction:column;border:1px solid #f2f2f2;">
-				<range-slider [subMeta]="subMeta" (change)="onChange($event)"></range-slider>
-				<vrtvideo-player [video]="video" [subMeta]="subMeta"></vrtvideo-player>
+				<range-slider [subAr]="subAr" [video]="video" (change)="onChange($event)"></range-slider>
+				<vrtvideo-player [video]="video" [subAr]="subAr"></vrtvideo-player>
 			</div>
-			<div>{{subMeta | json}}</div>
+			<div>{{ subAr | json }}</div>
 		</div>
 
 	</div>

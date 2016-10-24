@@ -13,25 +13,20 @@ import { Project } from '../../../../models/project.model'
 })
 export class SubtitlesComponent implements OnInit {
 
-    subMeta: any = {
-        start: 0.2,
-        end: 1.2,
-        movielength: 2.6,
-      };
-      
-    video: any = { 
-        src: "http://static.videogular.com/assets/videos/videogular.mp4",
-        type: "video/mp4",
-        loop: true,
-    };
+  video: any = { 
+      src: "http://static.videogular.com/assets/videos/videogular.mp4",
+      type: "video/mp4",
+      loop: true,
+      movielength: 1.37,  
+  };
 
-    uploadFile: any;
-    firebaseToProcess: FirebaseListObservable<any[]>;
-    firebaseProjects:  FirebaseListObservable<any[]>;
-    firebaseProject: any;
-    modelProject: any;
-    
-    
+  subAr: any = [];
+
+  uploadFile: any;
+  firebaseToProcess: FirebaseListObservable<any[]>;
+  firebaseProjects:  FirebaseListObservable<any[]>;
+  firebaseProject: any;
+  modelProject: any;
 
   constructor(
       private http: Http,
@@ -46,15 +41,14 @@ export class SubtitlesComponent implements OnInit {
       this.service.progress$.subscribe(data => {
         console.log(`progress = ${data}`);
       });
+  }
 
+  ngOnInit() {
+    this.addSub();
   }
 
   onChange(event) {
-    //console.log('event', event);
-    this.subMeta = event;
-  }
-  
-  ngOnInit() {
+    this.subAr[0] = event;
   }
 
   newProject() {
@@ -88,5 +82,24 @@ export class SubtitlesComponent implements OnInit {
   queue() {
     // add a project ID to the 'to-process' list
     this.firebaseToProcess.push({ projectId: this.modelProject.projectId });
+  }
+
+  addSub() {
+    //let emptySub = { start: '0', end: '1.2'};
+    //console.log(typeof this.subAr)
+    console.log('this.subAr =', this.subAr)
+
+    this.subAr.push( { start: '0', end: '1.2'} );
+
+  }
+
+  makeChange(){
+    let subAr = [{start: '0.5', end: '1.2'}];
+    this.subAr = subAr;
+    //this.subAr = Object.assign({}, [{start: '0.5', end: '1.2'}]);
+
+    //  this.subAr = Object.assign(this.subAr, [{start: '0.8', end: '1.2'}] );
+    console.log(this.subAr)
+     //
   }
 }
