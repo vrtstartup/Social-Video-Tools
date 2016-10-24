@@ -59,8 +59,7 @@ export class SubtitlesComponent implements OnInit {
 
     // listen for updates
     this.firebaseProject.child('status/downscaled').on('value', (snapshot) => {
-      const val = snapshot.val();
-      if(val){
+      if( snapshot.val() ){
         // show video 
         this.video = {
           src: this.modelProject.clip.lowResUrl,
