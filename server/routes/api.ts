@@ -2,7 +2,7 @@ import * as express from 'express';
 import { resolve } from 'path';
 const router = express.Router();
 
-router.get('/video/:videoId/low', (req, res) => {
+router.get('/video/:videoId.mp4', (req, res) => {
   // return a direct link to the static lowres video file
   // provide a project id as parameter
   const videoId = req.params.videoId;
