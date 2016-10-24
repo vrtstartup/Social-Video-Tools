@@ -19,11 +19,7 @@ export class SubtitlesComponent implements OnInit {
         movielength: 2.6,
       };
       
-    video: any = { 
-        src: null,
-        type: "video/mp4",
-        loop: true,
-    };
+    video: any;
 
     uploadFile: any;
     firebaseToProcess: FirebaseListObservable<any[]>;
@@ -70,11 +66,15 @@ export class SubtitlesComponent implements OnInit {
     // listen for updates
     this.firebaseProject.child('status/downscaled').on('value', (snapshot) => {
       const val = snapshot.val();
-      console.log(val);
+      console.log('status/downscaled: ', val);
       if(val){
         // show video 
-        console.log(this.modelProject.clip.lowResUrl);
-        this.video.src =  this.modelProject.clip.lowResUrl;
+        this.video = {
+          src: this.modelProject.clip.lowResUrl,
+          type: "video/mp4",
+          loop: true,
+        };
+
       }
     });
   }

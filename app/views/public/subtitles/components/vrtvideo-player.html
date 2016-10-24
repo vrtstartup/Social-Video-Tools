@@ -23,9 +23,8 @@
             </vg-controls>
 
             <video vg-media id="singleVideo" preload="auto" [controls]="controls">
-                <source [src]="video.src" [type]="video.type">
+                <source *ngFor="let video of sources" [src]="video.src" [type]="video.type">
             </video>
-
         </vg-player>
         
     </div>

@@ -4,72 +4,74 @@
 		<div class="" style=":;">
 			<button type="button" class="btn btn-primary" (click)="newProject()">New</button>
 			<button type="button" class="btn btn-secondary">Open</button>
-			<input type="file" name="video" *ngIf="firebaseProject" (change)="upload($event)">
-			<input type="text" name="video-name" *ngIf="firebaseProject" [(ngModel)]="modelProject.name" (keyup)="update()">
-			<button *ngIf="firebaseProject" (click)="queue()">Render Movie</button>
+			<!--<input type="text" name="video-name" *ngIf="firebaseProject" [(ngModel)]="modelProject.name" (keyup)="update()">-->
 		</div>
 	</div>
 
-	<div class="" style="display:flex; flex-direction:row; flex: 0 1 auto; background: #D2D2D2;">
+	<div *ngIf="firebaseProject" class="" style="display:flex; flex-direction:row; flex: 0 1 auto; background: #D2D2D2;">
 		<div class="" style=":;">
 			<input type="file" class="btn btn-secondary" name="video" (change)="upload($event)">
 			<button type="button" class="btn btn-secondary">Add Subtitle(U)</button>
+			<button type="button" class="btn btn-secondary" (click)="queue()">Render Movie(R)</button>
 		</div>
 	</div>
 
-	<div class="sub-controls" style="display:flex; flex-direction:row; flex: 1;">
+	<div *ngIf="this.video" class="video-panel">
 
-		<div class="" style="flex: 0 0 50%; display:flex;">
+		<div class="sub-controls" style="display:flex; flex-direction:row; flex: 1;">
 
-			<!--subtitles column-->
-			<div class="" style="flex:1 1 20%; display:flex;flex-direction:column;border:1px solid #f2f2f2;">
-				<div class="" style="flex:0;border:1px solid #f2f2f2;">
-					subtitle 1
+			<div class="" style="flex: 0 0 50%; display:flex;">
+
+				<!--subtitles column-->
+				<div class="" style="flex:1 1 20%; display:flex;flex-direction:column;border:1px solid #f2f2f2;">
+					<div class="" style="flex:0;border:1px solid #f2f2f2;">
+						subtitle 1
+					</div>
+					<div class="" style="flex:0;border:1px solid #f2f2f2;">
+						subtitle 2
+					</div>
+					<div class="" style="flex:0;border:1px solid #f2f2f2;">
+						subtitle 3
+					</div>
 				</div>
-				<div class="" style="flex:0;border:1px solid #f2f2f2;">
-					subtitle 2
+
+				<!--template column-->
+				<div class="" style="flex:1 1 20%; display:flex;flex-direction:column;border:1px solid #f2f2f2;">
+					<div class="" style="flex:0;border:1px solid #f2f2f2;">
+						template 1
+					</div>
+					<div class="" style="flex:0;border:1px solid #f2f2f2;">
+						template 2
+					</div>
 				</div>
-				<div class="" style="flex:0;border:1px solid #f2f2f2;">
-					subtitle 3
+
+				<!--inputs column-->
+				<div class="" style="flex:1 1 20%; display:flex;flex-direction:column;border:1px solid #f2f2f2;">
+					<div class="" style="flex:0;border:1px solid #f2f2f2;">
+						inputs here
+					</div>
+					<div class="" style="flex:0;border:1px solid #f2f2f2;">
+						inputs here
+					</div>
+					<div class="" style="flex:0;border:1px solid #f2f2f2;">
+						inputs here
+					</div>
+					<div class="" style="flex:0;border:1px solid #f2f2f2;">
+						inputs here
+					</div>
 				</div>
 			</div>
-
-			<!--template column-->
-			<div class="" style="flex:1 1 20%; display:flex;flex-direction:column;border:1px solid #f2f2f2;">
-				<div class="" style="flex:0;border:1px solid #f2f2f2;">
-					template 1
+			
+			<!--video-->
+			<div class="" style="flex: 0 0 50%;">
+				<div class="" style="flex:1 1 0%; display:flex;flex-wrap:nowrap;flex-direction:column;border:1px solid #f2f2f2;">
+					<range-slider [subMeta]="subMeta" (change)="onChange($event)"></range-slider>
+					<vrtvideo-player [video]="video" [subMeta]="subMeta"></vrtvideo-player>
 				</div>
-				<div class="" style="flex:0;border:1px solid #f2f2f2;">
-					template 2
-				</div>
+				<div>{{subMeta | json}}</div>
 			</div>
 
-			<!--inputs column-->
-			<div class="" style="flex:1 1 20%; display:flex;flex-direction:column;border:1px solid #f2f2f2;">
-				<div class="" style="flex:0;border:1px solid #f2f2f2;">
-					inputs here
-				</div>
-				<div class="" style="flex:0;border:1px solid #f2f2f2;">
-					inputs here
-				</div>
-				<div class="" style="flex:0;border:1px solid #f2f2f2;">
-					inputs here
-				</div>
-				<div class="" style="flex:0;border:1px solid #f2f2f2;">
-					inputs here
-				</div>
-			</div>
 		</div>
-		
-		<!--video-->
-		<div class="" style="flex: 0 0 50%;">
-			<div class="" style="flex:1 1 0%; display:flex;flex-wrap:nowrap;flex-direction:column;border:1px solid #f2f2f2;">
-				<range-slider [subMeta]="subMeta" (change)="onChange($event)"></range-slider>
-				<vrtvideo-player *ngIf="video.src" [video]="video" [subMeta]="subMeta"></vrtvideo-player>
-			</div>
-			<div>{{subMeta | json}}</div>
-		</div>
-
 	</div>
 
 	<div class="" style="display:flex; flex-direction:row;">

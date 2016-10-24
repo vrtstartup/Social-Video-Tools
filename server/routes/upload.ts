@@ -39,10 +39,11 @@ router.post('/', file, (req: any, res) => {
   const fileMeta = req.files.video[0];
   const fireBase = req.app.get('fireBase');
   // #todo: fix link
-  const lowResUrl = `${req.protocol}://${req.host}:8080/api/video/${projectId}/low`; 
+  // const lowResUrl = `${req.protocol}://${req.host}:8080/api/video/${projectId}.mp4`; 
+  const lowResUrl = `${req.protocol}://${req.host}:8080/video/${projectId}/source-lowres.mp4`; 
   
   // update project 
-  fireBase.setProjectProperties(projectId, {
+  let proms = fireBase.setProjectProperties(projectId, {
     'baseDir': fileMeta.destination,
     'clip': {
       'fileName': fileMeta.filename,
@@ -50,8 +51,10 @@ router.post('/', file, (req: any, res) => {
     }
   });
 
-  // queue this project for lowres rendering
-  fireBase.queue(projectId);
+  Promise.all(proms).then(
+    // queue this project for lowres rendering
+    fireBase.queue(projectId)
+  )
 
   // respond to client request
   res.json({

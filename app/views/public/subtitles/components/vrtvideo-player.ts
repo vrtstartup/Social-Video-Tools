@@ -9,6 +9,7 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
     @Input() video;
     @Input() subMeta;
 
+    sources:Array<Object>;
     controls:boolean = false;
     autoplay:boolean = false;
     preload:string = 'auto';
@@ -17,45 +18,26 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
 
     constructor(api:VgAPI) {
         this.fsAPI = VgFullscreenAPI;
-
         this.api = api;
-
-        console.log(api);
+        this.sources = [];
     }
 
     ngOnInit(){}
     ngAfterViewInit(){}
 
     ngOnChanges(){
-        console.log("onChanges triggered");
-        //console.log('onchange', this.subMeta);
-        //console.log( parseFloat(this.subMeta.start) );
+        if(this.video){
+          this.sources = [this.video];
+        }
+
         let seektime = ( parseFloat(this.subMeta.start) / parseFloat(this.subMeta.movielength) * 100 ) ;
-        //console.log(seektime);
-
         this.api.seekTime( seektime );
-        this.api.play();
+        // conflict
+        // this.api.play();
     }
 
-    // ngDoCheck() {
-    //     // check if the src property on the source element has changed
-    //     if(this.video.currentSource != this.video.src){
-    //         //  do something
-    //         this.video.currentSource = this.video.src;
-    //     }
-    //  }
-
-    // where is this being referenced?
     onPlayerReady() {
-        // this.video.currentSource = this.video.src;
+        // console.log("player ready");
     }
-    // vgChangeSource() {
-    //     console.log("TEST");
-    // }
-
-    // setVideo() {
-    //     // this.api.stop();
-    //     // this.
-    // }
 
 }
