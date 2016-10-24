@@ -52,14 +52,16 @@ export class FireBase {
   setReferenceData(firebaseRef, data){
     // recursively update the properties of the data object on the firebase reference
     // the update operation is destructive when used with nested object values
+    let arrPromises = [];
+
     for(var i in data) {
         if(data.hasOwnProperty(i)){
           // prop has value 
           const prop = i;
           const val = data[i];
-          (typeof val === 'object') ?  this.setReferenceData(firebaseRef.child(i), val) : firebaseRef.child(i).set(val);
+          (typeof val === 'object') ?  this.setReferenceData(firebaseRef.child(i), val) : arrPromises.push(firebaseRef.child(i).set(val));
         }
     }
-    return null;
+    return arrPromises;
   }
 }
