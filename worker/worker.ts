@@ -21,6 +21,7 @@ refProcess.on('value', (snapshot) => {
 
   // does parsing return data? (e.g. not null etc)
   if(docs && !busyProcessing) {
+    console.log("lets process");
     busyProcessing = true;
     const jobKey = Object.keys(docs)[0];
     const firstProject = docs[jobKey];
@@ -28,7 +29,7 @@ refProcess.on('value', (snapshot) => {
     // get project ref
     const refProject = db.ref(`projects/${firstProject.projectId}`);
     // #todo: projectId frontend request
-    refProject.on('value', (snapshot) => {
+    refProject.once('value', (snapshot) => {
       // we have metadata
       const project = snapshot.val();
       const dir = project.baseDir;
@@ -37,11 +38,13 @@ refProcess.on('value', (snapshot) => {
 
       // now read the file from the disk
       const filePath = `${dir}/${file}`;
+      console.log("got project data");
 
       // perform an ffprobe 
       const probeData = ffprobe( console, filePath )
       .then(() => {
-        console.log("valid stream found");
+
+        fireBase.resolveJob(jobKey);
 
         scaleDown(console, file, dir)
           .then((data:any) => {
@@ -53,9 +56,7 @@ refProcess.on('value', (snapshot) => {
             operations.push(fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file));
             operations.push(fireBase.setProjectProperty(projectId, 'status/downscaled', true));
 
-            Promise.all(operations).then(
-              fireBase.resolveJob(jobKey).then(done)
-            );
+            Promise.all(operations).then(done);
             
           }, (err) =>{
             console.log("encode failed");
@@ -72,5 +73,6 @@ refProcess.on('value', (snapshot) => {
 });
 
 function done(){
+  console.log("Done, new job possible");
   busyProcessing = false;
 }
