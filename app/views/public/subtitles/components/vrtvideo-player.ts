@@ -7,7 +7,7 @@ import { VgAPI, VgFullscreenAPI } from 'videogular2/core';
 })
 export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
     @Input() video;
-    @Input() subMeta;
+    @Input() subAr;
 
     sources:Array<Object>;
     controls:boolean = false;
@@ -29,8 +29,7 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
         if(this.video){
           this.sources = [this.video];
         }
-
-        let seektime = ( parseFloat(this.subMeta.start) / parseFloat(this.subMeta.movielength) * 100 ) ;
+        let seektime = ( parseFloat(this.subAr[0].start) / parseFloat(this.video.movieLength) * 100 ) ;
         this.api.seekTime( seektime );
         // conflict
         // this.api.play();

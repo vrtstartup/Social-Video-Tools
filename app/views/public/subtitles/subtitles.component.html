@@ -61,19 +61,18 @@
 					</div>
 				</div>
 			</div>
-			
-			<!--video-->
-			<div class="" style="flex: 0 0 50%;">
-				<div class="" style="flex:1 1 0%; display:flex;flex-wrap:nowrap;flex-direction:column;border:1px solid #f2f2f2;">
-					<range-slider [subMeta]="subMeta" (change)="onChange($event)"></range-slider>
-					<vrtvideo-player [video]="video" [subMeta]="subMeta"></vrtvideo-player>
-				</div>
-				<div>{{subMeta | json}}</div>
+		</div>
+		
+		<!--video-->
+		<div class="" style="flex: 0 0 50%;">
+			<div class="" style="flex:1 1 0%; display:flex;flex-wrap:nowrap;flex-direction:column;border:1px solid #f2f2f2;">
+				<range-slider [subAr]="subAr" [video]="video" (change)="onChange($event)"></range-slider>
+				<vrtvideo-player [video]="video" [subAr]="subAr"></vrtvideo-player>
 			</div>
+			<div>{{subAr | json}}</div>
+		</div>
 
 		</div>
-	</div>
 
-	<div class="" style="display:flex; flex-direction:row;">
-	</div>
+	<div class="" style="display:flex; flex-direction:row;"></div>
 </div>

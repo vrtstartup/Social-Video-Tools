@@ -13,11 +13,9 @@ import { Project } from '../../../../models/project.model'
 })
 export class SubtitlesComponent implements OnInit {
 
-    subMeta: any = {
-        start: 0.2,
-        end: 1.2,
-        movielength: 2.6,
-      };
+    subAr: any = [
+      { start: '0.2', end: '1.2' },
+      ];
       
     video: any;
 
@@ -26,8 +24,6 @@ export class SubtitlesComponent implements OnInit {
     firebaseProjects:  FirebaseListObservable<any[]>;
     firebaseProject: any;
     modelProject: any;
-    
-    
 
   constructor(
       private http: Http,
@@ -40,14 +36,13 @@ export class SubtitlesComponent implements OnInit {
 
       // subscribe to service observable
       this.service.progress$.subscribe(data => {
-        console.log(`progress = ${data}`);
+        //console.log(`progress = ${data}`);
       });
-
   }
 
   onChange(event) {
-    //console.log('event', event);
-    this.subMeta = event;
+    const test = [ event ];
+    this.subAr = test;
   }
   
   ngOnInit() {}
@@ -66,15 +61,14 @@ export class SubtitlesComponent implements OnInit {
     // listen for updates
     this.firebaseProject.child('status/downscaled').on('value', (snapshot) => {
       const val = snapshot.val();
-      console.log('status/downscaled: ', val);
       if(val){
         // show video 
         this.video = {
           src: this.modelProject.clip.lowResUrl,
           type: "video/mp4",
           loop: true,
+          movieLength: 360, // #todo: get a real value for this
         };
-
       }
     });
   }
