@@ -20,7 +20,7 @@ export class FireBase {
   getDatabase() {
     return this.database;
   }
-
+  
   queue(projectId, firebaseDb?: any) {
     // set a project up for processing in the firebase queue
 

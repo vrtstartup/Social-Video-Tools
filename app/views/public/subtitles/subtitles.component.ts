@@ -58,17 +58,7 @@ export class SubtitlesComponent implements OnInit {
     this.modelProject.projectId = this.firebaseProject.key; 
 
     // listen for updates
-    this.firebaseProject.child('status/downscaled').on('value', (snapshot) => {
-      if( snapshot.val() ){
-        // show video 
-        this.video = {
-          src: this.modelProject.clip.lowResUrl,
-          type: "video/mp4",
-          loop: true,
-          movieLength: 360, // #todo: get a real value for this
-        };
-      }
-    });
+    this.listenDownscale();
   }
 
   update() {
@@ -91,5 +81,20 @@ export class SubtitlesComponent implements OnInit {
   queue() {
     // add a project ID to the 'to-process' list
     this.firebaseToProcess.push({ projectId: this.modelProject.projectId });
+  }
+
+  listenDownscale() {
+    this.firebaseProject.child('status/downscaled').on('value', (snapshot) => {
+      // status/downscaled will be true when the job has been handled
+      if( snapshot.val() ){
+        // show video 
+        this.video = {
+          src: this.modelProject.clip.lowResUrl,
+          type: "video/mp4",
+          loop: true,
+          movieLength: 360, // #todo: get a real value for this
+        };
+      }
+    });
   }
 }
