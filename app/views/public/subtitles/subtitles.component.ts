@@ -16,12 +16,14 @@ export class SubtitlesComponent implements OnInit {
       { start: '0.2', end: '1.2' },
     ];
 
+    af: AngularFire;
     projectTemplate: Object; //this is the object we use to initialize new projects in firebase
     video: any;
     uploadFile: any;
     firebaseToProcess: FirebaseListObservable<any[]>; // this is the 'to-process' queue object in firebase
     firebaseProjects:  FirebaseListObservable<any[]>; // this is the 'projects' object in firebase
     firebaseProject: any; // this is the firebase project object we're currently working on
+    firebaseSubtitles:  FirebaseListObservable<any[]>; 
     project: any; // this is the ngModel we use to update, receive and bind firebase data
 
   constructor(
@@ -29,11 +31,26 @@ export class SubtitlesComponent implements OnInit {
       private service: UploadService,
       af: AngularFire
     ) {
+      this.af = af;
+
+      this.video = { 
+        lowResUrl: ''
+      }
       // set project template 
       this.projectTemplate = {
         name: '',
         clip: {},
-        subtitles: {},
+        subtitles: {
+          initial: {
+            text: 'Dit is een test',
+            start: '0.20',
+            end: '1.20',
+            options: {
+              "fade": true,
+              "size": 20
+            }
+          }
+        },
         status: {
           initiated: true,
           uploaded:'',
@@ -51,7 +68,6 @@ export class SubtitlesComponent implements OnInit {
       });
   }
 
-  onChange(event) {}
   ngOnInit() {}
 
   newProject() {
@@ -61,6 +77,7 @@ export class SubtitlesComponent implements OnInit {
     // store new project in Firebase
     this.firebaseProjects.push(this.project).then((ref) => {
       this.firebaseProject = ref;
+      this.firebaseSubtitles = this.af.database.list(`/projects/${this.firebaseProject.key}/subtitles`);
       this.listen();
     });
   }
@@ -73,7 +90,21 @@ export class SubtitlesComponent implements OnInit {
   listen() {
     this.firebaseProject.on('value', (snapshot) => {
       this.project = snapshot.val();
+
+
+      // if(this.project.clip && this.project.clip.hasOwnProperty('lowResUrl') && this.video.lowResUrl !== this.project.clip.lowResUrl) {
+      //   console.log("setting video", this.project.clip);
+      //   this.video = this.project.clip;
+      // }
     })
+  }
+
+  updateSubtitles(event) { 
+    const data = event;
+    const key = event.$key;
+    delete data.$key;
+    delete data.$exists;
+    this.firebaseSubtitles.update(key, event);
   }
 
   upload($event) {
@@ -96,8 +127,9 @@ export class SubtitlesComponent implements OnInit {
 
   addSubtitle() {
     this.firebaseProject.child('subtitles').push({
-      start: '00:00',
-      end: '00:30',
+      text: 'Dit is een test',
+      start: '0.2',
+      end: '1.2',
       options: {
         "fade": true,
         "size": 20

@@ -28,6 +28,8 @@ export class RangeSliderComponent implements OnInit, AfterViewInit, OnChanges {
     ngOnInit() {
         // $( this.el.nativeElement ).find('button').on('click', function(){ alert('it works'); })
 
+        console.log(this.subAr);
+
         this.rangeSlider = document.getElementById('range-slider');
 
         noUiSlider.create(this.rangeSlider, {
@@ -45,7 +47,6 @@ export class RangeSliderComponent implements OnInit, AfterViewInit, OnChanges {
             this.subAr[0].end = this.rangeSlider.noUiSlider.get()[1]
 
             this.change.emit(Object.assign({}, this.subAr[0]));
-            
         });
         console.log( 'this.rangeSlider =', this.rangeSlider );
         console.log( 'this.rangeSlider.noUiSlider =', this.rangeSlider.noUiSlider );

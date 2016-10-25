@@ -24,14 +24,8 @@
 
 				<!--subtitles column-->
 				<div class="" style="flex:1 1 20%; display:flex;flex-direction:column;border:1px solid #f2f2f2;">
-					<div class="" style="flex:0;border:1px solid #f2f2f2;">
-						subtitle 1
-					</div>
-					<div class="" style="flex:0;border:1px solid #f2f2f2;">
-						subtitle 2
-					</div>
-					<div class="" style="flex:0;border:1px solid #f2f2f2;">
-						subtitle 3
+					<div *ngFor="let sub of firebaseSubtitles | async" class="" style="flex:0;border:1px solid #f2f2f2;">
+						{{sub.text}}
 					</div>
 				</div>
 
@@ -66,10 +60,10 @@
 		<!--video-->
 		<div class="" style="flex: 0 0 50%;">
 			<div class="" style="flex:1 1 0%; display:flex;flex-wrap:nowrap;flex-direction:column;border:1px solid #f2f2f2;">
-				<range-slider [subAr]="subAr" [video]="project.clip" (change)="onChange($event)"></range-slider>
-				<vrtvideo-player [video]="project.clip" [subAr]="subAr"></vrtvideo-player>
+				<range-slider [subAr]="firebaseSubtitles | async" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>
+				<vrtvideo-player [video]="project.clip" [subAr]="firebaseSubtitles | async"></vrtvideo-player>
 			</div>
-			<div>{{subAr | json}}</div>
+			<div>{{firebaseSubtitles | async | json}}</div>
 		</div>
 
 		</div>
