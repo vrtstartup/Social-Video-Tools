@@ -11,20 +11,20 @@ const db = fireBase.getDatabase();
 
 // Listen to process queue
 const refProcess = db.ref('to-process');
-
 let busyProcessing = false;
+let jobKey;
 
 // Attach an asynchronous callback to read the data at our posts reference
 refProcess.on('value', (snapshot) => {
   // this runs when a new job is created in the queue.
-  let docs = snapshot.val();
+  const jobs = snapshot.val();
 
   // does parsing return data? (e.g. not null etc)
-  if(docs && !busyProcessing) {
+  if(jobs && !busyProcessing) {
     console.log("lets process");
     busyProcessing = true;
-    const jobKey = Object.keys(docs)[0];
-    const firstProject = docs[jobKey];
+    jobKey = Object.keys(jobs)[0];
+    const firstProject = jobs[jobKey];
 
     // get project ref
     const refProject = db.ref(`projects/${firstProject.projectId}`);
@@ -43,21 +43,18 @@ refProcess.on('value', (snapshot) => {
       // perform an ffprobe 
       const probeData = ffprobe( console, filePath )
       .then(() => {
-
-        fireBase.resolveJob(jobKey);
-
-        scaleDown(console, file, dir)
+        scaleDown(messageHandler, file, dir)
           .then((data:any) => {
             const file = data.videoLowres;
-
             let operations = [];
 
             // set properties in firebase
             operations.push(fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file));
             operations.push(fireBase.setProjectProperty(projectId, 'status/downscaled', true));
 
-            Promise.all(operations).then(done);
-            
+            Promise.all(operations)
+              .then(fireBase.resolveJob(jobKey))
+              .then(done);
           }, (err) =>{
             console.log("encode failed");
             console.log(err);
@@ -75,4 +72,12 @@ refProcess.on('value', (snapshot) => {
 function done(){
   console.log("Done, new job possible");
   busyProcessing = false;
+}
+
+function messageHandler(message) {
+  // #todo: log to some general log handler here (i.e. papertrail)
+  if(typeof message == 'object' && message.hasOwnProperty("percent")) {
+    // this is an ffmpeg progress message
+    refProcess.child(jobKey).update({'progress': message.percent});
+  }
 }

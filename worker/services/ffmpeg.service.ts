@@ -54,7 +54,7 @@ export function ffprobe (logger, filePath ) {
   });
 };
 
-export function scaleDown(logger, fileName, workingDir) {
+export function scaleDown(messageHandler, fileName, workingDir) {
     const filePath = path.resolve(workingDir,fileName);
     const lowresName = `source-lowres.${config.format.video.extension}`;
     const output = path.resolve(workingDir, lowresName);
@@ -66,17 +66,17 @@ export function scaleDown(logger, fileName, workingDir) {
     };
 
     return new Promise((resolve:any, reject) => {
-      let command = new FfmpegCommand(filePath, { logger: logger})
+      let command = new FfmpegCommand(filePath, { logger: console})
         .videoFilters(scaleFilter)
         .output(output)
         .on('error', (err) => { 
-          logger.log("error ocurred", err);
+          console.log("error ocurred", err);
           reject(err);
         })
-        .on('start', (commandLine) => {logger.log('Spawned Ffmpeg with command: ' + commandLine)})
-        .on('progress', (msg) => { logger.log(msg)})
+        .on('start', (commandLine) => {console.log('Spawned Ffmpeg with command: ' + commandLine)})
+        .on('progress', (msg) => { messageHandler(msg)})
         .on('end', () => {
-          logger.log("Done processing")
+          console.log("Done processing")
           resolve(data);
         })
         .run();
