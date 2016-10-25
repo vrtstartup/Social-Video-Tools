@@ -14,7 +14,7 @@ const refProcess = db.ref('to-process');
 let busyProcessing = false;
 let jobKey;
 
-// Attach an asynchronous callback to read the data at our posts reference
+// listen to the queue object 
 refProcess.on('value', (snapshot) => {
   // this runs when a new job is created in the queue.
   const jobs = snapshot.val();
@@ -26,6 +26,9 @@ refProcess.on('value', (snapshot) => {
     jobKey = Object.keys(jobs)[0];
     const firstProject = jobs[jobKey];
 
+    // update the queue item status
+    setInProgress(jobKey);
+    
     // get project ref
     const refProject = db.ref(`projects/${firstProject.projectId}`);
     // #todo: projectId frontend request
@@ -81,3 +84,8 @@ function messageHandler(message) {
     refProcess.child(jobKey).update({'progress': message.percent});
   }
 }
+
+function setInProgress(jobKey) {
+  refProcess.child(jobKey).update({'status': 'in progress'});
+}
+
