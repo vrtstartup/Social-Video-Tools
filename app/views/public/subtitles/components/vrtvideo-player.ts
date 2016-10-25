@@ -29,6 +29,7 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
         if(this.video){
           this.sources = [this.video];
         }
+        
         let seektime = ( parseFloat(this.subAr[0].start) / parseFloat(this.video.movieLength) * 100 ) ;
         this.api.seekTime( seektime );
         // conflict

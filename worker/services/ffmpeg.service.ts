@@ -44,7 +44,8 @@ export function ffprobe (filePath, outputHandler ) {
           else {
             // valid video stream found, propagate desired data 
             outputHandler({
-              'movieLength': outputObj.format.duration
+              'movieLength': outputObj.format.duration,
+              'type': 'video/mp4',
             });
 
             console.log('Valid video stream found. FFprobe finished.');

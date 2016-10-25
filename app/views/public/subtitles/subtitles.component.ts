@@ -14,21 +14,33 @@ export class SubtitlesComponent implements OnInit {
 
     subAr: any = [
       { start: '0.2', end: '1.2' },
-      ];
-      
-    video: any;
+    ];
 
+    projectTemplate: Object; //this is the object we use to initialize new projects in firebase
+    video: any;
     uploadFile: any;
-    firebaseToProcess: FirebaseListObservable<any[]>;
-    firebaseProjects:  FirebaseListObservable<any[]>;
-    firebaseProject: any;
-    modelProject: any;
+    firebaseToProcess: FirebaseListObservable<any[]>; // this is the 'to-process' queue object in firebase
+    firebaseProjects:  FirebaseListObservable<any[]>; // this is the 'projects' object in firebase
+    firebaseProject: any; // this is the firebase project object we're currently working on
+    project: any; // this is the ngModel we use to update, receive and bind firebase data
 
   constructor(
       private http: Http,
       private service: UploadService,
       af: AngularFire
     ) {
+      // set project template 
+      this.projectTemplate = {
+        name: '',
+        clip: {},
+        subtitles: {},
+        status: {
+          initiated: true,
+          uploaded:'',
+          downscaled: '',
+        }
+      };
+
       // init AngularFire
       this.firebaseToProcess = af.database.list('/to-process');
       this.firebaseProjects = af.database.list('/projects');
@@ -40,18 +52,14 @@ export class SubtitlesComponent implements OnInit {
   }
 
   onChange(event) {}
-  
   ngOnInit() {}
 
   newProject() {
     // Bound UI elements need to be initiated
-    this.modelProject = {
-      name: '',
-      clip: {}
-    };
+    this.project = this.projectTemplate;
 
     // store new project in Firebase
-    this.firebaseProjects.push(this.modelProject).then((ref) => {
+    this.firebaseProjects.push(this.project).then((ref) => {
       this.firebaseProject = ref;
       this.listen();
     });
@@ -59,22 +67,12 @@ export class SubtitlesComponent implements OnInit {
 
   update() {
     // update firebase reference with local project model
-    this.firebaseProject.update( this.modelProject );
+    this.firebaseProject.update( this.project );
   }
 
   listen() {
     this.firebaseProject.on('value', (snapshot) => {
-      this.modelProject = snapshot.val();
-
-      if(this.modelProject.status.downscaled) {
-        // project has been downscaled, show video
-        this.video = {
-          src: this.modelProject.clip.lowResUrl,
-          type: "video/mp4",
-          loop: true,
-          movieLength: parseFloat(this.modelProject.clip.movieLength)
-        }
-      }
+      this.project = snapshot.val();
     })
   }
 
@@ -94,5 +92,16 @@ export class SubtitlesComponent implements OnInit {
     // add a project ID to the 'to-process' list
     const key = this.firebaseProject.key;
     this.firebaseToProcess.push({ projectId: key});
+  }
+
+  addSubtitle() {
+    this.firebaseProject.child('subtitles').push({
+      start: '00:00',
+      end: '00:30',
+      options: {
+        "fade": true,
+        "size": 20
+      }
+    })
   }
 }

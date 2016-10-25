@@ -4,19 +4,19 @@
 		<div class="" style=":;">
 			<button type="button" class="btn btn-primary" (click)="newProject()">New</button>
 			<button type="button" class="btn btn-secondary">Open</button>
-			<!--<input type="text" name="video-name" *ngIf="firebaseProject" [(ngModel)]="modelProject.name" (keyup)="update()">-->
+			<!--<input type="text" name="video-name" *ngIf="firebaseProject" [(ngModel)]="project.name" (keyup)="update()">-->
 		</div>
 	</div>
 
 	<div *ngIf="firebaseProject" class="" style="display:flex; flex-direction:row; flex: 0 1 auto; background: #D2D2D2;">
 		<div class="" style=":;">
 			<input type="file" class="btn btn-secondary" name="video" (change)="upload($event)">
-			<button type="button" class="btn btn-secondary">Add Subtitle(U)</button>
-			<button type="button" class="btn btn-secondary" (click)="queue()">Render Movie(R)</button>
+			<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="addSubtitle()">Add Subtitle(U)</button>
+			<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="queue()">Render Movie(R)</button>
 		</div>
 	</div>
 
-	<div *ngIf="this.video" class="video-panel">
+	<div *ngIf="project && project.status.downscaled" class="video-panel">
 
 		<div class="sub-controls" style="display:flex; flex-direction:row; flex: 1;">
 
@@ -66,8 +66,8 @@
 		<!--video-->
 		<div class="" style="flex: 0 0 50%;">
 			<div class="" style="flex:1 1 0%; display:flex;flex-wrap:nowrap;flex-direction:column;border:1px solid #f2f2f2;">
-				<range-slider [subAr]="subAr" [video]="video" (change)="onChange($event)"></range-slider>
-				<vrtvideo-player [video]="video" [subAr]="subAr"></vrtvideo-player>
+				<range-slider [subAr]="subAr" [video]="project.clip" (change)="onChange($event)"></range-slider>
+				<vrtvideo-player [video]="project.clip" [subAr]="subAr"></vrtvideo-player>
 			</div>
 			<div>{{subAr | json}}</div>
 		</div>
