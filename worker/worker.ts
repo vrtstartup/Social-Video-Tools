@@ -12,7 +12,10 @@ const db = fireBase.getDatabase();
 // Listen to process queue
 const refProcess = db.ref('to-process');
 let busyProcessing = false;
+
+// #todo: the way these variables are scoped isn't that great
 let jobKey;
+let projectId;
 
 // listen to the queue object 
 refProcess.on('value', (snapshot) => {
@@ -28,7 +31,7 @@ refProcess.on('value', (snapshot) => {
 
     // update the queue item status
     setInProgress(jobKey);
-    
+
     // get project ref
     const refProject = db.ref(`projects/${firstProject.projectId}`);
     // #todo: projectId frontend request
@@ -37,14 +40,14 @@ refProcess.on('value', (snapshot) => {
       const project = snapshot.val();
       const dir = project.baseDir;
       const file = project.clip.fileName;
-      const projectId = snapshot.key;
+      projectId = snapshot.key;
 
       // now read the file from the disk
       const filePath = `${dir}/${file}`;
       console.log("got project data");
 
       // perform an ffprobe 
-      const probeData = ffprobe( console, filePath )
+      const probeData = ffprobe(filePath, ffprobeHandler)
       .then(() => {
         scaleDown(messageHandler, file, dir)
           .then((data:any) => {
@@ -89,3 +92,7 @@ function setInProgress(jobKey) {
   refProcess.child(jobKey).update({'status': 'in progress'});
 }
 
+function ffprobeHandler(data) {
+  // update firebase with lip metadata
+  fireBase.setProjectProperties(projectId, {clip: data});
+}

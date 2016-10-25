@@ -11,8 +11,8 @@ const config = require('../config.js');
  * @param workingDir - directory containing target file
  * @returns {Promise}
  */
-export function ffprobe (logger, filePath ) {
-  logger.log('Starting FFprobe');
+export function ffprobe (filePath, outputHandler ) {
+  console.log('Starting FFprobe');
   
   return new Promise((resolve, reject) => {
 
@@ -27,9 +27,9 @@ export function ffprobe (logger, filePath ) {
       const cb = (error, stdout, stderr) => {
           if (error) {
               reject(error);
-              logger.log("There has been an error performing ffprobe");
-              logger.log(error);
-              logger.log(stderr);
+              console.log("There has been an error performing ffprobe");
+              console.log(error);
+              console.log(stderr);
           }
 
           const outputObj = JSON.parse(stdout);
@@ -42,8 +42,13 @@ export function ffprobe (logger, filePath ) {
           if (!hasVideoStream)
               reject('FFprobe: no valid video stream found');
           else {
-              logger.log('Valid video stream found. FFprobe finished.');
-              resolve();
+            // valid video stream found, propagate desired data 
+            outputHandler({
+              'movieLength': outputObj.format.duration
+            });
+
+            console.log('Valid video stream found. FFprobe finished.');
+            resolve();
           }
       };
 

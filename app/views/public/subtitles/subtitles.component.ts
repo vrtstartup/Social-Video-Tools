@@ -4,7 +4,6 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
 import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/video.service';
-import { Project } from '../../../../models/project.model'
 
 @Component({
     providers: [ UploadService ],
@@ -40,25 +39,22 @@ export class SubtitlesComponent implements OnInit {
       });
   }
 
-  onChange(event) {
-    const test = [ event ];
-    this.subAr = test;
-  }
+  onChange(event) {}
   
   ngOnInit() {}
 
   newProject() {
-    // isntantiate new project
-    this.modelProject = new Project();
+    // Bound UI elements need to be initiated
+    this.modelProject = {
+      name: '',
+      clip: {}
+    };
 
     // store new project in Firebase
-    this.firebaseProject = this.firebaseProjects.push(this.modelProject);
-
-    // attach the new firebase key to the local model
-    this.modelProject.projectId = this.firebaseProject.key; 
-
-    // listen for updates
-    this.listenDownscale();
+    this.firebaseProjects.push(this.modelProject).then((ref) => {
+      this.firebaseProject = ref;
+      this.listen();
+    });
   }
 
   update() {
@@ -66,35 +62,37 @@ export class SubtitlesComponent implements OnInit {
     this.firebaseProject.update( this.modelProject );
   }
 
+  listen() {
+    this.firebaseProject.on('value', (snapshot) => {
+      this.modelProject = snapshot.val();
+
+      if(this.modelProject.status.downscaled) {
+        // project has been downscaled, show video
+        this.video = {
+          src: this.modelProject.clip.lowResUrl,
+          type: "video/mp4",
+          loop: true,
+          movieLength: parseFloat(this.modelProject.clip.movieLength)
+        }
+      }
+    })
+  }
+
   upload($event) {
     // store the new file 
     this.uploadFile = $event.target;
 
     // Post uploaded video
-    this.service.makeFileRequest('http://localhost:8080/upload', this.uploadFile.files[0], this.modelProject.projectId)
+    this.service.makeFileRequest('http://localhost:8080/upload', this.uploadFile.files[0], this.firebaseProject.key)
       .subscribe((data) => {
         // response holds link to owres video source
-        this.modelProject.clip.lowResUrl = data.lowResUrl
+        this.firebaseProject.child('clip').update({lowResUrl: data.lowResUrl});
       });
   }
 
   queue() {
     // add a project ID to the 'to-process' list
-    this.firebaseToProcess.push({ projectId: this.modelProject.projectId });
-  }
-
-  listenDownscale() {
-    this.firebaseProject.child('status/downscaled').on('value', (snapshot) => {
-      // status/downscaled will be true when the job has been handled
-      if( snapshot.val() ){
-        // show video 
-        this.video = {
-          src: this.modelProject.clip.lowResUrl,
-          type: "video/mp4",
-          loop: true,
-          movieLength: 360, // #todo: get a real value for this
-        };
-      }
-    });
+    const key = this.firebaseProject.key;
+    this.firebaseToProcess.push({ projectId: key});
   }
 }
