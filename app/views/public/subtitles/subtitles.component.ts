@@ -88,15 +88,13 @@ export class SubtitlesComponent implements OnInit {
   }
 
   listen() {
-    this.firebaseProject.on('value', (snapshot) => {
-      this.project = snapshot.val();
-
-
-      // if(this.project.clip && this.project.clip.hasOwnProperty('lowResUrl') && this.video.lowResUrl !== this.project.clip.lowResUrl) {
-      //   console.log("setting video", this.project.clip);
-      //   this.video = this.project.clip;
-      // }
-    })
+    // when data in firebase updates, propagate it to our working model
+    // only update the relevant nodes
+    this.firebaseProject.on('child_changed', (snapshot) => { 
+      const child = snapshot.key;
+      const data = snapshot.val();
+      this.project[child] = data;
+    });
   }
 
   updateSubtitles(event) { 
