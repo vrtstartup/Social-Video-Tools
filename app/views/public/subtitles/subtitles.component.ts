@@ -11,11 +11,6 @@ import { UploadService } from '../../../common/services/video.service';
     templateUrl: 'subtitles.component.html',
 })
 export class SubtitlesComponent implements OnInit {
-
-    subAr: any = [
-      { start: '0.2', end: '1.2' },
-    ];
-
     af: AngularFire;
     projectTemplate: Object; //this is the object we use to initialize new projects in firebase
     video: any;
