@@ -23,7 +23,7 @@ export class SubtitlesComponent implements OnInit {
     firebaseToProcess: FirebaseListObservable<any[]>; // this is the 'to-process' queue object in firebase
     firebaseProjects:  FirebaseListObservable<any[]>; // this is the 'projects' object in firebase
     firebaseProject: any; // this is the firebase project object we're currently working on
-    firebaseSubtitles:  FirebaseListObservable<any[]>; 
+    firebaseSubtitles:  FirebaseListObservable<any[]>;  // af.FirebaseListObservable supplies an iterable list
     project: any; // this is the ngModel we use to update, receive and bind firebase data
 
   constructor(
@@ -97,12 +97,13 @@ export class SubtitlesComponent implements OnInit {
     });
   }
 
+  // #todo write general update function instead of updateThis, updateThat...
   updateSubtitles(event) { 
-    const data = event;
     const key = event.$key;
-    delete data.$key;
-    delete data.$exists;
-    this.firebaseSubtitles.update(key, event);
+    delete event.$exists;
+    delete event.$key;
+
+    this.firebaseProject.child('subtitles').child(key).update(event);
   }
 
   upload($event) {
