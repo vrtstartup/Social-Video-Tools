@@ -6,7 +6,7 @@ import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/video.service';
 
 @Component({
-    providers: [ UploadService ],
+    providers: [UploadService],
     selector: 'subtitles-component',
     templateUrl: 'subtitles.component.html',
 })
@@ -18,7 +18,7 @@ export class SubtitlesComponent implements OnInit {
     firebaseToProcess: FirebaseListObservable<any[]>; // this is the 'to-process' queue object in firebase
     firebaseProjects:  FirebaseListObservable<any[]>; // this is the 'projects' object in firebase
     firebaseProject: any; // this is the firebase project object we're currently working on
-    firebaseSubtitles:  FirebaseListObservable<any[]>;  // af.FirebaseListObservable supplies an iterable list
+    firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
     project: any; // this is the ngModel we use to update, receive and bind firebase data
 
   constructor(
@@ -72,7 +72,7 @@ export class SubtitlesComponent implements OnInit {
     // store new project in Firebase
     this.firebaseProjects.push(this.project).then((ref) => {
       this.firebaseProject = ref;
-      this.firebaseSubtitles = this.af.database.list(`/projects/${this.firebaseProject.key}/subtitles`);
+      this.firebaseSelectedSubKey = 'initial'; // #todo get this from a proper place 
       this.listen();
     });
   }
@@ -94,10 +94,7 @@ export class SubtitlesComponent implements OnInit {
 
   // #todo write general update function instead of updateThis, updateThat...
   updateSubtitles(event) { 
-    const key = event.$key;
-    delete event.$exists;
-    delete event.$key;
-
+    const key = this.firebaseSelectedSubKey;
     this.firebaseProject.child('subtitles').child(key).update(event);
   }
 
@@ -120,7 +117,7 @@ export class SubtitlesComponent implements OnInit {
   }
 
   addSubtitle() {
-    this.firebaseProject.child('subtitles').push({
+    const ref = this.firebaseProject.child('subtitles').push({
       text: 'Dit is een test',
       start: '0.2',
       end: '1.2',
@@ -128,6 +125,9 @@ export class SubtitlesComponent implements OnInit {
         "fade": true,
         "size": 20
       }
-    })
+    });
+
+    // update the selected sub key
+    this.firebaseSelectedSubKey = ref.key;
   }
 }
