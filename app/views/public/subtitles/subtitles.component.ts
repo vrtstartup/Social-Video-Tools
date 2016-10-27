@@ -113,7 +113,11 @@ export class SubtitlesComponent implements OnInit {
   queue() {
     // add a project ID to the 'to-process' list
     const key = this.firebaseProject.key;
-    this.firebaseToProcess.push({ projectId: key});
+    this.firebaseToProcess.push({ 
+      projectId: key,
+      operation: 'render',
+      status: 'open',
+    });
   }
 
   addSubtitle() {

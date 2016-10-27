@@ -27,13 +27,13 @@ refProcess.on('value', (snapshot) => {
     console.log("lets process");
     busyProcessing = true;
     jobKey = Object.keys(jobs)[0];
-    const firstProject = jobs[jobKey];
+    const job = jobs[jobKey];
 
     // update the queue item status
     setInProgress(jobKey);
 
     // get project ref
-    const refProject = db.ref(`projects/${firstProject.projectId}`);
+    const refProject = db.ref(`projects/${job.projectId}`);
     // #todo: projectId frontend request
     refProject.once('value', (snapshot) => {
       // we have metadata
@@ -42,38 +42,56 @@ refProcess.on('value', (snapshot) => {
       const file = project.clip.fileName;
       projectId = snapshot.key;
 
-      // now read the file from the disk
-      const filePath = `${dir}/${file}`;
-      console.log("got project data");
-
-      // perform an ffprobe 
-      const probeData = ffprobe(filePath, ffprobeHandler)
-      .then(() => {
-        scaleDown(messageHandler, file, dir)
-          .then((data:any) => {
-            const file = data.videoLowres;
-            let operations = [];
-
-            // set properties in firebase
-            operations.push(fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file));
-            operations.push(fireBase.setProjectProperty(projectId, 'status/downscaled', true));
-
-            Promise.all(operations)
-              .then(fireBase.resolveJob(jobKey))
-              .then(done);
-          }, (err) =>{
-            console.log("encode failed");
-            console.log(err);
-          });
-      }, () => {
-        console.log("no valid stream found");
-      });
-
+      handleOperation(job.operation, file, dir);
     })
   }  
 }, (errorObject) => {
   console.log(`The read failed: ${errorObject.code}`);
 });
+
+
+function handleOperation(op, file, dir){
+  switch (op) {
+    case 'lowres':
+        console.log('handling lowres operation...');
+        lowres(file, dir);
+      break;
+  
+    case 'render':
+      console.log('handling render operation...');
+      break;
+    default:
+      console.warn('handlin unknown operation!');
+      break;
+  }
+}
+
+function lowres(file, dir) {
+  const filePath = `${dir}/${file}`;
+
+  // perform an ffprobe 
+  const probeData = ffprobe(filePath, ffprobeHandler)
+  .then(() => {
+    scaleDown(messageHandler, file, dir)
+      .then((data:any) => {
+        const file = data.videoLowres;
+        let operations = [];
+
+        // set properties in firebase
+        operations.push(fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file));
+        operations.push(fireBase.setProjectProperty(projectId, 'status/downscaled', true));
+
+        Promise.all(operations)
+          .then(fireBase.resolveJob(jobKey))
+          .then(done);
+      }, (err) =>{
+        console.log("encode failed");
+        console.log(err);
+      });
+  }, () => {
+    console.log("no valid stream found");
+  });
+}
 
 function done(){
   console.log("Done, new job possible");

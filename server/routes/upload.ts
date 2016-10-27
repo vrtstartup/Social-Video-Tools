@@ -65,7 +65,7 @@ router.post('/', file, (req: any, res) => {
 
   Promise.all(proms).then(
     // queue this project for lowres rendering
-    fireBase.queue(projectId)
+    fireBase.queue(projectId, 'lowres')
   )
 
   // respond to client request

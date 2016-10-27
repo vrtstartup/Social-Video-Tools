@@ -21,7 +21,7 @@ export class FireBase {
     return this.database;
   }
   
-  queue(projectId, firebaseDb?: any) {
+  queue(projectId, operation, firebaseDb?: any) {
     // set a project up for processing in the firebase queue
 
     // has firebase been initialized? 
@@ -29,7 +29,7 @@ export class FireBase {
 
     return refQueue.push({ 
       "projectId": projectId,
-      "job": "lowres",
+      "operation": operation,
       "status": "open"
     });
   }
