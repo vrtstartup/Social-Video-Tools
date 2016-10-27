@@ -5,3 +5,4 @@ aot
 server/projects
 *.ngfactory.ts
 worker/bin
+npm-debug.log

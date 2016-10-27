@@ -55,18 +55,19 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		
-		<!--video-->
-		<div class="" style="flex: 0 0 50%;">
-			<div class="" style="flex:1 1 0%; display:flex;flex-wrap:nowrap;flex-direction:column;border:1px solid #f2f2f2;">
-				<range-slider [subAr]="project.subtitles | list" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>
-				<vrtvideo-player [video]="project.clip" [subAr]="project.subtitles | list"></vrtvideo-player>
+
+			<!--video-->
+			<div class="" style="flex: 0 0 50%;">
+				<div class="" style="flex:1 1 0%; display:flex;flex-wrap:nowrap;flex-direction:column;border:1px solid #f2f2f2;">
+					<range-slider [subAr]="project.subtitles | list" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>
+					<vrtvideo-player [video]="project.clip" [subAr]="project.subtitles | list"></vrtvideo-player>
+				</div>
+				<div>{{project.subtitles | list | json}}</div>
 			</div>
-			<div>{{project.subtitles | list | json }}</div>
-		</div>
 
 		</div>
+
+	</div>
 
 	<div class="" style="display:flex; flex-direction:row;"></div>
 </div>
