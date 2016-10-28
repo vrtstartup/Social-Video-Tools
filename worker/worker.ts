@@ -1,8 +1,10 @@
 require('ts-node/register');
 
+const subtitle = require('subtitle');
+import * as path from 'path';
 import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
-import { ffprobe, scaleDown } from './services/ffmpeg.service'
+import { ffprobe, scaleDown } from './services/ffmpeg.service';
 
 // init database 
 // const db = FireBase.database();
@@ -38,11 +40,9 @@ refProcess.on('value', (snapshot) => {
     refProject.once('value', (snapshot) => {
       // we have metadata
       const project = snapshot.val();
-      const dir = project.baseDir;
-      const file = project.clip.fileName;
       projectId = snapshot.key;
 
-      handleOperation(job.operation, file, dir);
+      handleOperation(job.operation, project);
     })
   }  
 }, (errorObject) => {
@@ -50,23 +50,26 @@ refProcess.on('value', (snapshot) => {
 });
 
 
-function handleOperation(op, file, dir){
+function handleOperation(op, project){
   switch (op) {
     case 'lowres':
         console.log('handling lowres operation...');
-        lowres(file, dir);
+        lowres(project);
       break;
   
     case 'render':
       console.log('handling render operation...');
+      makeSrt(project);
       break;
     default:
-      console.warn('handlin unknown operation!');
+      console.warn('handling unknown operation!');
       break;
   }
 }
 
-function lowres(file, dir) {
+function lowres(project) {
+  const dir = project.baseDir;
+  const file = project.clip.fileName;
   const filePath = `${dir}/${file}`;
 
   // perform an ffprobe 
@@ -90,6 +93,43 @@ function lowres(file, dir) {
       });
   }, () => {
     console.log("no valid stream found");
+  });
+}
+
+function makeSrt(project){
+  let arrKeys: any[] = Object.keys(project.subtitles);
+  const file = path.resolve(`${project.baseDir}/${project.clip.fileName}.srt`);
+  const counter = 1;
+  const captions = new subtitle();
+
+  arrKeys.forEach((key:any) => {
+    const sub = project.subtitles[key];
+
+    // convert to ms
+    sub.start *= 1000;
+    sub.end *= 1000;
+
+    captions.add(sub);
+  });
+
+  // wite to file 
+  fs.open(file, 'wx', (err, fd) => {
+    if (err) {
+      if (err.code === "EEXIST") {
+        console.error('.srt file already exists');
+        return;
+      } else {
+        throw err;
+      }
+    }
+
+    const stream = fs.createWriteStream(file);
+    stream.write(captions.stringify(), 'utf-8', () => {
+      console.log('done!');
+      stream.close();
+      fireBase.resolveJob(jobKey);
+    });
+    stream.on('error', (err) => console.log(err));
   });
 }
 
