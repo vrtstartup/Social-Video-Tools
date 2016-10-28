@@ -1,22 +1,19 @@
-<div class="subtitle-tool" style="display:flex;flex-wrap:nowrap;flex-direction:column; width:100%;height:100vh">
+<div class="socialvideotool">
 
-	<div class="sub-menu" style="display:flex; flex-direction:row; flex: 0 1 auto;">
-		<div class="" style=":;">
+	<div class="s-mainmenu">
+		<div>
 			<button type="button" class="btn btn-primary" (click)="newProject()">New</button>
-			<button type="button" class="btn btn-secondary">Open</button>
-			<!--<input type="text" name="video-name" *ngIf="firebaseProject" [(ngModel)]="project.name" (keyup)="update()">-->
+			<button type="button" class="btn btn-secondary" (click)="''">Open</button>
+			<button *ngIf="firebaseProject && project.status.downscaled" type="button" class="btn btn-secondary" (click)="queue()">Render Movie(R)</button>
 		</div>
 	</div>
 
-	<div *ngIf="firebaseProject" class="" style="display:flex; flex-direction:row; flex: 0 1 auto; background: #D2D2D2;">
-		<div class="" style=":;">
-			<input type="file" class="btn btn-secondary" name="video" (change)="upload($event)">
-			<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="addSubtitle()">Add Subtitle(U)</button>
-			<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="queue()">Render Movie(R)</button>
-		</div>
+	<div class="s-submenu" *ngIf="firebaseProject">
+		<input type="file" class="btn btn-secondary" name="video" (change)="upload($event)">
+		<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="addSubtitle()">Add Subtitle(U)</button>
 	</div>
 
-	<div *ngIf="project && project.status.downscaled" class="video-panel">
+	<div *ngIf="project && project.status.downscaled">
 
 		<div class="sub-controls" style="display:flex; flex-direction:row; flex: 1;">
 
