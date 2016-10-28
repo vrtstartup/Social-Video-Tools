@@ -75,6 +75,7 @@
     "multer": "^1.2.0",
     "nouislider": "9.0.0",
     "npm": "^3.10.8",
+    "subtitle": "^0.1.2",
     "ts-node": "^1.6.0",
     "videogular2": "0.13.3",
     "zone.js": "0.6.21"
