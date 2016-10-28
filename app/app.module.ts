@@ -22,13 +22,7 @@ import { SubtitlesComponent } from './views/public/subtitles/subtitles.component
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { listPipe } from './common/pipes/list.pipe';
 
-// Must export the config
-export const firebaseConfig = {
-  apiKey: 'AIzaSyD3BnxjYmXHrP7zUPn8PxXQ1H-SbEzZwsY',
-  authDomain: 'localhost',
-  databaseURL: 'https://socialvideotool.firebaseio.com',
-  storageBucket: 'socialvideotool.appspot.com',
-};
+import firebaseConfig from './config/firebase.config';
 
 @NgModule({
     declarations: [
@@ -48,7 +42,7 @@ export const firebaseConfig = {
         VgOverlayPlayModule, 
         VgBufferingModule,
         HttpModule,
-        AngularFireModule.initializeApp(firebaseConfig),
+        AngularFireModule.initializeApp( firebaseConfig() ),
         RouterModule.forRoot([
             { path: 'subtitles', component: SubtitlesComponent },
             { path: '', component: SubtitlesComponent },

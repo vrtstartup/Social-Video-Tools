@@ -2,32 +2,32 @@ require('ts-node/register');
 
 const firebase = require('firebase');
 const path = require('path');
-const fs = require('fs'); 
+const fs = require('fs');
+
+import { fbConfig } from './firebase.config';
 
 export class FireBase {
+
   public database: any;
 
-  constructor(){
+  constructor() {
     // this operation is synchronous
-    firebase.initializeApp({
-      serviceAccount: path.resolve(`./common/firebase/key.json`),
-      databaseURL: 'https://socialvideotool.firebaseio.com',
-    });
+    firebase.initializeApp( fbConfig );
 
-    this.database = firebase.database(); 
+    this.database = firebase.database();
   }
 
   getDatabase() {
     return this.database;
   }
-  
+
   queue(projectId, operation, firebaseDb?: any) {
     // set a project up for processing in the firebase queue
 
     // has firebase been initialized? 
     const refQueue = this.database.ref('to-process');
 
-    return refQueue.push({ 
+    return refQueue.push({
       "projectId": projectId,
       "operation": operation,
       "status": "open"
@@ -49,18 +49,18 @@ export class FireBase {
     return this.setReferenceData(refProject, properties);
   }
 
-  setReferenceData(firebaseRef, data){
+  setReferenceData(firebaseRef, data) {
     // recursively update the properties of the data object on the firebase reference
     // the update operation is destructive when used with nested object values
     let arrPromises = [];
 
-    for(var i in data) {
-        if(data.hasOwnProperty(i)){
-          // prop has value 
-          const prop = i;
-          const val = data[i];
-          (typeof val === 'object') ?  this.setReferenceData(firebaseRef.child(i), val) : arrPromises.push(firebaseRef.child(i).set(val));
-        }
+    for (var i in data) {
+      if (data.hasOwnProperty(i)) {
+        // prop has value 
+        const prop = i;
+        const val = data[i];
+        (typeof val === 'object') ? this.setReferenceData(firebaseRef.child(i), val) : arrPromises.push(firebaseRef.child(i).set(val));
+      }
     }
     return arrPromises;
   }

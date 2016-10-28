@@ -47,5 +47,5 @@ server.use(cors(corsOptions));
 server.use('/upload', uploadRoutes);
 server.use('/api', apiRoutes);
 
-console.log(port);
+console.log('listening on port: ' + port);
 server.listen(port);

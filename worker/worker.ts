@@ -2,7 +2,7 @@ require('ts-node/register');
 
 import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
-import { ffprobe, scaleDown } from './services/ffmpeg.service'
+import { ffprobe, scaleDown } from './services/ffmpeg.service';
 
 // init database 
 // const db = FireBase.database();
