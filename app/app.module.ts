@@ -22,8 +22,6 @@ import { SubtitlesComponent } from './views/public/subtitles/subtitles.component
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { listPipe } from './common/pipes/list.pipe';
 
-import firebaseConfig from './config/firebase.config';
-
 @NgModule({
     declarations: [
         AppComponent,
@@ -42,7 +40,7 @@ import firebaseConfig from './config/firebase.config';
         VgOverlayPlayModule, 
         VgBufferingModule,
         HttpModule,
-        AngularFireModule.initializeApp( firebaseConfig() ),
+        AngularFireModule.initializeApp( process.env.FIREBASE ),
         RouterModule.forRoot([
             { path: 'subtitles', component: SubtitlesComponent },
             { path: '', component: SubtitlesComponent },

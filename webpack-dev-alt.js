@@ -8,14 +8,14 @@ const commonConfig = require('./webpack.common.config.js');
 const webpackMerge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const ENV = process.env.ENV = process.env.NODE_ENV = 'development'; // set environment to development
+const ENV = process.env.ENV = process.env.NODE_ENV = 'development'; // set environment to production
 const API_URL = process.env.API_URL = 'localhost';
 const FIREBASE = {
-    apiKey: "AIzaSyAOsjXWW-1EBeHJX5hHz7dhDRuGYsrchNU",
-    authDomain: "socialvideotool-dev.firebaseapp.com",
-    databaseURL: "https://socialvideotool-dev.firebaseio.com",
-    storageBucket: "socialvideotool-dev.appspot.com",
-    messagingSenderId: "82496228852"
+    apiKey: "AIzaSyD3BnxjYmXHrP7zUPn8PxXQ1H-SbEzZwsY",
+    authDomain: "socialvideotool.firebaseapp.com",
+    databaseURL: "https://socialvideotool.firebaseio.com",
+    storageBucket: "socialvideotool.appspot.com",
+    messagingSenderId: "796211105673"
 };
 
 const METADATA = webpackMerge(commonConfig.metadata, {
