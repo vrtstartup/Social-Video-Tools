@@ -21,6 +21,7 @@ import { VrtAppsComponent } from './views/public/vrtapps.component';
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { listPipe } from './common/pipes/list.pipe';
+import firebaseConfig from './config/firebase.config';
 
 @NgModule({
     declarations: [
@@ -40,7 +41,7 @@ import { listPipe } from './common/pipes/list.pipe';
         VgOverlayPlayModule, 
         VgBufferingModule,
         HttpModule,
-        AngularFireModule.initializeApp( process.env.FIREBASE ),
+        AngularFireModule.initializeApp( firebaseConfig() ),
         RouterModule.forRoot([
             { path: 'subtitles', component: SubtitlesComponent },
             { path: '', component: SubtitlesComponent },
