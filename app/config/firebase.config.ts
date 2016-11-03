@@ -5,7 +5,6 @@ when switching between databases
 
 export default function() {
     // development database connection
-    console.log(process.env);
 
     if( process.env.ENV != 'production'){
         

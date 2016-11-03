@@ -87,9 +87,31 @@ export function scaleDown(messageHandler, fileName, workingDir) {
         })
         .run();
     });
-    
-    
-
 };
+
+export function burnSrt(sourceFileName, pathToSrt, workingDir) {
+    // burn .srt file over video source file
+    const sourceFile = path.resolve(workingDir, sourceFileName);
+    const srtFile = path.resolve(pathToSrt);
+    const outputFileName = `subtitled.${config.format.video.extension}`;
+    const outputFile = path.resolve(workingDir, outputFileName);
+
+    return new Promise((resolve, reject) => {
+        let command = new FfmpegCommand(sourceFile, { logger: console})
+            .outputOptions(`-vf subtitles=${pathToSrt}`)
+            .output(outputFile)
+            .on('error', (err) => { 
+                console.error("error ocurred", err);
+                reject(err);
+            })
+            .on('start', (commandLine) => {console.log('Spawned Ffmpeg with command: ' + commandLine)})
+            .on('progress', (msg) => { console.log(msg)})
+            .on('end', () => {
+                console.log('done burning subs'); 
+                resolve();
+            })
+            .run();
+    });
+}
 
 

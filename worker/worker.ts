@@ -4,7 +4,7 @@ const subtitle = require('subtitle');
 import * as path from 'path';
 import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
-import { ffprobe, scaleDown } from './services/ffmpeg.service';
+import { ffprobe, scaleDown, burnSrt } from './services/ffmpeg.service';
 
 // init database 
 // const db = FireBase.database();
@@ -59,7 +59,10 @@ function handleOperation(op, project){
   
     case 'render':
       console.log('handling render operation...');
-      makeSrt(project);
+      makeSrt(project).then((pathToSrtFile) => { 
+        fireBase.setProjectProperty(projectId, 'srtPath', pathToSrtFile);
+        burnSrt(project.clip.fileName, pathToSrtFile, project.baseDir);
+        }, (err) => console.error(err));
       break;
     default:
       console.warn('handling unknown operation!');
@@ -112,25 +115,31 @@ function makeSrt(project){
     captions.add(sub);
   });
 
-  // wite to file 
-  fs.open(file, 'wx', (err, fd) => {
-    if (err) {
-      if (err.code === "EEXIST") {
-        console.error('.srt file already exists');
-        return;
-      } else {
-        throw err;
+  // Return a promise 
+  return new Promise((resolve, reject) => {
+    // wite to file 
+    fs.open(file, 'wx', (err, fd) => {
+      if (err) {
+        if (err.code === "EEXIST") {
+          console.error('.srt file already exists');
+          reject(err);
+          return;
+        } else {
+          throw err;
+        }
       }
-    }
 
-    const stream = fs.createWriteStream(file);
-    stream.write(captions.stringify(), 'utf-8', () => {
-      console.log('done!');
-      stream.close();
-      fireBase.resolveJob(jobKey);
+      const stream = fs.createWriteStream(file);
+      stream.write(captions.stringify(), 'utf-8', () => {
+        stream.close();
+        fireBase.resolveJob(jobKey);
+
+        // resolve with the path to the file we've just written to 
+        resolve(file);
+      });
+      stream.on('error', (err) => reject(err));
     });
-    stream.on('error', (err) => console.log(err));
-  });
+  })
 }
 
 function done(){
