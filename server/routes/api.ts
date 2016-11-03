@@ -1,18 +1,17 @@
 import * as express from 'express';
 import { resolve } from 'path';
+import { config } from '../../common/config';
+import { getFilePathByType } from '../../common/services/resolver.service';
+
 const router = express.Router();
 
-router.get('/video/:videoId.mp4', (req, res) => {
-  // return a direct link to the static lowres video file
-  // provide a project id as parameter
-  const videoId = req.params.videoId;
+// this can be used for downloading videos by users
+router.get('/video/:baseDir', (req, res) => {
+  const baseDir = req.params.baseDir;
 
-  // get project data using service wrapper 
-  const staticFilesDir = resolve(__dirname, '../projects');
-  const projectDir = resolve(staticFilesDir, videoId);
-  const fileName = 'source-lowres.mp4';
-  const filePath = resolve(projectDir, fileName);
-
+  // #todo: this is placeholdercontent
+  const filePath = getFilePathByType('source', baseDir);
+  console.log("API", filePath);
   res.sendFile(filePath);
 });
 

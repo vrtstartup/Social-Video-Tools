@@ -5,9 +5,10 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
 import { ffprobe, scaleDown, burnSrt } from './services/ffmpeg.service';
+import { destinationDirectory, destinationFile, getFilePathByType } from '../common/services/resolver.service';
+import { config } from '../common/config';
 
 // init database 
-// const db = FireBase.database();
 const fireBase = new FireBase();
 const db = fireBase.getDatabase();
 
@@ -61,7 +62,7 @@ function handleOperation(op, project){
       console.log('handling render operation...');
       makeSrt(project).then((pathToSrtFile) => { 
         fireBase.setProjectProperty(projectId, 'srtPath', pathToSrtFile);
-        burnSrt(project.clip.fileName, pathToSrtFile, project.baseDir);
+        burnSrt(project.files.baseDir);
         }, (err) => console.error(err));
       break;
     default:
@@ -71,20 +72,17 @@ function handleOperation(op, project){
 }
 
 function lowres(project) {
-  const dir = project.baseDir;
-  const file = project.clip.fileName;
-  const filePath = `${dir}/${file}`;
+  const baseDir = project.files.baseDir;
 
   // perform an ffprobe 
-  const probeData = ffprobe(filePath, ffprobeHandler)
+  const probeData = ffprobe(baseDir, ffprobeHandler)
   .then(() => {
-    scaleDown(messageHandler, file, dir)
+    scaleDown(messageHandler, baseDir)
       .then((data:any) => {
         const file = data.videoLowres;
         let operations = [];
 
-        // set properties in firebase
-        operations.push(fireBase.setProjectProperty(projectId, 'clip/lowResFileName' ,file));
+        // update status
         operations.push(fireBase.setProjectProperty(projectId, 'status/downscaled', true));
 
         Promise.all(operations)
@@ -101,7 +99,7 @@ function lowres(project) {
 
 function makeSrt(project){
   let arrKeys: any[] = Object.keys(project.subtitles);
-  const file = path.resolve(`${project.baseDir}/${project.clip.fileName}.srt`);
+  const file = getFilePathByType('subtitle', project.files.baseDir);
   const counter = 1;
   const captions = new subtitle();
 

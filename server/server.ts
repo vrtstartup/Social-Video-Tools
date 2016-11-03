@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { FireBase } from '../common/firebase/firebase.service';
 import { resolve } from 'path';
+import { config } from '../common/config';
 
 const morgan = require('morgan');
 const path = require('path');
@@ -21,7 +22,7 @@ const apiRoutes = require('./routes/api');
 server.set('fireBase', fireBase);
 server.use(bodyParser());
 
-let publicPath = resolve('server/projects');
+let publicPath = config.workingDirectory;
 server.use('/video', express.static(publicPath)); 
 
 // when getting root, serve angular client

@@ -1,4 +1,6 @@
+// #todo: rename to encoding.service
 import {spawn, spawnSync, execFile} from 'child_process';
+import { destinationDirectory, destinationFile, getFilePathByType } from '../../common/services/resolver.service';
 var FfmpegCommand = require('fluent-ffmpeg');
 const path = require('path');
 const config = require('../config.js');
@@ -11,9 +13,12 @@ const config = require('../config.js');
  * @param workingDir - directory containing target file
  * @returns {Promise}
  */
-export function ffprobe (filePath, outputHandler ) {
-  console.log('Starting FFprobe');
-  
+
+// #todo ordr of parameters should be the same for each function...
+export function ffprobe (baseDir, outputHandler ) {
+  console.log('Starting FFprobe'); 
+  const input = getFilePathByType('source', baseDir);
+
   return new Promise((resolve, reject) => {
 
       const args = [
@@ -21,7 +26,7 @@ export function ffprobe (filePath, outputHandler ) {
           '-print_format', 'json',
           '-show_format',
           '-show_streams',
-          '-i', filePath
+          '-i', input
       ];
 
       const cb = (error, stdout, stderr) => {
@@ -60,19 +65,19 @@ export function ffprobe (filePath, outputHandler ) {
   });
 };
 
-export function scaleDown(messageHandler, fileName, workingDir) {
-    const filePath = path.resolve(workingDir,fileName);
-    const lowresName = `source-lowres.${config.format.video.extension}`;
-    const output = path.resolve(workingDir, lowresName);
+export function scaleDown(messageHandler, baseDir) {
+    // #todo, merge these config files into one application config
+    const lowresFileName = `source-lowres.${config.format.video.extension}`;
+    const input = getFilePathByType('source', baseDir);
+    const output = destinationFile('lowres', baseDir, lowresFileName);
     const scaleFilter = `scale='min(${config.videoMaxWidth.toString()}\\,iw):-2'`;
 
     const data = {
-      'baseDir': filePath,
-      'videoLowres': lowresName
+      'videoLowres': lowresFileName
     };
 
     return new Promise((resolve:any, reject) => {
-      let command = new FfmpegCommand(filePath, { logger: console})
+      let command = new FfmpegCommand(input, { logger: console})
         .videoFilters(scaleFilter)
         .output(output)
         .on('error', (err) => { 
@@ -89,17 +94,18 @@ export function scaleDown(messageHandler, fileName, workingDir) {
     });
 };
 
-export function burnSrt(sourceFileName, pathToSrt, workingDir) {
+export function burnSrt(baseDir) {
     // burn .srt file over video source file
-    const sourceFile = path.resolve(workingDir, sourceFileName);
-    const srtFile = path.resolve(pathToSrt);
-    const outputFileName = `subtitled.${config.format.video.extension}`;
-    const outputFile = path.resolve(workingDir, outputFileName);
+    const input = getFilePathByType('source', baseDir);
+    const srtFile = getFilePathByType('subtitle', baseDir);
+
+    // #todo extension in resolver and config
+    const output = `${getFilePathByType('subtitledSource', baseDir)}.${config.format.video.extension}`;
 
     return new Promise((resolve, reject) => {
-        let command = new FfmpegCommand(sourceFile, { logger: console})
-            .outputOptions(`-vf subtitles=${pathToSrt}`)
-            .output(outputFile)
+        let command = new FfmpegCommand(input, { logger: console})
+            .outputOptions(`-vf subtitles=${srtFile}`)
+            .output(output)
             .on('error', (err) => { 
                 console.error("error ocurred", err);
                 reject(err);

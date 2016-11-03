@@ -1,3 +1,4 @@
+// #todo move to application config
 module.exports = {
 	"videoMaxWidth": 350,
 	"videoMaxDuration": 1800,
