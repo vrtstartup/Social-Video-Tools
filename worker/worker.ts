@@ -6,7 +6,6 @@ import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
 import { ffprobe, scaleDown, burnSrt } from './services/ffmpeg.service';
 import { destinationDirectory, destinationFile, getFilePathByType } from '../common/services/resolver.service';
-import { config } from '../common/config';
 
 // init database 
 const fireBase = new FireBase();

@@ -1,6 +1,6 @@
 import { resolve } from 'path';
 
-export const config = {
+export const appConfig = {
   workingDirectory: `${resolve('somedirectory')}`,
   subDirectories: {
     source: './',

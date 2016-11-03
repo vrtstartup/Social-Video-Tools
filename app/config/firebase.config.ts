@@ -3,10 +3,12 @@ Don't forget to set the process environment variables for the server and the wor
 when switching between databases
 */
 
+import config from './config';
+
 export default function() {
     // development database connection
 
-    if( process.env.ENV != 'production'){
+    if( config.env != 'production'){
         
         const firebaseDevConfig = {
             apiKey: "AIzaSyAOsjXWW-1EBeHJX5hHz7dhDRuGYsrchNU",
@@ -16,8 +18,8 @@ export default function() {
             messagingSenderId: "82496228852"
         } 
         return  firebaseDevConfig
+    } 
 
-        } 
     // production database connection
     const firebaseProdConfig = {
         apiKey: "AIzaSyD3BnxjYmXHrP7zUPn8PxXQ1H-SbEzZwsY",

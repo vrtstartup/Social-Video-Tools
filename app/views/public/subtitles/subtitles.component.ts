@@ -103,7 +103,7 @@ export class SubtitlesComponent implements OnInit {
     this.uploadFile = $event.target;
 
     // Post uploaded video
-    this.service.makeFileRequest('http://localhost:8080/upload', this.uploadFile.files[0], this.firebaseProject.key)
+    this.service.makeFileRequest('api/upload', this.uploadFile.files[0], this.firebaseProject.key)
       .subscribe((data) => {
         // response holds link to owres video source
         this.firebaseProject.child('clip').update({lowResUrl: data.lowResUrl});

@@ -1,12 +1,13 @@
 import * as express from 'express';
 import { FireBase } from '../common/firebase/firebase.service';
 import { resolve } from 'path';
-import { config } from '../common/config';
+import { appConfig } from '../common/config.temp';
 
 const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const config = require('../common/config');
 
 // init firebase
 // const db = FireBase.database();
@@ -14,7 +15,7 @@ const fireBase = new FireBase();
 
 // init server
 const server = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || config.port;
 
 const uploadRoutes = require('./routes/upload');
 const apiRoutes = require('./routes/api');
@@ -22,13 +23,12 @@ const apiRoutes = require('./routes/api');
 server.set('fireBase', fireBase);
 server.use(bodyParser());
 
-let publicPath = config.workingDirectory;
+let publicPath = appConfig.workingDirectory;
 server.use('/video', express.static(publicPath)); 
 
 // when getting root, serve angular client
-const pathToClient = path.join(__dirname, '../dist/dev');
+const pathToClient = path.join(__dirname, '../dist');
 
-console.log(pathToClient);
 server.use('/', express.static(pathToClient));
 
 const originsWhitelist = [
@@ -45,7 +45,7 @@ const corsOptions = {
 
 server.use(cors(corsOptions));
 
-server.use('/upload', uploadRoutes);
+server.use('/api/upload', uploadRoutes);
 server.use('/api', apiRoutes);
 
 console.log('listening on port: ' + port);

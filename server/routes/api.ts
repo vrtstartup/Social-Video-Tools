@@ -1,6 +1,5 @@
 import * as express from 'express';
 import { resolve } from 'path';
-import { config } from '../../common/config';
 import { getFilePathByType } from '../../common/services/resolver.service';
 
 const router = express.Router();

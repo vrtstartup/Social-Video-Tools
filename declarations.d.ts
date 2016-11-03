@@ -18,16 +18,3 @@ declare var require: {
     (paths: string[], callback: (...modules: any[]) => void): void;
     ensure: (paths: string[], callback: (require: <T>(path: string) => T) => void) => void;
 };
-
-
-// Extra variables that live on Global that will be replaced by webpack DefinePlugin
-declare var process: any;
-declare var ENV: string;
-declare var API_URL: string;
-declare var FIREBASE: Object;
-
-interface GlobalEnvironment {
-  ENV;
-  API_URL;
-  FIREBASE;
-}

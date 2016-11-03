@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { FireBase } from '../../common/firebase/firebase.service';
 import { destinationDirectory } from '../../common/services/resolver.service';
-import { config } from '../../common/config';
+import { appConfig } from '../../common/config.temp';
 
 const multer = require('multer');
 const path = require('path');
@@ -9,7 +9,7 @@ const fs = require('fs');
 
 const router = express.Router();
 
-const projectsDir = config.workingDirectory; // #todo move to resolver service? 
+const projectsDir = appConfig.workingDirectory; // #todo move to resolver service? 
 
 // create projectsdirectory if none exists
 if ( !fs.existsSync(projectsDir) ){
@@ -43,7 +43,7 @@ const storage = multer.diskStorage({
     cb(null, dest);
   },
   filename: (req, file, cb) => {
-    cb(null, config.fileNames.source);
+    cb(null, appConfig.fileNames.source);
   }
 });
 

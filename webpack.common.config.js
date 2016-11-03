@@ -1,7 +1,11 @@
 'use strict';
+
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const config = require('./common/config');
 
 module.exports = function () {
     return {
@@ -17,18 +21,25 @@ module.exports = function () {
                 path.resolve(__dirname, 'node_modules/reflect-metadata/Reflect.js'),
                 path.resolve(__dirname, 'node_modules/zone.js/dist/zone.min.js'),
                 path.resolve(__dirname, 'node_modules/zone.js/dist/long-stack-trace-zone.min.js')
-            ]
+            ],
+            app: './app/bootstrap.ts'
         },
 
         output: {
             filename: '[name].bundle.js',
+            path: __dirname + '/dist'
+        },
+        
+        resolve: {
+            root: [path.resolve(__dirname, 'app')],
+            extensions: ['', '.ts', '.js']
         },
 
         module: {
             loaders: [
                 {
                     test: /\.ts$/,
-                    loaders: ['angular2-template-loader', 'awesome-typescript-loader'],
+                    loaders: ['awesome-typescript-loader', 'angular2-template-loader'],
                     exclude: [/\.(spec|e2e)\.ts$/]
                 },
                 {
@@ -43,22 +54,22 @@ module.exports = function () {
                 },
             ]
         },
-        sassLoader: {
-            includePaths: [path.resolve(__dirname, "./some-folder")]
-        },
-        resolve: {
-            root: [path.resolve(__dirname, 'app')],
-            extensions: ['', '.ts', '.js']
-        },
 
         plugins: [
+            new HtmlWebpackPlugin({
+                template: 'index.html',
+                inject: false
+            }),
             new webpack.LoaderOptionsPlugin({
                 minimize: true,
                 debug: false
             }),
-            new CopyWebpackPlugin([
-                { from: 'node_modules/videogular2/fonts', to: 'fonts' }
-            ]),
+            new CopyWebpackPlugin([{ 
+                from: 'node_modules/videogular2/fonts', to: 'fonts' 
+            }]),
+            new webpack.DefinePlugin({
+                'ENV': JSON.stringify( config.env ),
+            }),
         ],
 
         devtool: false,
