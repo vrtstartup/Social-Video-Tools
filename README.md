@@ -1,37 +1,43 @@
-# Videogular 2 Starter
+# Social-Video-tools Starter
 
-## Introduction
-Welcome to Videogular 2 Starter!
+### Introduction
+Welcome 
 
-## Prerequisites
-You need to have [Node.js and npm](https://nodejs.org/en/)
-- Support Node v4 - latest
-- Support npm v3 - latest
+### Prerequisites
+You need to have [Node.js and npm]
+- Node node/6.9.0
 
 ## Installation
 
-Install:
-```bash
-npm install
+```
+npm i
 ```
 
-## NPM commands
-Start development server:
-```bash
-npm start
+### NPM commands
+Start server [on port 3000]:
 ```
-Build app for development:
-```bash
-npm run build
-```
-Start production server:
-```bash
-npm run start:prod
-```
-Build app for production:
-```bash
-npm run build:prod
+npm run server
 ```
 
-## License
+Start worker:
+```
+npm run worker
+```
+
+Start app [you need to run server and worker]
+```
+npm run dev-server
+```
+
+Build app [dev]
+```
+npm run build-dev
+```
+
+Build app [prod]
+```
+npm run build-prod
+```
+
+### License
 MIT
