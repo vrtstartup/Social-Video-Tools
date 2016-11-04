@@ -3,7 +3,7 @@ require('ts-node/register');
 const subtitle = require('subtitle');
 import * as path from 'path';
 import * as fs from 'fs';
-import { FireBase } from '../common/firebase/firebase.service';
+import { FireBase } from '../common/services/firebase.service';
 import { ffprobe, scaleDown, burnSrt } from '../common/services/encoding.service';
 import * as resolve from '../common/services/resolver.service';
 import { logger } from '../common/config/winston';

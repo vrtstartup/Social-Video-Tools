@@ -4,7 +4,7 @@ const firebase = require('firebase');
 const path = require('path');
 const fs = require('fs');
 
-import { fbConfig } from './firebase.config';
+import { fbConfig } from '../config/firebase';
 
 export class FireBase {
 

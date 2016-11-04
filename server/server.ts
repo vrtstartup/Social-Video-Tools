@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { FireBase } from '../common/firebase/firebase.service';
+import { FireBase } from '../common/services/firebase.service';
 import { resolve } from 'path';
 import { fileConfig } from '../common/config/files';
 import { logger } from '../common/config/winston';

@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { FireBase } from '../../common/firebase/firebase.service';
+import { FireBase } from '../../common/services/firebase.service';
 import * as resolve from '../../common/services/resolver.service';
 
 const multer = require('multer');
