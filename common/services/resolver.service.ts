@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { fileConfig } from '../../common/config.files';
+import { fileConfig } from '../../common/config/files';
 import * as fs from 'fs';
 const mkdirp = require('mkdirp');
 
