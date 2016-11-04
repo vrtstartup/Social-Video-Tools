@@ -39,6 +39,19 @@ export class FireBase {
     return this.database.ref("to-process").child(key).remove();
   }
 
+  killJob(key, err) {
+    // make sure that faulty, error-throwing jobs dont get stuck in an execution loop
+    return this.database.ref("to-process").child(key).update({
+      status: 'error',
+      error: {
+        message: err.message ? err.message : 'none',
+        type: err.type ? err.type : 'none',
+        arguments: err.arguments ? err.arguments : 'none',
+        stack: err.stack ? err.stack : 'none'
+      }
+    });
+  }
+
   setProjectProperty(projectId, property, value) {
     const refProject = this.database.ref(`projects/${projectId}`);
     return refProject.child(property).set(value);

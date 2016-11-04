@@ -29,7 +29,7 @@ refProcess.on('value', (snapshot) => {
   if(jobs && !busyProcessing) {
     logger.verbose("lets process");
     busyProcessing = true;
-    jobKey = Object.keys(jobs)[0];
+    jobKey = Object.keys(jobs)[0]; // #todo get first job -> order ?
     const job = jobs[jobKey];
 
     // update the queue item status
@@ -37,13 +37,22 @@ refProcess.on('value', (snapshot) => {
 
     // get project ref
     const refProject = db.ref(`projects/${job.projectId}`);
-    // #todo: projectId frontend request
     refProject.once('value', (snapshot) => {
       // we have metadata
       const project = snapshot.val();
       projectId = snapshot.key;
 
-      handleOperation(job.operation, project);
+      // try to execute the job
+      try {
+        handleOperation(job.operation, project);
+      } catch (err) {
+        // Ohnoes, there's been a terrible error
+        logger.error('job failed', err); // log the error 
+        fireBase.killJob(jobKey, err); // remove job from queue
+        done(); // next job 
+      }
+
+      // getJob().then((data) => console.log(data), (err) => console.log(err));
     })
   }  
 }, (errorObject) => {
@@ -72,6 +81,7 @@ function handleOperation(op, project){
 
 function lowres(project) {
   const baseDir = project.files.baseDir;
+  // const baseDir = null; //serious error
 
   // perform an ffprobe 
   const probeData = ffprobe(baseDir, ffprobeHandler)
@@ -96,6 +106,7 @@ function lowres(project) {
   });
 }
 
+// #todo subtitle service
 function makeSrt(project){
   let arrKeys: any[] = Object.keys(project.subtitles);
   const file = resolve.getFilePathByType('subtitle', project.files.baseDir);
@@ -142,6 +153,33 @@ function makeSrt(project){
 function done(){
   logger.verbose("Done, new job possible");
   busyProcessing = false;
+}
+
+function getJob() {
+  // get the first job from the queue stack
+  return new Promise((resolve, reject) => {
+    refProcess.once('value', (snapshot) => {
+      const jobs = snapshot.val(); // list of jobs
+      const arrKeys = Object.keys(jobs);
+
+      // loop over jobs
+      for (let i=0 ; i < arrKeys.length ; i++ ) {
+        const key = arrKeys[i];
+        const job = jobs[key];
+
+        if(job.status === 'open'){
+          console.log('returning job');
+          resolve({
+            key: key,
+            job: job
+          });
+
+          break;
+        }
+      }
+      reject('null'); // no more available jobs
+    });
+  });
 }
 
 function messageHandler(message) {
