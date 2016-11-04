@@ -5,7 +5,9 @@
   "scripts": {
     "dev-server": "webpack-dev-server --config webpack.dev.js",
     "worker": "node worker --ext js,ts",
+    "worker:dev": "nodemon worker --ext js,ts",
     "server": "node server --ext js,ts",
+    "server:dev": "nodemon server --ext js,ts",
     "clean": "rm -rf dist",
     "ngc": "ngc -p ./tsconfig-prod.json",
     "build-dev": "npm run clean && webpack --config webpack.dev.js",
@@ -68,6 +70,7 @@
     "http-server": "0.9.0",
     "install": "^0.8.1",
     "jquery": "^3.1.1",
+    "mkdirp": "^0.5.1",
     "morgan": "^1.7.0",
     "multer": "^1.2.0",
     "nouislider": "9.0.0",
