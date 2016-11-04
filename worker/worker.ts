@@ -60,8 +60,7 @@ function handleOperation(op, project){
   
     case 'render':
       logger.verbose('handling render operation...');
-      makeSrt(project).then((pathToSrtFile) => { 
-        fireBase.setProjectProperty(projectId, 'srtPath', pathToSrtFile);
+      makeSrt(project).then(() => { 
         burnSrt(project.files.baseDir).then(done);
         }, (err) => logger.error(err));
       break;
@@ -133,7 +132,7 @@ function makeSrt(project){
         fireBase.resolveJob(jobKey);
 
         // resolve with the path to the file we've just written to 
-        resolve(file);
+        resolve();
       });
       stream.on('error', (err) => reject(err));
     });
