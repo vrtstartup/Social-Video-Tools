@@ -4,7 +4,7 @@ import * as resolve from '../../common/services/resolver.service';
 import { logger } from '../../common/config/winston';
 var FfmpegCommand = require('fluent-ffmpeg');
 const path = require('path');
-const config = require('../config.js');
+const config = require('../config/encoding');
 
 // #todo order of parameters should be the same for each function...
 export function ffprobe (baseDir, outputHandler ) {
@@ -29,7 +29,6 @@ export function ffprobe (baseDir, outputHandler ) {
           }
 
           const outputObj = JSON.parse(stdout);
-
           const hasVideoStream = outputObj.streams.some(stream =>
               stream.codec_type === 'video' &&
               (stream.duration || outputObj.format.duration) <= config.videoMaxDuration
