@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
 import { ffprobe, scaleDown, burnSrt } from './services/ffmpeg.service';
 import * as resolve from '../common/services/resolver.service';
+import { logger } from '../common/config/winston';
 
 // init database 
 const fireBase = new FireBase();
@@ -26,7 +27,7 @@ refProcess.on('value', (snapshot) => {
 
   // does parsing return data? (e.g. not null etc)
   if(jobs && !busyProcessing) {
-    console.log("lets process");
+    logger.verbose("lets process");
     busyProcessing = true;
     jobKey = Object.keys(jobs)[0];
     const job = jobs[jobKey];
@@ -46,26 +47,26 @@ refProcess.on('value', (snapshot) => {
     })
   }  
 }, (errorObject) => {
-  console.log(`The read failed: ${errorObject.code}`);
+  logger.error(`The read failed: ${errorObject.code}`);
 });
 
 
 function handleOperation(op, project){
   switch (op) {
     case 'lowres':
-        console.log('handling lowres operation...');
+        logger.verbose('handling lowres operation...');
         lowres(project);
       break;
   
     case 'render':
-      console.log('handling render operation...');
+      logger.verbose('handling render operation...');
       makeSrt(project).then((pathToSrtFile) => { 
         fireBase.setProjectProperty(projectId, 'srtPath', pathToSrtFile);
         burnSrt(project.files.baseDir).then(done);
-        }, (err) => console.error(err));
+        }, (err) => logger.error(err));
       break;
     default:
-      console.warn('handling unknown operation!');
+      logger.warn('handling unknown operation!');
       break;
   }
 }
@@ -88,11 +89,11 @@ function lowres(project) {
           .then(fireBase.resolveJob(jobKey))
           .then(done);
       }, (err) =>{
-        console.log("encode failed");
-        console.log(err);
+        logger.info("encode failed");
+        logger.error(err);
       });
   }, () => {
-    console.log("no valid stream found");
+    logger.warn("no valid stream found");
   });
 }
 
@@ -118,7 +119,7 @@ function makeSrt(project){
     fs.open(file, 'wx', (err, fd) => {
       if (err) {
         if (err.code === "EEXIST") {
-          console.error('.srt file already exists');
+          logger.warn('.srt file already exists');
           reject(err);
           return;
         } else {
@@ -140,7 +141,7 @@ function makeSrt(project){
 }
 
 function done(){
-  console.log("Done, new job possible");
+  logger.verbose("Done, new job possible");
   busyProcessing = false;
 }
 

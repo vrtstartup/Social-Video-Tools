@@ -1,17 +1,17 @@
 // #todo: rename to encoding.service
 import {spawn, spawnSync, execFile} from 'child_process';
 import * as resolve from '../../common/services/resolver.service';
+import { logger } from '../../common/config/winston';
 var FfmpegCommand = require('fluent-ffmpeg');
 const path = require('path');
 const config = require('../config.js');
 
 // #todo order of parameters should be the same for each function...
 export function ffprobe (baseDir, outputHandler ) {
-  console.log('Starting FFprobe'); 
+  logger.verbose('Starting FFprobe'); 
   const input = resolve.getFilePathByType('source', baseDir);
 
   return new Promise((resolve, reject) => {
-
       const args = [
           '-v', 'error',
           '-print_format', 'json',
@@ -20,14 +20,12 @@ export function ffprobe (baseDir, outputHandler ) {
           '-i', input
       ];
 
-      console.log(input);
-
       const cb = (error, stdout, stderr) => {
           if (error) {
               reject(error);
-              console.log("There has been an error performing ffprobe");
-              console.log(error);
-              console.log(stderr);
+              logger.verbose("There has been an error performing ffprobe");
+              logger.error(error);
+              logger.error(stderr);
           }
 
           const outputObj = JSON.parse(stdout);
@@ -46,7 +44,7 @@ export function ffprobe (baseDir, outputHandler ) {
               'type': 'video/mp4',
             });
 
-            console.log('Valid video stream found. FFprobe finished.');
+            logger.verbose('Valid video stream found. FFprobe finished.');
             resolve();
           }
       };
@@ -70,17 +68,17 @@ export function scaleDown(messageHandler, baseDir) {
     };
 
     return new Promise((resolve:any, reject) => {
-      let command = new FfmpegCommand(input, { logger: console})
+      let command = new FfmpegCommand(input, { logger: logger})
         .videoFilters(scaleFilter)
         .output(output)
         .on('error', (err) => { 
-          console.log("error ocurred", err);
+          logger.error(err);
           reject(err);
         })
-        .on('start', (commandLine) => {console.log('Spawned Ffmpeg with command: ' + commandLine)})
+        .on('start', (commandLine) => {logger.verbose('Spawned Ffmpeg with command: ' + commandLine)})
         .on('progress', (msg) => { messageHandler(msg)})
         .on('end', () => {
-          console.log("Done processing")
+          logger.verbose("Done processing")
           resolve(data);
         })
         .run();
@@ -96,17 +94,17 @@ export function burnSrt(baseDir) {
     const output = `${resolve.getFilePathByType('subtitledSource', baseDir)}`;
 
     return new Promise((resolve, reject) => {
-        let command = new FfmpegCommand(input, { logger: console})
+        let command = new FfmpegCommand(input, { logger: logger})
             .outputOptions(`-vf subtitles=${srtFile}`)
             .output(output)
             .on('error', (err) => { 
-                console.error("error ocurred", err);
+                logger.error(err);
                 reject(err);
             })
-            .on('start', (commandLine) => {console.log('Spawned Ffmpeg with command: ' + commandLine)})
-            .on('progress', (msg) => { console.log(msg)})
+            .on('start', (commandLine) => {logger.debug('Spawned Ffmpeg with command: ' + commandLine)})
+            .on('progress', (msg) => { logger.verbose(msg)})
             .on('end', () => {
-                console.log('done burning subs'); 
+                logger.verbose('done burning subs'); 
                 resolve();
             })
             .run();

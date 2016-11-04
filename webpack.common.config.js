@@ -35,7 +35,13 @@ module.exports = function () {
             extensions: ['', '.ts', '.js']
         },
 
+        node: {
+            fs: 'empty'
+        },
         module: {
+            preLoaders: [
+                { test: /\.json$/, loader: 'json'},
+            ],
             loaders: [
                 {
                     test: /\.ts$/,

@@ -2,6 +2,7 @@ import * as express from 'express';
 import { FireBase } from '../common/firebase/firebase.service';
 import { resolve } from 'path';
 import { fileConfig } from '../common/config.files';
+import { logger } from '../common/config/winston';
 
 const morgan = require('morgan');
 const path = require('path');
@@ -48,5 +49,5 @@ server.use(cors(corsOptions));
 server.use('/api/upload', uploadRoutes);
 server.use('/api', apiRoutes);
 
-console.log('listening on port: ' + port);
+logger.verbose('listening on port: ' + port);
 server.listen(port);

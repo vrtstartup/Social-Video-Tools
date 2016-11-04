@@ -10,7 +10,6 @@ router.get('/video/:baseDir', (req, res) => {
 
   // #todo: this is placeholdercontent
   const filePath = getFilePathByType('source', baseDir);
-  console.log("API", filePath);
   res.sendFile(filePath);
 });
 
