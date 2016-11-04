@@ -43,14 +43,17 @@ refProcess.on('value', (snapshot) => {
       projectId = snapshot.key;
 
       // try to execute the job
-      try {
-        handleOperation(job.operation, project);
-      } catch (err) {
-        // Ohnoes, there's been a terrible error
-        logger.error('job failed', err); // log the error 
-        fireBase.killJob(jobKey, err); // remove job from queue
-        done(); // next job 
-      }
+      handleOperation(job.operation, project)
+        .then((data) => {
+          console.log('Grear success, executing then block');
+          fireBase.resolveJob(jobKey).then(done);
+        }, (err) => { 
+          // there's been a terrible error
+          console.log('Ohnoes...');
+          logger.error('job failed', err); // log the error 
+          fireBase.killJob(jobKey, err); // remove job from queue
+          done(); // next job 
+        });
 
       // getJob().then((data) => console.log(data), (err) => console.log(err));
     })
@@ -61,48 +64,50 @@ refProcess.on('value', (snapshot) => {
 
 
 function handleOperation(op, project){
-  switch (op) {
-    case 'lowres':
-        logger.verbose('handling lowres operation...');
-        lowres(project);
-      break;
-  
-    case 'render':
-      logger.verbose('handling render operation...');
-      makeSrt(project).then(() => { 
-        burnSrt(project.files.baseDir).then(done);
-        }, (err) => logger.error(err));
-      break;
-    default:
-      logger.warn('handling unknown operation!');
-      break;
-  }
+  return new Promise((resolve, reject) => {
+    switch (op) {
+      case 'lowres':
+          logger.verbose('handling lowres operation...');
+          // promise.then(resolve) aka bubble up
+          lowres(project).then(resolve, reject);
+        break;
+    
+      case 'render':
+        logger.verbose('handling render operation...');
+        makeSrt(project).then(() => { 
+          burnSrt(project.files.baseDir).then(resolve, reject);
+          }, reject);
+        break;
+      default:
+        logger.warn('handling unknown operation!');
+        break;
+    }
+  });
 }
 
 function lowres(project) {
-  const baseDir = project.files.baseDir;
-  // const baseDir = null; //serious error
+  return new Promise((resolve, reject) => {
+    const baseDir = project.files.baseDir;
+    // const baseDir = null; //serious error
 
-  // perform an ffprobe 
-  const probeData = ffprobe(baseDir, ffprobeHandler)
-  .then(() => {
-    scaleDown(messageHandler, baseDir)
-      .then((data:any) => {
-        const file = data.videoLowres;
-        let operations = [];
+    // perform an ffprobe 
+    const probeData = ffprobe(baseDir, ffprobeHandler)
+    .then(() => {
+      scaleDown(messageHandler, baseDir)
+        .then((data:any) => {
+          const file = data.videoLowres;
+          let operations = [];
 
-        // update status
-        operations.push(fireBase.setProjectProperty(projectId, 'status/downscaled', true));
-
-        Promise.all(operations)
-          .then(fireBase.resolveJob(jobKey))
-          .then(done);
-      }, (err) =>{
-        logger.info("encode failed");
-        logger.error(err);
-      });
-  }, () => {
-    logger.warn("no valid stream found");
+          // update status
+          fireBase.setProjectProperty(projectId, 'status/downscaled', true).then(resolve);
+        }, (err) =>{
+          logger.info("encode failed");
+          logger.error(err);
+          reject(err); // #todo handle promise rejections and error logging in the proper place
+        });
+    }, () => {
+      logger.warn("no valid stream found");
+    });
   });
 }
 
@@ -155,32 +160,32 @@ function done(){
   busyProcessing = false;
 }
 
-function getJob() {
-  // get the first job from the queue stack
-  return new Promise((resolve, reject) => {
-    refProcess.once('value', (snapshot) => {
-      const jobs = snapshot.val(); // list of jobs
-      const arrKeys = Object.keys(jobs);
+// function getJob() {
+//   // get the first job from the queue stack
+//   return new Promise((resolve, reject) => {
+//     refProcess.once('value', (snapshot) => {
+//       const jobs = snapshot.val(); // list of jobs
+//       const arrKeys = Object.keys(jobs);
 
-      // loop over jobs
-      for (let i=0 ; i < arrKeys.length ; i++ ) {
-        const key = arrKeys[i];
-        const job = jobs[key];
+//       // loop over jobs
+//       for (let i=0 ; i < arrKeys.length ; i++ ) {
+//         const key = arrKeys[i];
+//         const job = jobs[key];
 
-        if(job.status === 'open'){
-          console.log('returning job');
-          resolve({
-            key: key,
-            job: job
-          });
+//         if(job.status === 'open'){
+//           console.log('returning job');
+//           resolve({
+//             key: key,
+//             job: job
+//           });
 
-          break;
-        }
-      }
-      reject('null'); // no more available jobs
-    });
-  });
-}
+//           break;
+//         }
+//       }
+//       reject('null'); // no more available jobs
+//     });
+//   });
+// }
 
 function messageHandler(message) {
   // #todo: log to some general log handler here (i.e. papertrail)
