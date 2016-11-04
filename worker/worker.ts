@@ -116,7 +116,7 @@ function makeSrt(project){
   // Return a promise 
   return new Promise((resolve, reject) => {
     // wite to file 
-    fs.open(file, 'wx', (err, fd) => {
+    fs.open(file, 'w+', (err, fd) => {
       if (err) {
         if (err.code === "EEXIST") {
           logger.warn('.srt file already exists');
