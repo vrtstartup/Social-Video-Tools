@@ -1,23 +1,14 @@
 // #todo: rename to encoding.service
 import {spawn, spawnSync, execFile} from 'child_process';
-import { destinationDirectory, destinationFile, getFilePathByType } from '../../common/services/resolver.service';
+import * as resolve from '../../common/services/resolver.service';
 var FfmpegCommand = require('fluent-ffmpeg');
 const path = require('path');
 const config = require('../config.js');
 
-/**
- * Runs FFprobe and ensures that the input file has a valid stream and meets the maximum duration threshold.
- *
- * @param {!{log: !function}} logger - The platform logger
- * @param filePath - full path to file
- * @param workingDir - directory containing target file
- * @returns {Promise}
- */
-
-// #todo ordr of parameters should be the same for each function...
+// #todo order of parameters should be the same for each function...
 export function ffprobe (baseDir, outputHandler ) {
   console.log('Starting FFprobe'); 
-  const input = getFilePathByType('source', baseDir);
+  const input = resolve.getFilePathByType('source', baseDir);
 
   return new Promise((resolve, reject) => {
 
@@ -28,6 +19,8 @@ export function ffprobe (baseDir, outputHandler ) {
           '-show_streams',
           '-i', input
       ];
+
+      console.log(input);
 
       const cb = (error, stdout, stderr) => {
           if (error) {
@@ -67,9 +60,9 @@ export function ffprobe (baseDir, outputHandler ) {
 
 export function scaleDown(messageHandler, baseDir) {
     // #todo, merge these config files into one application config
-    const lowresFileName = `source-lowres.${config.format.video.extension}`;
-    const input = getFilePathByType('source', baseDir);
-    const output = destinationFile('lowres', baseDir, lowresFileName);
+    const lowresFileName = resolve.getFileNameByType('lowres', baseDir);
+    const input = resolve.getFilePathByType('source', baseDir);
+    const output = resolve.destinationFile('lowres', baseDir, lowresFileName);
     const scaleFilter = `scale='min(${config.videoMaxWidth.toString()}\\,iw):-2'`;
 
     const data = {
@@ -96,11 +89,11 @@ export function scaleDown(messageHandler, baseDir) {
 
 export function burnSrt(baseDir) {
     // burn .srt file over video source file
-    const input = getFilePathByType('source', baseDir);
-    const srtFile = getFilePathByType('subtitle', baseDir);
+    const input = resolve.getFilePathByType('source', baseDir);
+    const srtFile = resolve.getFilePathByType('subtitle', baseDir);
 
     // #todo extension in resolver and config
-    const output = `${getFilePathByType('subtitledSource', baseDir)}.${config.format.video.extension}`;
+    const output = `${resolve.getFilePathByType('subtitledSource', baseDir)}`;
 
     return new Promise((resolve, reject) => {
         let command = new FfmpegCommand(input, { logger: console})

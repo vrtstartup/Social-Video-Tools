@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { FireBase } from '../common/firebase/firebase.service';
 import { ffprobe, scaleDown, burnSrt } from './services/ffmpeg.service';
-import { destinationDirectory, destinationFile, getFilePathByType } from '../common/services/resolver.service';
+import * as resolve from '../common/services/resolver.service';
 
 // init database 
 const fireBase = new FireBase();
@@ -61,7 +61,7 @@ function handleOperation(op, project){
       console.log('handling render operation...');
       makeSrt(project).then((pathToSrtFile) => { 
         fireBase.setProjectProperty(projectId, 'srtPath', pathToSrtFile);
-        burnSrt(project.files.baseDir);
+        burnSrt(project.files.baseDir).then(done);
         }, (err) => console.error(err));
       break;
     default:
@@ -98,7 +98,7 @@ function lowres(project) {
 
 function makeSrt(project){
   let arrKeys: any[] = Object.keys(project.subtitles);
-  const file = getFilePathByType('subtitle', project.files.baseDir);
+  const file = resolve.getFilePathByType('subtitle', project.files.baseDir);
   const counter = 1;
   const captions = new subtitle();
 
