@@ -69,7 +69,7 @@ function handleJob(operation, project){
       case 'lowres':
           logger.verbose('handling lowres operation...');
           // promise.then(resolve) aka bubble up
-          lowres(project).then(resolve, reject);
+          makeLowres(project).then(resolve, reject);
         break;
     
       case 'render':
@@ -85,15 +85,14 @@ function handleJob(operation, project){
   });
 }
 
-function lowres(project) {
+function makeLowres(project) {
   return new Promise((resolve, reject) => {
     const baseDir = project.files.baseDir;
-    // const baseDir = null; //serious error
 
     // perform an ffprobe 
-    const probeData = ffprobe(baseDir, ffprobeHandler)
+    ffprobe(baseDir, ffprobeHandler)
     .then(() => {
-      scaleDown(messageHandler, baseDir)
+      scaleDown(progressHandler, baseDir)
         .then((data:any) => {
           const file = data.videoLowres;
           let operations = [];
@@ -212,16 +211,17 @@ function getJob() {
   });
 }
 
-function messageHandler(message) {
+
+function setInProgress(jobKey) {
+  refProcess.child(jobKey).update({'status': 'in progress'});
+}
+
+function progressHandler(message) {
   // #todo updating the 'progress' value on the job triggers the listener, creating a feedback loop
   if(typeof message == 'object' && message.hasOwnProperty("percent")) {
     // this is an ffmpeg progress message
     refProcess.child(jobKey).update({'progress': message.percent});
   }
-}
-
-function setInProgress(jobKey) {
-  refProcess.child(jobKey).update({'status': 'in progress'});
 }
 
 function ffprobeHandler(data) {
