@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 
 import { fbConfig } from '../config/firebase';
+import { logger } from '../../common/config/winston';
 
 export class FireBase {
 
@@ -79,6 +80,14 @@ export class FireBase {
         reject('No more jobs'); // no more available jobs
       });
     });
+  }
+
+  getProject(projectId:string, firebaseDb?: any) {
+    const refProject = firebaseDb.ref(`projects/${projectId}`);
+
+    return new Promise((resolve, reject) => {
+      refProject.once('value').then(snapshot => resolve(snapshot.val()) , err => logger.error(err));
+    })
   }
 
   setProjectProperty(projectId, property, value) {

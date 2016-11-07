@@ -36,12 +36,9 @@ function handleQueue(jobs){
 
       setInProgress(jobKey); // update job state
 
-      // get project ref
-      const refProject = db.ref(`projects/${job.projectId}`);
-      refProject.once('value', (snapshot) => {
+      fireBase.getProject(job.projectId, db).then((project) => {
         // we have metadata
-        const project = snapshot.val();
-        projectId = snapshot.key;
+        projectId = job.projectId;
 
         // try to execute the job
         handleJob(job.operation, project)
@@ -54,11 +51,10 @@ function handleQueue(jobs){
             fireBase.killJob(jobKey, err); // remove job from processing queue
             done(); // next job 
           });
-    }, (err) => {
-      // handle errors thrown by firebase
-      logger.error(err); 
-      done();
-    });
+      }, (err) => {
+        logger.error(err);
+        done();
+      })
     }, (warning) => logger.warn(warning))
   }  
 }
