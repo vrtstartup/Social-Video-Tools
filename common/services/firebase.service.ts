@@ -68,12 +68,8 @@ export class FireBase {
           const job = jobs[key];
 
           if(job.status === 'open'){
-            console.log('returning job');
-            resolve({
-              key: key,
-              job: job
-            });
-
+            job.key = key;
+            resolve(job);
             break;
           }
         }
@@ -88,6 +84,14 @@ export class FireBase {
     return new Promise((resolve, reject) => {
       refProject.once('value').then(snapshot => resolve(snapshot.val()) , err => logger.error(err));
     })
+  }
+
+  getTemplates(firebaseDb?: any) {
+    return new Promise((resolve, reject) => {
+      firebaseDb.ref('templates')
+        .once('value')
+        .then(snapshot => resolve(snapshot.val()), err => logger.error(err));
+    });
   }
 
   setProjectProperty(projectId, property, value) {

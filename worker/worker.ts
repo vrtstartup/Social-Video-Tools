@@ -28,11 +28,10 @@ function handleQueue(jobs){
     logger.verbose("processing queue...");
     busyProcessing = true;
     
-    fireBase.getFirst('to-process', db).then((data:any) => {
+    fireBase.getFirst('to-process', db).then((job:any) => {
       // Process job
       // update the queue item status
-      const job = data.job;
-      jobKey = data.key;
+      jobKey = job.key;
 
       setInProgress(jobKey); // update job state
 
