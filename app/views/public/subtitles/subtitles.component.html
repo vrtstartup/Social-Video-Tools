@@ -4,67 +4,66 @@
 		<div>
 			<button type="button" class="btn btn-primary" (click)="newProject()">New</button>
 			<button type="button" class="btn btn-secondary" (click)="''">Open</button>
-			<button *ngIf="firebaseProject && project.status.downscaled" type="button" class="btn btn-secondary" (click)="queue()">Render Movie(R)</button>
 		</div>
 	</div>
 
 	<div class="s-submenu" *ngIf="firebaseProject">
-		<input type="file" class="btn btn-secondary" name="video" (change)="upload($event)">
+		<label class="btn btn-secondary btn-upload">
+			<input type="file" style="display: none;" name="video" (change)="upload($event)">Upload
+		</label>
 		<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="addSubtitle()">Add Subtitle(U)</button>
+		<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="queue()">Render Movie(R)</button>
 	</div>
 
-	<div *ngIf="project && project.status.downscaled">
 
-		<div class="sub-controls" style="display:flex; flex-direction:row; flex: 1;">
-
-			<div class="" style="flex: 0 0 50%; display:flex;">
-
-				<!--subtitles column-->
-				<div class="" style="flex:1 1 20%; display:flex;flex-direction:column;border:1px solid #f2f2f2;">
-					<div *ngFor="let sub of project.subtitles | list" class="" style="flex:0;border:1px solid #f2f2f2;">
-						{{sub.text}}
-					</div>
-				</div>
-
-				<!--template column-->
-				<div class="" style="flex:1 1 20%; display:flex;flex-direction:column;border:1px solid #f2f2f2;">
-					<div class="" style="flex:0;border:1px solid #f2f2f2;">
-						template 1
-					</div>
-					<div class="" style="flex:0;border:1px solid #f2f2f2;">
-						template 2
-					</div>
-				</div>
-
-				<!--inputs column-->
-				<div class="" style="flex:1 1 20%; display:flex;flex-direction:column;border:1px solid #f2f2f2;">
-					<div class="" style="flex:0;border:1px solid #f2f2f2;">
-						inputs here
-					</div>
-					<div class="" style="flex:0;border:1px solid #f2f2f2;">
-						inputs here
-					</div>
-					<div class="" style="flex:0;border:1px solid #f2f2f2;">
-						inputs here
-					</div>
-					<div class="" style="flex:0;border:1px solid #f2f2f2;">
-						inputs here
-					</div>
+	<div class="s-sub-controls" *ngIf="project && project.status.downscaled">
+		
+		<!--subs-->
+		<div class="s-sub__wrapper">
+			<!--subtitles column-->
+			<div class="s-sub-items">
+				<div *ngFor="let sub of project.subtitles | list" class="s-sub-item">
+					{{sub.text}}
 				</div>
 			</div>
 
-			<!--video-->
-			<div class="" style="flex: 0 0 50%;">
-				<div class="" style="flex:1 1 0%; display:flex;flex-wrap:nowrap;flex-direction:column;border:1px solid #f2f2f2;">
-					<range-slider [subAr]="project.subtitles | list" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>
-					<vrtvideo-player [video]="project.clip" [subAr]="project.subtitles | list"></vrtvideo-player>
+			<!--template column-->
+			<div class="s-sub-templates">
+				<div class="s-sub-template">
+					template 1
 				</div>
-				<div>{{project.subtitles | list | json}}</div>
+				<div class="s-sub-template">
+					template 2
+				</div>
 			</div>
 
+			<!--inputs column-->
+			<div class="s-sub-inputs">
+				<div class="">
+					inputs here
+				</div>
+				<div class="s-sub-input">
+					inputs here
+				</div>
+				<div class="s-sub-input">
+					inputs here
+				</div>
+				<div class="s-sub-input">
+					inputs here
+				</div>
+			</div>
+		</div>
+
+		<!--video-->
+		<div class="s-video_wrapper">
+			<div class="s-video">
+				<vrtvideo-player [video]="project.clip" [subAr]="project.subtitles | list"></vrtvideo-player>
+				<range-slider [subAr]="project.subtitles | list" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>
+			</div>
+			<small>{{project.subtitles | list | json}}</small>
 		</div>
 
 	</div>
 
-	<div class="" style="display:flex; flex-direction:row;"></div>
+	<div class=""></div>
 </div>
