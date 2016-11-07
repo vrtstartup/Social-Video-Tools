@@ -86,22 +86,31 @@ function makeLowres(project) {
 
     // perform an ffprobe 
     ffprobe(baseDir, ffprobeHandler)
-    .then(() => {
-      scaleDown(progressHandler, baseDir)
-        .then((data:any) => {
-          const file = data.videoLowres;
-          let operations = [];
+      .then(() => {
+        // then-method returns a Promise, you can easily chain
 
-          // update status
-          fireBase.setProjectProperty(projectId, 'status/downscaled', true).then(resolve);
-        }, (err) =>{
-          logger.info("encode failed");
-          logger.error(err);
-          reject(err); // #todo handle promise rejections and error logging in the proper place
-        });
-    }, () => {
-      logger.warn("no valid stream found");
-    });
+        // TODO
+        // update project after probe
+        // this way totalframes is available when scaling down
+        // retun project (returned object is available in next then() )
+      })
+      .then(() => {
+        scaleDown(progressHandler, baseDir)
+          // I think you can simply chain this .then() out of de scaleDown( not nested)?
+          .then((data:any) => {
+            const file = data.videoLowres;
+            let operations = [];
+
+            // update status
+            fireBase.setProjectProperty(projectId, 'status/downscaled', true).then(resolve);
+          }, (err) =>{
+            logger.info("encode failed");
+            logger.error(err);
+            reject(err); // #todo handle promise rejections and error logging in the proper place
+          });
+      }, () => {
+        logger.warn("no valid stream found");
+      });
   });
 }
 
