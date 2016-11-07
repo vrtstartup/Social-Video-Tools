@@ -60,19 +60,22 @@ export class FireBase {
     return new Promise((resolve, reject) => {
       refProperty.once('value', (snapshot) => {
         const jobs = snapshot.val(); // list of jobs
-        const arrKeys = Object.keys(jobs);
 
-        // loop over jobs
-        for (let i=0 ; i < arrKeys.length ; i++ ) {
-          const key = arrKeys[i];
-          const job = jobs[key];
+        if(jobs !== null && jobs.constructor === Object && Object.keys(jobs).length !== 0) {
+          // loop over jobs
+          const arrKeys = Object.keys(jobs);
+          for (let i=0 ; i < arrKeys.length ; i++ ) {
+            const key = arrKeys[i];
+            const job = jobs[key];
 
-          if(job.status === 'open'){
-            job.key = key;
-            resolve(job);
-            break;
+            if(job.status === 'open'){
+              job.key = key;
+              resolve(job);
+              break;
+            }
           }
         }
+
         reject('No more jobs'); // no more available jobs
       });
     });

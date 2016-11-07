@@ -16,7 +16,7 @@ router.get('/queue', (req, res) => {
           fireBase.getTemplates(db)
             .then( templates => res.send(parseTitles(project, templates)));
         }, err => console.log(err));
-    });
+    }, (warn) => res.json(warn));
 });
 
 module.exports = router;
