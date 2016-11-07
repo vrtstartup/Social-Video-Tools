@@ -16,6 +16,7 @@ export class SubtitlesComponent implements OnInit {
     video: any;
     uploadFile: any;
     firebaseToProcess: FirebaseListObservable<any[]>; // this is the 'to-process' queue object in firebase
+    firebaseTemplaterQueue: FirebaseListObservable<any[]>; // this is the 'to-process' queue object in firebase
     firebaseProjects:  FirebaseListObservable<any[]>; // this is the 'projects' object in firebase
     firebaseProject: any; // this is the firebase project object we're currently working on
     firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
@@ -46,6 +47,26 @@ export class SubtitlesComponent implements OnInit {
             }
           }
         },
+        titles:{
+          one:{
+            fieldOne: "Field one content",
+            fieldTwo: "Field two content",
+            start: '0.20',
+            end: '1.20'
+          },
+          two:{
+            fieldOne: "Field one content",
+            fieldTwo: "Field two content",
+            start: '2.20',
+            end: '3.20'
+          },
+          three:{
+            fieldOne: "Field one content",
+            fieldTwo: "Field two content",
+            start: '5.20',
+            end: '6.20'
+          }
+        },
         status: {
           initiated: true,
           uploaded:'',
@@ -55,6 +76,7 @@ export class SubtitlesComponent implements OnInit {
 
       // init AngularFire
       this.firebaseToProcess = af.database.list('/to-process');
+      this.firebaseTemplaterQueue = af.database.list('/templater-queue');
       this.firebaseProjects = af.database.list('/projects');
 
       // subscribe to service observable
@@ -111,13 +133,7 @@ export class SubtitlesComponent implements OnInit {
   }
 
   queue() {
-    // add a project ID to the 'to-process' list
-    const key = this.firebaseProject.key;
-    this.firebaseToProcess.push({ 
-      projectId: key,
-      operation: 'render',
-      status: 'open',
-    });
+    (this.hasTitles()) ? this.queueTitles() : this.queueSubtitles();
   }
 
   addSubtitle() {
@@ -133,5 +149,35 @@ export class SubtitlesComponent implements OnInit {
 
     // update the selected sub key
     this.firebaseSelectedSubKey = ref.key;
+  }
+
+  hasTitles() {
+    // check wether or not this project containes titles
+    let children = false;
+
+    if(this.project.hasOwnProperty("titles")) {
+      children = Object.keys(this.project.titles).length !== 0;
+    } 
+
+    return children;
+  }
+
+  queueSubtitles() {
+    // add a project ID to the 'to-process' list
+    const key = this.firebaseProject.key;
+    this.firebaseToProcess.push({ 
+      projectId: key,
+      operation: 'render',
+      status: 'open',
+    });
+  }
+
+  queueTitles() {
+    // add project titles to 'templater-queue' list
+    const key = this.firebaseProject.key;
+    this.firebaseTemplaterQueue.push({ 
+      projectId: key,
+      status: 'open',
+    });
   }
 }
