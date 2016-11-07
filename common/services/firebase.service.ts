@@ -52,6 +52,35 @@ export class FireBase {
     });
   }
 
+  getFirst(property:string, firebaseDb?: any) {
+    // get the first job from the queue stack
+    const refProperty = firebaseDb.ref(property);
+
+    return new Promise((resolve, reject) => {
+      refProperty.once('value', (snapshot) => {
+        const jobs = snapshot.val(); // list of jobs
+        const arrKeys = Object.keys(jobs);
+
+        // loop over jobs
+        for (let i=0 ; i < arrKeys.length ; i++ ) {
+          const key = arrKeys[i];
+          const job = jobs[key];
+
+          if(job.status === 'open'){
+            console.log('returning job');
+            resolve({
+              key: key,
+              job: job
+            });
+
+            break;
+          }
+        }
+        reject('No more jobs'); // no more available jobs
+      });
+    });
+  }
+
   setProjectProperty(projectId, property, value) {
     const refProject = this.database.ref(`projects/${projectId}`);
     return refProject.child(property).set(value);
