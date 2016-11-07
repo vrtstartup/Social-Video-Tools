@@ -12,64 +12,64 @@ import { logger } from '../common/config/winston';
 const fireBase = new FireBase();
 const db = fireBase.getDatabase();
 
-// Listen to process queue
 const refProcess = db.ref('to-process');
-let busyProcessing = false;
+let busyProcessing = false; // busy / idle state
 
 // #todo: the way these variables are scoped isn't that great
 let jobKey;
 let projectId;
 
-// listen to the queue object 
-refProcess.on('value', (snapshot) => {
-  // this runs when a new job is created in the queue.
-  const jobs = snapshot.val();
+// attach listener to queue
+listenQueue();
 
+function handleQueue(jobs){ 
   // does parsing return data? (e.g. not null etc)
   if(jobs && !busyProcessing) {
-    logger.verbose("lets process");
+    logger.verbose("processing queue...");
     busyProcessing = true;
-    jobKey = Object.keys(jobs)[0]; // #todo get first job -> order ?
-    const job = jobs[jobKey];
 
-    // update the queue item status
-    setInProgress(jobKey);
+    getJob().then((data:any) => {
+      // Process job
+      // update the queue item status
+      const job = data.job;
+      jobKey = data.key;
 
-    // get project ref
-    const refProject = db.ref(`projects/${job.projectId}`);
-    refProject.once('value', (snapshot) => {
-      // we have metadata
-      const project = snapshot.val();
-      projectId = snapshot.key;
+      setInProgress(jobKey); // update job state
 
-      // try to execute the job
-      handleOperation(job.operation, project)
-        .then((data) => {
-          console.log('Grear success, executing then block');
-          fireBase.resolveJob(jobKey).then(done);
-        }, (err) => { 
-          // there's been a terrible error
-          console.log('Ohnoes...');
-          logger.error('job failed', err); // log the error 
-          fireBase.killJob(jobKey, err); // remove job from queue
-          done(); // next job 
-        });
+      // get project ref
+      const refProject = db.ref(`projects/${job.projectId}`);
+      refProject.once('value', (snapshot) => {
+        // we have metadata
+        const project = snapshot.val();
+        projectId = snapshot.key;
 
-      // getJob().then((data) => console.log(data), (err) => console.log(err));
-    })
+        // try to execute the job
+        handleJob(job.operation, project)
+          .then((data) => {
+            logger.verbose('successfully handled job...');
+            fireBase.resolveJob(jobKey).then(done);
+          }, (err) => { 
+            // there's been a terrible error
+            logger.error('job failed', err); // log the error 
+            fireBase.killJob(jobKey, err); // remove job from processing queue
+            done(); // next job 
+          });
+    }, (err) => {
+      // handle errors thrown by firebase
+      logger.error(err); 
+      done();
+    });
+    }, (warning) => logger.warn(warning))
   }  
-}, (errorObject) => {
-  logger.error(`The read failed: ${errorObject.code}`);
-});
+}
 
-
-function handleOperation(op, project){
+function handleJob(operation, project){
   return new Promise((resolve, reject) => {
-    switch (op) {
+    switch (operation) {
       case 'lowres':
           logger.verbose('handling lowres operation...');
           // promise.then(resolve) aka bubble up
-          lowres(project).then(resolve, reject);
+          makeLowres(project).then(resolve, reject);
         break;
     
       case 'render':
@@ -85,15 +85,14 @@ function handleOperation(op, project){
   });
 }
 
-function lowres(project) {
+function makeLowres(project) {
   return new Promise((resolve, reject) => {
     const baseDir = project.files.baseDir;
-    // const baseDir = null; //serious error
 
     // perform an ffprobe 
-    const probeData = ffprobe(baseDir, ffprobeHandler)
+    ffprobe(baseDir, ffprobeHandler)
     .then(() => {
-      scaleDown(messageHandler, baseDir)
+      scaleDown(progressHandler, baseDir)
         .then((data:any) => {
           const file = data.videoLowres;
           let operations = [];
@@ -156,47 +155,73 @@ function makeSrt(project){
 }
 
 function done(){
+  // go to idle state
   logger.verbose("Done, new job possible");
   busyProcessing = false;
+
+  // check wether or not any jobs have been added to queue whilst processing was happening
+  refProcess.once('value', (snapshot) => {
+    const jobs = snapshot.val();
+
+    handleQueue(jobs);
+  }, (errorObject) => {
+    logger.error(`The read failed: ${errorObject.code}`);
+  });
 }
 
-// function getJob() {
-//   // get the first job from the queue stack
-//   return new Promise((resolve, reject) => {
-//     refProcess.once('value', (snapshot) => {
-//       const jobs = snapshot.val(); // list of jobs
-//       const arrKeys = Object.keys(jobs);
 
-//       // loop over jobs
-//       for (let i=0 ; i < arrKeys.length ; i++ ) {
-//         const key = arrKeys[i];
-//         const job = jobs[key];
+function listenQueue() {
+  // listen to the queue object in database
+  refProcess.on('value', (snapshot) => {
+    // this runs when a new job is created in the queue.
+    logger.verbose('got new queue data');
+    const jobs = snapshot.val();
 
-//         if(job.status === 'open'){
-//           console.log('returning job');
-//           resolve({
-//             key: key,
-//             job: job
-//           });
+    // #todo make a pickJob function, this passing makes no sense
+    handleQueue(jobs);
+  }, (errorObject) => {
+    logger.error(`The read failed: ${errorObject.code}`);
+  });
+}
 
-//           break;
-//         }
-//       }
-//       reject('null'); // no more available jobs
-//     });
-//   });
-// }
+function getJob() {
+  // get the first job from the queue stack
+  return new Promise((resolve, reject) => {
+    refProcess.once('value', (snapshot) => {
+      const jobs = snapshot.val(); // list of jobs
+      const arrKeys = Object.keys(jobs);
 
-function messageHandler(message) {
-  // #todo: log to some general log handler here (i.e. papertrail)
+      // loop over jobs
+      for (let i=0 ; i < arrKeys.length ; i++ ) {
+        const key = arrKeys[i];
+        const job = jobs[key];
+
+        if(job.status === 'open'){
+          console.log('returning job');
+          resolve({
+            key: key,
+            job: job
+          });
+
+          break;
+        }
+      }
+      reject('No more jobs'); // no more available jobs
+    });
+  });
+}
+
+
+function setInProgress(jobKey) {
+  refProcess.child(jobKey).update({'status': 'in progress'});
+}
+
+function progressHandler(message) {
+  // #todo updating the 'progress' value on the job triggers the listener, creating a feedback loop
   if(typeof message == 'object' && message.hasOwnProperty("percent")) {
     // this is an ffmpeg progress message
     refProcess.child(jobKey).update({'progress': message.percent});
   }
-}
-
-function setInProgress(jobKey) {
-  refProcess.child(jobKey).update({'status': 'in progress'});
 }
 
 function ffprobeHandler(data) {
