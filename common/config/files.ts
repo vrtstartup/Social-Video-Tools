@@ -1,7 +1,7 @@
 import { resolve } from 'path';
 
 export const fileConfig = {
-  workingDirectory: `${resolve('somedirectory')}`,
+  workingDirectory: `${resolve('projects')}`,
   files: {
     source: {
       directory: 'source',

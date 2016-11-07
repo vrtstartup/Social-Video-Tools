@@ -7,3 +7,4 @@ server/projects
 worker/bin
 npm-debug.log
 logs
+projects
