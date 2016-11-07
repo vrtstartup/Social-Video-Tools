@@ -16,7 +16,7 @@ export class SubtitlesComponent implements OnInit {
   video: any;
   uploadFile: any;
   firebaseToProcess: FirebaseListObservable<any[]>; // this is the 'to-process' queue object in firebase
-  firebaseTemplaterQueue: FirebaseListObservable<any[]>; // this is the 'emplater-queue' queue object in firebase
+  firebaseTemplaterQueue: FirebaseListObservable<any[]>; // this is the 'templater-queue' queue object in firebase
   firebaseProjects: FirebaseListObservable<any[]>; // this is the 'projects' object in firebase
   firebaseProject: any; // this is the firebase project object we're currently working on
   firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
@@ -49,20 +49,20 @@ export class SubtitlesComponent implements OnInit {
       },
       titles:{
           one:{
-            fieldOne: "Field one content",
-            fieldTwo: "Field two content",
+            templateId: '-KVyfBD28LKYo8z04Vki',
+            Text2DR: "Zo kennen we de Beenhouwersstraat in Brussel. Overal terrasjes en luifels.",
             start: '0.20',
             end: '1.20'
           },
           two:{
-            fieldOne: "Field one content",
-            fieldTwo: "Field two content",
+            templateId: '-KVyfBD28LKYo8z04Vki',
+            Text2DR: "Zo ziet de straat er tegenwoordig uit. Terrassen en luifels moeten verdwijnen tijdens de wintermaanden.",
             start: '2.20',
             end: '3.20'
           },
           three:{
-            fieldOne: "Field one content",
-            fieldTwo: "Field two content",
+            templateId: '-KVyfBD28LKYo8z04Vki',
+            Text2DR: "Enkele maanden geleden was er een brand in de wijk. De brandweer kon het brandende pand niet vlot bereiken.",
             start: '5.20',
             end: '6.20'
           }
