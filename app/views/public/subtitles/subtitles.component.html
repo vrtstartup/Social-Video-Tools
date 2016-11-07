@@ -1,20 +1,31 @@
 <div class="socialvideotool">
-
+	
 	<div class="s-mainmenu">
 		<div>
-			<button type="button" class="btn btn-primary" (click)="newProject()">New</button>
+			<label class="btn btn-secondary btn-upload">
+				<input type="file" style="display: none;" name="video" (change)="createNewProject($event)">New
+			</label>
 			<button type="button" class="btn btn-secondary" (click)="''">Open</button>
 		</div>
 	</div>
-
 	<div class="s-submenu" *ngIf="firebaseProject">
-		<label class="btn btn-secondary btn-upload">
-			<input type="file" style="display: none;" name="video" (change)="upload($event)">Upload
-		</label>
-		<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="addSubtitle()">Add Subtitle(U)</button>
-		<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="queue()">Render Movie(R)</button>
-	</div>
 
+		<!--progressbar upload-->
+		<div class="s-progress" *ngIf="uploadProgress > 0 && uploadProgress < 100">
+			<div class="s-progress__label">upload</div>
+			<div class="s-progress__bg" *ngIf="uploadProgress">
+				<div class="s-progress__bar" [style.width]="uploadProgress + '%' "></div>
+			</div>
+		</div>
+
+		<div *ngIf="project.status.downscaled">
+			<label class="btn btn-secondary btn-upload">
+				<input type="file" style="display: none;" name="video" (change)="upload($event)">Change Source
+			</label>
+			<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="addSubtitle()">Add Subtitle(U)</button>
+			<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="queue()">Render Movie(R)</button>
+		</div>
+	</div>
 
 	<div class="s-sub-controls" *ngIf="project && project.status.downscaled">
 		
