@@ -11,12 +11,12 @@ import { UploadService } from '../../../common/services/video.service';
   templateUrl: 'subtitles.component.html',
 })
 export class SubtitlesComponent implements OnInit {
-
   af: AngularFire;
   projectTemplate: Object; //this is the object we use to initialize new projects in firebase
   video: any;
   uploadFile: any;
   firebaseToProcess: FirebaseListObservable<any[]>; // this is the 'to-process' queue object in firebase
+  firebaseTemplaterQueue: FirebaseListObservable<any[]>; // this is the 'templater-queue' queue object in firebase
   firebaseProjects: FirebaseListObservable<any[]>; // this is the 'projects' object in firebase
   firebaseProject: any; // this is the firebase project object we're currently working on
   firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
@@ -47,6 +47,29 @@ export class SubtitlesComponent implements OnInit {
           }
         }
       },
+      titles:{
+          one:{
+            templateId: '-KVyfBD28LKYo8z04Vki',
+            Text2DR: "Zo kennen we de Beenhouwersstraat in Brussel. Overal terrasjes en luifels.",
+            start: '0.20',
+            end: '1.20',
+            "render-status": 'ready' 
+          },
+          two:{
+            templateId: '-KVyfBD28LKYo8z04Vki',
+            Text2DR: "Zo ziet de straat er tegenwoordig uit. Terrassen en luifels moeten verdwijnen tijdens de wintermaanden.",
+            start: '2.20',
+            end: '3.20',
+            "render-status": 'ready' 
+          },
+          three:{
+            templateId: '-KVyfBD28LKYo8z04Vki',
+            Text2DR: "Enkele maanden geleden was er een brand in de wijk. De brandweer kon het brandende pand niet vlot bereiken.",
+            start: '5.20',
+            end: '6.20',
+            "render-status": 'ready' 
+          }
+        },
       status: {
         initiated: true,
         uploaded: '',
@@ -56,6 +79,7 @@ export class SubtitlesComponent implements OnInit {
 
     // init AngularFire
     this.firebaseToProcess = af.database.list('/to-process');
+    this.firebaseTemplaterQueue = af.database.list('/templater-queue');
     this.firebaseProjects = af.database.list('/projects');
 
     // subscribe to service observable
@@ -121,13 +145,7 @@ export class SubtitlesComponent implements OnInit {
   }
 
   queue() {
-    // add a project ID to the 'to-process' list
-    const key = this.firebaseProject.key;
-    this.firebaseToProcess.push({
-      projectId: key,
-      operation: 'render',
-      status: 'open',
-    });
+    (this.hasTitles()) ? this.queueTitles() : this.queueSubtitles();
   }
 
   addSubtitle() {
@@ -143,5 +161,35 @@ export class SubtitlesComponent implements OnInit {
 
     // update the selected sub key
     this.firebaseSelectedSubKey = ref.key;
+  }
+
+  hasTitles() {
+    // check wether or not this project containes titles
+    let children = false;
+
+    if(this.project.hasOwnProperty("titles")) {
+      children = Object.keys(this.project.titles).length !== 0;
+    } 
+
+    return children;
+  }
+
+  queueSubtitles() {
+    // add a project ID to the 'to-process' list
+    const key = this.firebaseProject.key;
+    this.firebaseToProcess.push({ 
+      projectId: key,
+      operation: 'render',
+      status: 'open',
+    });
+  }
+
+  queueTitles() {
+    // add project titles to 'templater-queue' list
+    const key = this.firebaseProject.key;
+    this.firebaseTemplaterQueue.push({ 
+      projectId: key,
+      status: 'open',
+    });
   }
 }

@@ -19,7 +19,8 @@ const server = express();
 const port = process.env.PORT || config.port;
 
 const uploadRoutes = require('./routes/upload');
-const apiRoutes = require('./routes/api');
+const fileRoutes = require('./routes/file');
+const templaterRoutes = require('./routes/templater');
 
 server.set('fireBase', fireBase);
 server.use(bodyParser());
@@ -47,7 +48,8 @@ const corsOptions = {
 server.use(cors(corsOptions));
 
 server.use('/api/upload', uploadRoutes);
-server.use('/api', apiRoutes);
+server.use('/api/file', fileRoutes);
+server.use('/api/templater', templaterRoutes);
 
 logger.verbose('listening on port: ' + port);
 server.listen(port);

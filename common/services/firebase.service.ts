@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 
 import { fbConfig } from '../config/firebase';
+import { logger } from '../../common/config/winston';
 
 export class FireBase {
 
@@ -49,6 +50,50 @@ export class FireBase {
         arguments: err.arguments ? err.arguments : 'none',
         stack: err.stack ? err.stack : 'none'
       }
+    });
+  }
+
+  getFirst(property:string, firebaseDb?: any) {
+    // get the first job from the queue stack
+    const refProperty = firebaseDb.ref(property);
+
+    return new Promise((resolve, reject) => {
+      refProperty.once('value', (snapshot) => {
+        const jobs = snapshot.val(); // list of jobs
+
+        if(jobs !== null && jobs.constructor === Object && Object.keys(jobs).length !== 0) {
+          // loop over jobs
+          const arrKeys = Object.keys(jobs);
+          for (let i=0 ; i < arrKeys.length ; i++ ) {
+            const key = arrKeys[i];
+            const job = jobs[key];
+
+            if(job.status === 'open'){
+              job.key = key;
+              resolve(job);
+              break;
+            }
+          }
+        }
+
+        reject('No more jobs'); // no more available jobs
+      });
+    });
+  }
+
+  getProject(projectId:string, firebaseDb?: any) {
+    const refProject = firebaseDb.ref(`projects/${projectId}`);
+
+    return new Promise((resolve, reject) => {
+      refProject.once('value').then(snapshot => resolve(snapshot.val()) , err => logger.error(err));
+    })
+  }
+
+  getTemplates(firebaseDb?: any) {
+    return new Promise((resolve, reject) => {
+      firebaseDb.ref('templates')
+        .once('value')
+        .then(snapshot => resolve(snapshot.val()), err => logger.error(err));
     });
   }
 

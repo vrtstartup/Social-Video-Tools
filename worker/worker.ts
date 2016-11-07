@@ -27,21 +27,17 @@ function handleQueue(jobs){
   if(jobs && !busyProcessing) {
     logger.verbose("processing queue...");
     busyProcessing = true;
-
-    getJob().then((data:any) => {
+    
+    fireBase.getFirst('to-process', db).then((job:any) => {
       // Process job
       // update the queue item status
-      const job = data.job;
-      jobKey = data.key;
+      jobKey = job.key;
 
       setInProgress(jobKey); // update job state
 
-      // get project ref
-      const refProject = db.ref(`projects/${job.projectId}`);
-      refProject.once('value', (snapshot) => {
+      fireBase.getProject(job.projectId, db).then((project) => {
         // we have metadata
-        const project = snapshot.val();
-        projectId = snapshot.key;
+        projectId = job.projectId;
 
         // try to execute the job
         handleJob(job.operation, project)
@@ -54,11 +50,10 @@ function handleQueue(jobs){
             fireBase.killJob(jobKey, err); // remove job from processing queue
             done(); // next job 
           });
-    }, (err) => {
-      // handle errors thrown by firebase
-      logger.error(err); 
-      done();
-    });
+      }, (err) => {
+        logger.error(err);
+        done();
+      })
     }, (warning) => logger.warn(warning))
   }  
 }
@@ -183,34 +178,6 @@ function listenQueue() {
     logger.error(`The read failed: ${errorObject.code}`);
   });
 }
-
-function getJob() {
-  // get the first job from the queue stack
-  return new Promise((resolve, reject) => {
-    refProcess.once('value', (snapshot) => {
-      const jobs = snapshot.val(); // list of jobs
-      const arrKeys = Object.keys(jobs);
-
-      // loop over jobs
-      for (let i=0 ; i < arrKeys.length ; i++ ) {
-        const key = arrKeys[i];
-        const job = jobs[key];
-
-        if(job.status === 'open'){
-          console.log('returning job');
-          resolve({
-            key: key,
-            job: job
-          });
-
-          break;
-        }
-      }
-      reject('No more jobs'); // no more available jobs
-    });
-  });
-}
-
 
 function setInProgress(jobKey) {
   refProcess.child(jobKey).update({'status': 'in progress'});
