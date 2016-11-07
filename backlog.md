@@ -1,11 +1,10 @@
 # As a user I want:
 
 ## UI | styling
-- to have a general UI setup
-- to have a custom scrubber
+- to have a general UI setup [joris]
     
 ## new project | upload
-- to create a new project &
+- to create a new project & [joris:front]
     - to upload a highresmovie and receive a lowresmovie(link)
     - progressbar (error)
     - error | notification: we converted your video to 2Mb a 30% reduction
@@ -20,6 +19,7 @@
 
 ## srubber
 - to set the start and endtime of the new subtitle (scrubber)
+- to have a custom scrubber
 
 ## srubber | videogular
 - to have the video looping when I edit end- and starttime (videogular loop)
