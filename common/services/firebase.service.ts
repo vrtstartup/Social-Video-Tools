@@ -105,7 +105,7 @@ export class FireBase {
 
   updateAssetStatus(projectId, titleId, status) {
     // #todo check wether status value is valid
-    return this.setProjectProperty(projectId, `titles/${titleId}/status`, status);
+    return this.setProjectProperty(projectId, `titles/${titleId}/render-status`, status);
   }
 
   setProjectProperty(projectId, property, value) {
