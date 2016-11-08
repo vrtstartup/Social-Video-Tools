@@ -41,7 +41,6 @@ function handleQueue(jobs) {
   // does parsing return data? (e.g. not null etc)
   if (jobs && !busyProcessing) {
     logger.verbose("processing queue...");
-    busyProcessing = true;
 
     // this isnt possible because handleJob depends on both the results of 'job' and 'project'
     // Promise.All syntax is ugly. 
@@ -145,6 +144,8 @@ function done() {
 }
 
 function setInProgress(job) {
+  busyProcessing = true;
+
   // #todo do I have to wrap this in a promise? 
   return new Promise((resolve, reject) => {
     refProcess.child(job.id)
