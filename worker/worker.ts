@@ -52,11 +52,11 @@ function handleQueue(jobs) {
         // Process job
         // update the queue item status
         jobKey = job.key;
-        projectId = job.projectId;
+        projectId = job.projectId; // #todo this is used somewhere, but ugly AF
 
         setInProgress(jobKey); // update job state
 
-        fireBase.getProject(job.projectId, db)
+        fireBase.getProjectByJob(job, db)
           .then( project => handleJob(job.operation, project), errorHandler)
           .then( project => fireBase.resolveJob(jobKey), errorHandler)
           .then(done, errorHandler)

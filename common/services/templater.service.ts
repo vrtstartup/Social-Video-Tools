@@ -11,6 +11,10 @@ export function parseTitles( project, templates ) {
         const title = titles[key];
         const template = templates[title.templateId];
 
+        // append some extra data so the templater bot can update status
+        title.titeId = key;
+        title.projectId = project.id;
+
         arrReturn.push(entry(title, template));
       });
     }

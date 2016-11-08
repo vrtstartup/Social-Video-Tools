@@ -82,17 +82,18 @@ export class FireBase {
     });
   }
 
-  getProject(projectId:string, firebaseDb?: any) {
+  getProjectByJob(job:any, firebaseDb?: any) {
+    const projectId = job.projectId;
     const refProject = firebaseDb.ref(`projects/${projectId}`);
     
-    // refProject is already a promise
-    // no need to wrap in new one
+    // return the project.  
     return refProject.once('value')
-      .then( snapshot => snapshot.val(), err => logger.error(err) )
-  
-    // return new Promise((resolve, reject) => {
-    //   refProject.once('value').then(snapshot => resolve(snapshot.val()) , err => logger.error(err));
-    // })
+      .then( snapshot => {
+        // for conveniece sake, append the project ID to the return object
+        const project = snapshot.val();
+        project.id=snapshot.key;
+        return project;
+      }, err => logger.error(err) )
   }
 
   getTemplates(firebaseDb?: any) {
