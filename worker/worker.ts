@@ -14,10 +14,6 @@ const db = fireBase.getDatabase();
 const refProcess = db.ref('to-process');
 let busyProcessing = false; // busy / idle state
 
-// #todo: the way these variables are scoped isn't that great
-let jobKey;
-let projectId;
-
 // attach listener to queue
 listenQueue();
 
@@ -47,32 +43,40 @@ function handleQueue(jobs) {
     logger.verbose("processing queue...");
     busyProcessing = true;
 
-    fireBase.getFirst('to-process', db)
-      .then((job: any) => {
-        // Process job
-        // update the queue item status
-        jobKey = job.key;
-        projectId = job.projectId; // #todo this is used somewhere, but ugly AF
+    // this isnt possible because handleJob depends on both the results of 'job' and 'project'
+    // Promise.All syntax is ugly. 
+    // 
+    // const job = fireBase.getFirst('to-process', db)
+    //   .then(job => setInProgress(job), errorHandler)
+    //   .then(job => fireBase.getProjectByJob(job,db), errorHandler)
+    //   .then( project => handleJob(job, project), errorHandler)
+    //   .then( project => fireBase.resolveJob(job.id), errorHandler)
+    //   .then(done, errorHandler);
 
-        setInProgress(jobKey); // update job state
-
+    const job = fireBase.getFirst('to-process', db)
+    
+    job.then((job:any) => {
+        setInProgress(job); // update job state
         fireBase.getProjectByJob(job, db)
-          .then( project => handleJob(job.operation, project), errorHandler)
-          .then( project => fireBase.resolveJob(jobKey), errorHandler)
+          .then( project => handleJob(job, project), errorHandler)
+          .then( project => fireBase.resolveJob(job.id), errorHandler)
           .then(done, errorHandler)
       }, (warning) => logger.warn(warning))
   }
 }
 
-function handleJob(operation, project) {
+function handleJob(job, project) {
   /*
   * check the job operation and process accordingly 
   */
+
+  const operation = job.operation
+
   return new Promise((resolve, reject) => {
     switch (operation) {
       case 'lowres':
         logger.verbose('processing lowres operation...');
-        processLowResJob(project).then(resolve, reject);
+        processLowResJob(project, job).then(resolve, reject);
         break;
 
       case 'render':
@@ -87,7 +91,7 @@ function handleJob(operation, project) {
   });
 }
 
-function processLowResJob(project) {
+function processLowResJob(project, job) {
     /*
     * This function:
     *   - Executes ffprobe on source file. 
@@ -102,7 +106,7 @@ function processLowResJob(project) {
     return new Promise((resolve, reject) => {
       ffprobe(project)
         .then(updateClip, errorHandler)
-        .then(project => scaleDown(project, progressHandler), errorHandler)
+        .then(project => scaleDown(project, progressHandler, job), errorHandler)
         .then(updateProjectStatus, errorHandler)
         .then(resolve, errorHandler);
     });
@@ -140,22 +144,27 @@ function done() {
   });
 }
 
-function setInProgress(jobKey) {
-  refProcess.child(jobKey).update({ 'status': 'in progress' });
+function setInProgress(job) {
+  // #todo do I have to wrap this in a promise? 
+  return new Promise((resolve, reject) => {
+    refProcess.child(job.id)
+      .update({ 'status': 'in progress' })
+      .then(resolve(job),reject);
+  })
 }
 
-function progressHandler(message) {
+function progressHandler(message, job) {
   // #todo updating the 'progress' value on the job triggers the listener, creating a feedback loop
   if (typeof message == 'object' && message.hasOwnProperty("percent")) {
     // this is an ffmpeg progress message
-    refProcess.child(jobKey).update({ 'progress': message.percent });
+    refProcess.child(job.id).update({ 'progress': message.percent });
   }
 }
 
 function updateClip(project:any) {
   // Update clip field, resolve with full project
   return new Promise((resolve, reject) => {
-    let promises = fireBase.setProjectProperties(projectId, { clip: project.clip });
+    let promises = fireBase.setProjectProperties(project.id, { clip: project.clip });
 
     // data variable contains the data returned by firebase, currently unused
     Promise.all(promises)
@@ -171,8 +180,8 @@ function updateProjectStatus(project) {
   // #todo this needs to be a more general function
   // i.e. which status, true/false, ...
   return new Promise((resolve, reject) => {
-    fireBase.setProjectProperty(projectId, 'status/downscaled', true)
-    .then(resolve(project), reject);
+    fireBase.setProjectProperty(project.id, 'status/downscaled', true)
+    .then(fbData => resolve(project), reject);
   }) 
   
 }

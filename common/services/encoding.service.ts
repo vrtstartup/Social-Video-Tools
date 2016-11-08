@@ -57,7 +57,7 @@ export function ffprobe (project) {
   });
 };
 
-export function scaleDown(project, messageHandler) {
+export function scaleDown(project, messageHandler, job) {
     const baseDir = project.files.baseDir;
     const lowresFileName = resolver.getFileNameByType('lowres', baseDir);
     const input = resolver.getFilePathByType('source', baseDir);
@@ -76,7 +76,7 @@ export function scaleDown(project, messageHandler) {
         .on('progress', (msg) => { 
             // append some extra data to the progress message
             msg.progress = msg.frames / project.clip.frames; // encoding progress
-            messageHandler(msg)
+            messageHandler(msg, job)
         })
         .on('end', () => {
           logger.verbose("Done processing")

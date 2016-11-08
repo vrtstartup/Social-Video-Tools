@@ -70,7 +70,7 @@ export class FireBase {
             const job = jobs[key];
 
             if(job.status === 'open'){
-              job.key = key;
+              job.id = key;
               resolve(job);
               break;
             }
