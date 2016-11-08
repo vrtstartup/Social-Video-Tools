@@ -83,16 +83,20 @@ export class FireBase {
 
   getProject(projectId:string, firebaseDb?: any) {
     const refProject = firebaseDb.ref(`projects/${projectId}`);
-
-    return new Promise((resolve, reject) => {
-      refProject.once('value').then(snapshot => resolve(snapshot.val()) , err => logger.error(err));
-    })
+    
+    // refProject is already a promise
+    // no need to wrap in new one
+    return refProject.once('value')
+      .then( snapshot => snapshot.val(), err => logger.error(err) )
+  
+    // return new Promise((resolve, reject) => {
+    //   refProject.once('value').then(snapshot => resolve(snapshot.val()) , err => logger.error(err));
+    // })
   }
 
   getTemplates(firebaseDb?: any) {
     return new Promise((resolve, reject) => {
-      firebaseDb.ref('templates')
-        .once('value')
+      firebaseDb.ref('templates').once('value')
         .then(snapshot => resolve(snapshot.val()), err => logger.error(err));
     });
   }

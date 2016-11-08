@@ -22,56 +22,73 @@ let projectId;
 // attach listener to queue
 listenQueue();
 
-function handleQueue(jobs){ 
-  // does parsing return data? (e.g. not null etc)
-  if(jobs && !busyProcessing) {
-    logger.verbose("processing queue...");
-    busyProcessing = true;
-    
-    fireBase.getFirst('to-process', db).then((job:any) => {
-      // Process job
-      // update the queue item status
-      jobKey = job.key;
+function listenQueue() {
+  // listen to the queue object in database
+  refProcess.on('value', (snapshot) => {
+    // this runs when a new job is created in the queue.
+    logger.verbose('got new queue data');
+    const jobs = snapshot.val();
 
-      setInProgress(jobKey); // update job state
-
-      fireBase.getProject(job.projectId, db).then((project) => {
-        // we have metadata
-        projectId = job.projectId;
-
-        // try to execute the job
-        handleJob(job.operation, project)
-          .then((data) => {
-            logger.verbose('successfully handled job...');
-            fireBase.resolveJob(jobKey).then(done);
-          }, (err) => { 
-            // there's been a terrible error
-            logger.error('job failed', err); // log the error 
-            fireBase.killJob(jobKey, err); // remove job from processing queue
-            done(); // next job 
-          });
-      }, (err) => {
-        logger.error(err);
-        done();
-      })
-    }, (warning) => logger.warn(warning))
-  }  
+    // #todo make a pickJob function, this passing makes no sense
+    handleQueue(jobs);
+  }, (errorObject) => {
+    logger.error(`The read failed: ${errorObject.code}`);
+  });
 }
 
-function handleJob(operation, project){
+function handleQueue(jobs) {
+  // does parsing return data? (e.g. not null etc)
+  if (jobs && !busyProcessing) {
+    logger.verbose("processing queue...");
+    busyProcessing = true;
+
+    fireBase.getFirst('to-process', db)
+      .then((job: any) => {
+        // Process job
+        // update the queue item status
+        jobKey = job.key;
+
+        setInProgress(jobKey); // update job state
+
+        fireBase.getProject(job.projectId, db)
+          .then((project) => {
+            
+            // we have metadata
+            projectId = job.projectId;
+
+            // try to execute the job
+            handleJob(job.operation, project)
+              .then((data) => {
+                logger.verbose('successfully handled job...');
+                fireBase.resolveJob(jobKey).then(done);
+              }, (err) => {
+                // there's been a terrible error
+                logger.error('job failed', err); // log the error 
+                fireBase.killJob(jobKey, err); // remove job from processing queue
+                done(); // next job 
+              });
+          }, (err) => {
+            logger.error(err);
+            done();
+          })
+      }, (warning) => logger.warn(warning))
+  }
+}
+
+function handleJob(operation, project) {
   return new Promise((resolve, reject) => {
     switch (operation) {
       case 'lowres':
-          logger.verbose('handling lowres operation...');
-          // promise.then(resolve) aka bubble up
-          makeLowres(project).then(resolve, reject);
+        logger.verbose('handling lowres operation...');
+        // promise.then(resolve) aka bubble up
+        makeLowres(project).then(resolve, reject);
         break;
-    
+
       case 'render':
         logger.verbose('handling render operation...');
-        makeSrt(project).then(() => { 
+        makeSrt(project).then(() => {
           burnSrt(project.files.baseDir).then(resolve, reject);
-          }, reject);
+        }, reject);
         break;
       default:
         logger.warn('handling unknown operation!');
@@ -79,6 +96,12 @@ function handleJob(operation, project){
     }
   });
 }
+
+// makeLowres
+// 1) then(Probe videoLowres)
+// 2) then(save data to db)
+// 3) then(scaledown)
+// ...
 
 function makeLowres(project) {
   return new Promise((resolve, reject) => {
@@ -88,22 +111,25 @@ function makeLowres(project) {
     ffprobe(baseDir, ffprobeHandler)
       .then(() => {
         // then-method returns a Promise, you can easily chain
-
+        // -- http://codepen.io/solenoid/pen/RoPRLX?editors=0012
         // TODO
         // update project after probe
         // this way totalframes is available when scaling down
-        // retun project (returned object is available in next then() )
+        // return project (returned object is available in next then() )
+      })
+      .then(() => {
+        // return promiseResovle
       })
       .then(() => {
         scaleDown(progressHandler, baseDir)
-          // I think you can simply chain this .then() out of de scaleDown( not nested)?
-          .then((data:any) => {
+          // I think you can simply chain this .then() out of de scaleDown( not nested) ?
+          .then((data: any) => {
             const file = data.videoLowres;
             let operations = [];
 
             // update status
             fireBase.setProjectProperty(projectId, 'status/downscaled', true).then(resolve);
-          }, (err) =>{
+          }, (err) => {
             logger.info("encode failed");
             logger.error(err);
             reject(err); // #todo handle promise rejections and error logging in the proper place
@@ -115,13 +141,13 @@ function makeLowres(project) {
 }
 
 // #todo subtitle service
-function makeSrt(project){
+function makeSrt(project) {
   let arrKeys: any[] = Object.keys(project.subtitles);
   const file = resolve.getFilePathByType('subtitle', project.files.baseDir);
   const counter = 1;
   const captions = new subtitle();
 
-  arrKeys.forEach((key:any) => {
+  arrKeys.forEach((key: any) => {
     const sub = project.subtitles[key];
 
     // convert to ms
@@ -158,7 +184,7 @@ function makeSrt(project){
   })
 }
 
-function done(){
+function done() {
   // go to idle state
   logger.verbose("Done, new job possible");
   busyProcessing = false;
@@ -173,34 +199,19 @@ function done(){
   });
 }
 
-
-function listenQueue() {
-  // listen to the queue object in database
-  refProcess.on('value', (snapshot) => {
-    // this runs when a new job is created in the queue.
-    logger.verbose('got new queue data');
-    const jobs = snapshot.val();
-
-    // #todo make a pickJob function, this passing makes no sense
-    handleQueue(jobs);
-  }, (errorObject) => {
-    logger.error(`The read failed: ${errorObject.code}`);
-  });
-}
-
 function setInProgress(jobKey) {
-  refProcess.child(jobKey).update({'status': 'in progress'});
+  refProcess.child(jobKey).update({ 'status': 'in progress' });
 }
 
 function progressHandler(message) {
   // #todo updating the 'progress' value on the job triggers the listener, creating a feedback loop
-  if(typeof message == 'object' && message.hasOwnProperty("percent")) {
+  if (typeof message == 'object' && message.hasOwnProperty("percent")) {
     // this is an ffmpeg progress message
-    refProcess.child(jobKey).update({'progress': message.percent});
+    refProcess.child(jobKey).update({ 'progress': message.percent });
   }
 }
 
 function ffprobeHandler(data) {
   // update firebase with lip metadata
-  fireBase.setProjectProperties(projectId, {clip: data});
+  fireBase.setProjectProperties(projectId, { clip: data });
 }
