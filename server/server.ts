@@ -18,9 +18,9 @@ const fireBase = new FireBase();
 const server = express();
 const port = process.env.PORT || config.port;
 
-const uploadRoutes = require('./routes/upload');
-const fileRoutes = require('./routes/file');
-const templaterRoutes = require('./routes/templater');
+const uploadRoutes = require('./routes/upload.routes');
+const fileRoutes = require('./routes/file.routes');
+const templaterRoutes = require('./routes/templater.routes');
 
 server.set('fireBase', fireBase);
 server.use(bodyParser());
