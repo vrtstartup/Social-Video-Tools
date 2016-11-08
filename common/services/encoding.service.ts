@@ -7,8 +7,9 @@ const path = require('path');
 const config = require('../config/encoding');
 
 // #todo order of parameters should be the same for each function...
-export function ffprobe (baseDir, outputHandler ) {
+export function ffprobe (project) {
   logger.verbose('Starting FFprobe'); 
+  const baseDir = project.files.baseDir;
   const input = resolve.getFilePathByType('source', baseDir);
 
   return new Promise((resolve, reject) => {
@@ -38,13 +39,13 @@ export function ffprobe (baseDir, outputHandler ) {
               reject('FFprobe: no valid video stream found');
           else {
             // valid video stream found, propagate desired data 
-            outputHandler({
-              'movieLength': outputObj.format.duration,
-              'type': 'video/mp4',
-            });
-
             logger.verbose('Valid video stream found. FFprobe finished.');
-            resolve();
+            
+            // Append new data to the project object 
+            project.clip.movieLength = outputObj.format.duration;
+            project.clip.type = 'video/mp4'
+            
+            resolve(project);
           }
       };
 
@@ -55,8 +56,8 @@ export function ffprobe (baseDir, outputHandler ) {
   });
 };
 
-export function scaleDown(messageHandler, baseDir) {
-    // #todo, merge these config files into one application config
+export function scaleDown(project, messageHandler) {
+    const baseDir = project.files.baseDir;
     const lowresFileName = resolve.getFileNameByType('lowres', baseDir);
     const input = resolve.getFilePathByType('source', baseDir);
     const output = resolve.destinationFile('lowres', baseDir, lowresFileName);
@@ -84,8 +85,9 @@ export function scaleDown(messageHandler, baseDir) {
     });
 };
 
-export function burnSrt(baseDir) {
+export function burnSrt(project) {
     // burn .srt file over video source file
+    const baseDir = project.files.baseDir; 
     const input = resolve.getFilePathByType('source', baseDir);
     const srtFile = resolve.getFilePathByType('subtitle', baseDir);
 
@@ -104,7 +106,7 @@ export function burnSrt(baseDir) {
             .on('progress', (msg) => { logger.verbose(msg)})
             .on('end', () => {
                 logger.verbose('done burning subs'); 
-                resolve();
+                resolve(project);
             })
             .run();
     });

@@ -37,6 +37,7 @@ export class FireBase {
 
   resolveJob(key) {
     // get reference 
+    logger.verbose('successfully processed job...');
     return this.database.ref("to-process").child(key).remove();
   }
 

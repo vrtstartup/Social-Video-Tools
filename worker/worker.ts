@@ -23,13 +23,10 @@ let projectId;
 listenQueue();
 
 function listenQueue() {
-  // listen to the queue object in database
   refProcess.on('value', (snapshot) => {
-    // this runs when a new job is created in the queue.
+    // this runs whenever a new job is created in the queue.
     logger.verbose('got new queue data');
     const jobs = snapshot.val();
-
-    // #todo make a pickJob function, this passing makes no sense
     handleQueue(jobs);
   }, (errorObject) => {
     logger.error(`The read failed: ${errorObject.code}`);
@@ -37,6 +34,15 @@ function listenQueue() {
 }
 
 function handleQueue(jobs) {
+   /*
+    * This function:
+    *   - gets the first job from the queue
+    *   - sets job status to InProgress
+    *   - gets the related project data
+    *   - processes the job
+    *   - resolves the job
+    */
+
   // does parsing return data? (e.g. not null etc)
   if (jobs && !busyProcessing) {
     logger.verbose("processing queue...");
@@ -47,97 +53,77 @@ function handleQueue(jobs) {
         // Process job
         // update the queue item status
         jobKey = job.key;
+        projectId = job.projectId;
 
         setInProgress(jobKey); // update job state
 
         fireBase.getProject(job.projectId, db)
-          .then((project) => {
-            
-            // we have metadata
-            projectId = job.projectId;
-
-            // try to execute the job
-            handleJob(job.operation, project)
-              .then((data) => {
-                logger.verbose('successfully handled job...');
-                fireBase.resolveJob(jobKey).then(done);
-              }, (err) => {
-                // there's been a terrible error
-                logger.error('job failed', err); // log the error 
-                fireBase.killJob(jobKey, err); // remove job from processing queue
-                done(); // next job 
-              });
-          }, (err) => {
-            logger.error(err);
-            done();
-          })
+          .then( project => handleJob(job.operation, project), errorHandler)
+          .then(fireBase.resolveJob(jobKey), errorHandler)
+          .then(done, errorHandler)
       }, (warning) => logger.warn(warning))
   }
 }
 
 function handleJob(operation, project) {
+  /*
+  * check the job operation and process accordingly 
+  */
   return new Promise((resolve, reject) => {
     switch (operation) {
       case 'lowres':
-        logger.verbose('handling lowres operation...');
-        // promise.then(resolve) aka bubble up
-        makeLowres(project).then(resolve, reject);
+        logger.verbose('processing lowres operation...');
+        processLowResJob(project).then(resolve, reject);
         break;
 
       case 'render':
-        logger.verbose('handling render operation...');
-        makeSrt(project).then(() => {
-          burnSrt(project.files.baseDir).then(resolve, reject);
-        }, reject);
+        logger.verbose('processing render operation...');
+        processRenderJob(project).then(resolve, reject);
+        
         break;
       default:
-        logger.warn('handling unknown operation!');
+        logger.warn('processing unknown operation!');
         break;
     }
   });
 }
 
-// makeLowres
-// 1) then(Probe videoLowres)
-// 2) then(save data to db)
-// 3) then(scaledown)
-// ...
+function processLowResJob(project) {
+    /*
+    * This function:
+    *   - Executes ffprobe on source file. 
+    *   - Updates firebase with returned clip database 
+    *   - If possible, scales down the source file to a lower resolution speciefied in the config files
+    *   - Updates project status in firebase on success
+    *
+    *   Note: 
+    *   Each operation is performed async. Each component function passes the modified 'project' variable when resolving. 
+    */
 
-function makeLowres(project) {
-  return new Promise((resolve, reject) => {
-    const baseDir = project.files.baseDir;
+    return new Promise((resolve, reject) => {
+      ffprobe(project)
+        .then(updateClip, errorHandler)
+        .then(project => scaleDown(project, progressHandler), errorHandler)
+        .then(updateProjectStatus, errorHandler)
+        .then(resolve, errorHandler);
+    });
+}
 
-    // perform an ffprobe 
-    ffprobe(baseDir, ffprobeHandler)
-      .then(() => {
-        // then-method returns a Promise, you can easily chain
-        // -- http://codepen.io/solenoid/pen/RoPRLX?editors=0012
-        // TODO
-        // update project after probe
-        // this way totalframes is available when scaling down
-        // return project (returned object is available in next then() )
-      })
-      .then(() => {
-        // return promiseResovle
-      })
-      .then(() => {
-        scaleDown(progressHandler, baseDir)
-          // I think you can simply chain this .then() out of de scaleDown( not nested) ?
-          .then((data: any) => {
-            const file = data.videoLowres;
-            let operations = [];
+function processRenderJob(project) {
+    /*
+    * This function:
+    *   - creates an SRT file containing the project subtitles
+    *   - burns the SRT subtitle file onto the project source file
+    *
+    *   Note: 
+    *   Each operation is performed async. Each component function passes the modified 'project' variable when resolving. 
+    */
 
-            // update status
-            fireBase.setProjectProperty(projectId, 'status/downscaled', true).then(resolve);
-          }, (err) => {
-            logger.info("encode failed");
-            logger.error(err);
-            reject(err); // #todo handle promise rejections and error logging in the proper place
-          });
-      }, () => {
-        logger.warn("no valid stream found");
-      });
-  });
+    return new Promise((resolve, reject) => {
+      makeSrt(project)
+        .then(burnSrt, errorHandler)
+        .then(resolve, errorHandler);
+    });
 }
 
 // #todo subtitle service
@@ -176,8 +162,7 @@ function makeSrt(project) {
         stream.close();
         fireBase.resolveJob(jobKey);
 
-        // resolve with the path to the file we've just written to 
-        resolve();
+        resolve(project);
       });
       stream.on('error', (err) => reject(err));
     });
@@ -211,7 +196,27 @@ function progressHandler(message) {
   }
 }
 
-function ffprobeHandler(data) {
-  // update firebase with lip metadata
-  fireBase.setProjectProperties(projectId, { clip: data });
+function updateClip(project:any) {
+  // Update clip field, resolve with full project
+  return new Promise((resolve, reject) => {
+    let promises = fireBase.setProjectProperties(projectId, { clip: project.clip });
+
+    // data variable contains the data returned by firebase, currently unused
+    Promise.all(promises)
+      .then(data => resolve(project), reject); 
+  });
+}
+
+function errorHandler(error) { 
+  logger.error('Something went wrong while processing a job', error);
+}
+
+function updateProjectStatus(project) {
+  // #todo this needs to be a more general function
+  // i.e. which status, true/false, ...
+  return new Promise((resolve, reject) => {
+    fireBase.setProjectProperty(projectId, 'status/downscaled', true)
+    .then(resolve(project), reject);
+  }) 
+  
 }
