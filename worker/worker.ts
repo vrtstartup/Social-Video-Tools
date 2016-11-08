@@ -24,7 +24,7 @@ listenQueue();
 function listenQueue() {
   refProcess.on('value', (snapshot) => {
     // this runs whenever a new job is created in the queue.
-    logger.verbose('got new queue data');
+    // logger.verbose('got new queue data'); //#todo feedback
     const jobs = snapshot.val();
     handleQueue(jobs);
   }, (errorObject) => {
@@ -58,7 +58,7 @@ function handleQueue(jobs) {
 
         fireBase.getProject(job.projectId, db)
           .then( project => handleJob(job.operation, project), errorHandler)
-          .then(fireBase.resolveJob(jobKey), errorHandler)
+          .then( project => fireBase.resolveJob(jobKey), errorHandler)
           .then(done, errorHandler)
       }, (warning) => logger.warn(warning))
   }

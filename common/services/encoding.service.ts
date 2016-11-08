@@ -1,6 +1,6 @@
 // #todo: rename to encoding.service
 import {spawn, spawnSync, execFile} from 'child_process';
-import * as resolve from '../../common/services/resolver.service';
+import * as resolver from '../../common/services/resolver.service';
 import { logger } from '../../common/config/winston';
 var FfmpegCommand = require('fluent-ffmpeg');
 const path = require('path');
@@ -10,7 +10,7 @@ const config = require('../config/encoding');
 export function ffprobe (project) {
   logger.verbose('Starting FFprobe'); 
   const baseDir = project.files.baseDir;
-  const input = resolve.getFilePathByType('source', baseDir);
+  const input = resolver.getFilePathByType('source', baseDir);
 
   return new Promise((resolve, reject) => {
       const args = [
@@ -40,10 +40,11 @@ export function ffprobe (project) {
           else {
             // valid video stream found, propagate desired data 
             logger.verbose('Valid video stream found. FFprobe finished.');
-            
+
             // Append new data to the project object 
             project.clip.movieLength = outputObj.format.duration;
-            project.clip.type = 'video/mp4'
+            project.clip.type = 'video/mp4';
+            project.clip.frames = outputObj.streams[0].nb_frames // #todo how do we store which stream is eligible for stitching?
             
             resolve(project);
           }
@@ -58,14 +59,10 @@ export function ffprobe (project) {
 
 export function scaleDown(project, messageHandler) {
     const baseDir = project.files.baseDir;
-    const lowresFileName = resolve.getFileNameByType('lowres', baseDir);
-    const input = resolve.getFilePathByType('source', baseDir);
-    const output = resolve.destinationFile('lowres', baseDir, lowresFileName);
+    const lowresFileName = resolver.getFileNameByType('lowres', baseDir);
+    const input = resolver.getFilePathByType('source', baseDir);
+    const output = resolver.destinationFile('lowres', baseDir, lowresFileName);
     const scaleFilter = `scale='min(${config.videoMaxWidth.toString()}\\,iw):-2'`;
-
-    const data = {
-      'videoLowres': lowresFileName
-    };
 
     return new Promise((resolve:any, reject) => {
       let command = new FfmpegCommand(input, { logger: logger})
@@ -76,10 +73,14 @@ export function scaleDown(project, messageHandler) {
           reject(err);
         })
         .on('start', (commandLine) => {logger.verbose('Spawned Ffmpeg with command: ' + commandLine)})
-        .on('progress', (msg) => { messageHandler(msg)})
+        .on('progress', (msg) => { 
+            // append some extra data to the progress message
+            msg.progress = msg.frames / project.clip.frames; // encoding progress
+            messageHandler(msg)
+        })
         .on('end', () => {
           logger.verbose("Done processing")
-          resolve(data);
+          resolve(project);
         })
         .run();
     });
@@ -88,11 +89,11 @@ export function scaleDown(project, messageHandler) {
 export function burnSrt(project) {
     // burn .srt file over video source file
     const baseDir = project.files.baseDir; 
-    const input = resolve.getFilePathByType('source', baseDir);
-    const srtFile = resolve.getFilePathByType('subtitle', baseDir);
+    const input = resolver.getFilePathByType('source', baseDir);
+    const srtFile = resolver.getFilePathByType('subtitle', baseDir);
 
     // #todo extension in resolver and config
-    const output = `${resolve.getFilePathByType('subtitledSource', baseDir)}`;
+    const output = `${resolver.getFilePathByType('subtitledSource', baseDir)}`;
 
     return new Promise((resolve, reject) => {
         let command = new FfmpegCommand(input, { logger: logger})
