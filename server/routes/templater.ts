@@ -40,6 +40,24 @@ router.get('/queue', (req, res) => {
 
 });
 
+
+/*
+* Update the status of a project title when templater has rendered the asset
+*/ 
+router.post('/status', (req, res) => {
+    // parse request
+    const titleId = req.body.titleId;
+    const projectId = req.body.projectId;
+    const status = req.body.status;
+
+    const fireBase = req.app.get('fireBase');
+    const db = fireBase.getDatabase();
+
+    // update title 
+    fireBase.updateAssetStatus(projectId, titleId, status).then(data => res.send(data), errorHandler);
+
+}); 
+
 function errorHandler(error) { 
   logger.error('Something went wrong while getting templater queue', error);
 }

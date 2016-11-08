@@ -103,6 +103,11 @@ export class FireBase {
     });
   }
 
+  updateAssetStatus(projectId, titleId, status) {
+    // #todo check wether status value is valid
+    return this.setProjectProperty(projectId, `titles/${titleId}/status`, status);
+  }
+
   setProjectProperty(projectId, property, value) {
     const refProject = this.database.ref(`projects/${projectId}`);
     return refProject.child(property).set(value);
