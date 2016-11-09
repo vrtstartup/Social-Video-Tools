@@ -54,7 +54,9 @@ router.post('/status', (req, res) => {
     const db = fireBase.getDatabase();
 
     // update title 
-    fireBase.updateAssetStatus(projectId, titleId, status).then(data => res.send(data), errorHandler);
+    fireBase.setProjectProperty(projectId, `titles/${titleId}/render-status`, 'done')
+      // .then(data => checkJobStatus) //#todo
+      .then(data => res.send(data), errorHandler);
 
 }); 
 
