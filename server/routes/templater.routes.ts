@@ -7,7 +7,6 @@ const router = express.Router();
 router.get('/queue', (req, res) => {
   // return JSON object for templater to handle 
   const fireBase = req.app.get('fireBase');
-  const db = fireBase.getDatabase();
   let data = [];
 
   /*
@@ -23,9 +22,9 @@ router.get('/queue', (req, res) => {
   *
   *   http://stackoverflow.com/a/28250697/1185774
   */
-  let templates = fireBase.getTemplates(db)
-  let project = fireBase.getFirst('templater-queue', db)
-    .then(job => fireBase.getProjectByJob(job, db), err => errorHandler(err));
+  let templates = fireBase.getTemplates()
+  let project = fireBase.getFirst('templater-queue')
+    .then(job => fireBase.getProjectByJob(job), err => errorHandler(err));
 
 
   Promise.all([
@@ -51,7 +50,6 @@ router.post('/status', (req, res) => {
     const status = req.body.status;
 
     const fireBase = req.app.get('fireBase');
-    const db = fireBase.getDatabase();
 
     // update title 
     fireBase.setProjectProperty(projectId, `titles/${titleId}/render-status`, 'done')

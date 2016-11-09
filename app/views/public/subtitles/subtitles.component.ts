@@ -187,9 +187,6 @@ export class SubtitlesComponent implements OnInit {
   queueTitles() {
     // add project titles to 'templater-queue' list
     const key = this.firebaseProject.key;
-    this.firebaseTemplaterQueue.push({ 
-      projectId: key,
-      status: 'open',
-    });
+    this.firebaseTemplaterQueue.update(key, {status: 'open'});
   }
 }

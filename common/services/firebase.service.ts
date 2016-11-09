@@ -20,10 +20,6 @@ export class FireBase {
     this.refFfmpegQueue = this.database.ref('to-process');
   }
 
-  getDatabase() {
-    return this.database;
-  }
-
   queue(projectId, operation, firebaseDb?: any) {
     // set a project up for processing in the firebase queue
 
@@ -56,6 +52,10 @@ export class FireBase {
     });
   }
 
+  getJobStatus() {
+    
+  }
+
   getFirst(property:string) {
     // #todo implement logic for picking the proper job
     // get the first job from the queue stack
@@ -86,8 +86,7 @@ export class FireBase {
   }
 
   getProjectByJob(job:any) {
-    const projectId = job.projectId;
-    const refProject = this.database.ref(`projects/${projectId}`);
+    const refProject = this.database.ref(`projects/${job.id}`);
     
     // return the project.  
     return refProject.once('value')
@@ -99,9 +98,9 @@ export class FireBase {
       }, err => logger.error(err) )
   }
 
-  getTemplates(firebaseDb?: any) {
+  getTemplates() {
     return new Promise((resolve, reject) => {
-      firebaseDb.ref('templates').once('value')
+      this.database.ref('templates').once('value')
         .then(snapshot => resolve(snapshot.val()), err => logger.error(err));
     });
   }
@@ -166,7 +165,7 @@ export class FireBase {
     const refProject = this.database.ref(`projects/${projectId}`);
     return this.setReferenceData(refProject, properties);
   }
-  
+
   setReferenceData(firebaseRef, data) {
     // recursively update the properties of the data object on the firebase reference
     // the update operation is destructive when used with nested object values
