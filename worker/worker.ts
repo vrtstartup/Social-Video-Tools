@@ -34,7 +34,7 @@ function handleQueue(jobs) {
         fireBase.setInProgress(job); // update job state
         fireBase.getProjectByJob(job)
           .then( project => handleJob(job, project), errorHandler)
-          .then( project => fireBase.resolveJob(job.id), errorHandler)
+          .then( project => fireBase.resolveJob('to-process', job.id), errorHandler)
           .then(done, errorHandler)
       }, (warning) => logger.warn(warning))
   }

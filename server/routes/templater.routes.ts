@@ -48,14 +48,13 @@ router.post('/status', (req, res) => {
     const titleId = req.body.titleId;
     const projectId = req.body.projectId;
     const status = req.body.status;
-
     const fireBase = req.app.get('fireBase');
 
     // update title 
     fireBase.setProjectProperty(projectId, `titles/${titleId}/render-status`, 'done')
-      // .then(data => checkJobStatus) //#todo
+      .then(fbData => fireBase.getProjectById(projectId))
+      .then(project => fireBase.titlesReady(project), errorHandler) 
       .then(data => res.send(data), errorHandler);
-
 }); 
 
 function errorHandler(error) { 

@@ -33,10 +33,10 @@ export class FireBase {
     });
   }
 
-  resolveJob(key) {
+  resolveJob(queue:string, key: string) {
     // get reference 
     logger.verbose('successfully processed job...');
-    return this.database.ref("to-process").child(key).remove();
+    return this.database.ref(`${queue}`).child(key).remove();
   }
 
   killJob(key, err) {
@@ -52,8 +52,27 @@ export class FireBase {
     });
   }
 
-  getJobStatus() {
-    
+  titlesReady(project:any) {
+    // check if all assets have been rendered
+    // resolve job if they have 
+    return new Promise((resolve, reject) => {
+      let titles = project.titles;
+      let titlesDone = true;
+
+      for(let key in titles) {
+        if(titles.hasOwnProperty(key)) {
+          titlesDone = titlesDone && (titles[key]['render-status'] === 'done');
+        }
+      }
+
+      if(titlesDone){
+        this.resolveJob('templater-queue', project.id)
+          .then(resolve);
+      } else{
+        resolve();
+      }
+    });
+
   }
 
   getFirst(property:string) {
@@ -89,6 +108,7 @@ export class FireBase {
     const refProject = this.database.ref(`projects/${job.id}`);
     
     // return the project.  
+    // #todo return value, wth?
     return refProject.once('value')
       .then( snapshot => {
         // for conveniece sake, append the project ID to the return object
@@ -96,6 +116,19 @@ export class FireBase {
         project.id=snapshot.key;
         return project;
       }, err => logger.error(err) )
+  }
+
+  getProjectById(id:string) {
+    const refProject = this.database.ref(`projects/${id}`);
+
+    return new Promise((resolve, reject) => {
+      refProject.once('value')
+      .then( snapshot => {
+        const project = snapshot.val();
+        project.id=snapshot.key;
+        resolve(project);
+      }, err => reject(err))
+    });
   }
 
   getTemplates() {
