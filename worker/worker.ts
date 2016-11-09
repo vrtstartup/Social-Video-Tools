@@ -144,7 +144,7 @@ function done() {
 }
 
 function setInProgress(job) {
-  busyProcessing = true;
+  // busyProcessing = true;
 
   // #todo do I have to wrap this in a promise? 
   return new Promise((resolve, reject) => {
@@ -156,9 +156,9 @@ function setInProgress(job) {
 
 function progressHandler(message, job) {
   // #todo updating the 'progress' value on the job triggers the listener, creating a feedback loop
-  if (typeof message == 'object' && message.hasOwnProperty("percent")) {
+  if (typeof message == 'object') {
     // this is an ffmpeg progress message
-    refProcess.child(job.id).update({ 'progress': message.percent });
+    refProcess.child(job.id).update({ 'progress': message.progress });
   }
 }
 
