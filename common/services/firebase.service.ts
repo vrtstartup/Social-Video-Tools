@@ -26,7 +26,7 @@ export class FireBase {
     // set a project up for processing in the firebase queue
 
     // has firebase been initialized? 
-    const refQueue = this.database.ref('to-process');
+    const refQueue = this.database.ref('ffmpeg-queue');
 
     return refQueue.push({
       "projectId": projectId,
@@ -38,12 +38,12 @@ export class FireBase {
   resolveJob(key) {
     // get reference 
     logger.verbose('successfully processed job...');
-    return this.database.ref("to-process").child(key).remove();
+    return this.database.ref('ffmpeg-queue').child(key).remove();
   }
 
   killJob(key, err) {
     // make sure that faulty, error-throwing jobs dont get stuck in an execution loop
-    return this.database.ref("to-process").child(key).update({
+    return this.database.ref('ffmpeg-queue').child(key).update({
       status: 'error',
       error: {
         message: err.message ? err.message : 'none',
