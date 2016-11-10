@@ -15,21 +15,22 @@
 		<div class="s-progress" *ngIf="uploadProgress > 0 && uploadProgress < 100">
 			<div class="s-progress__label">upload</div>
 			<div class="s-progress__bg" *ngIf="uploadProgress">
-				<div class="s-progress__bar" [style.width]="uploadProgress + '%' "></div>
+				<div class="s-progress__bar" [style.width]="uploadProgress + '%'"></div>
 			</div>
 		</div>
 
 		<!--progressbar downscaling-->
 		<div class="s-progress" *ngIf="(projectRef | async)?.status?.downScaleProgress > 0 && (projectRef | async)?.status?.downScaleProgress < 100">
-			<div class="s-progress__label">upload</div>
+			<div class="s-progress__label">downscaling</div>
 			<div class="s-progress__bg" *ngIf="(projectRef | async)?.status.downScaleProgress">
-				<div class="s-progress__bar" [style.width]="(projectRef | async)?.status?.downScaleProgress + '%' "></div>
+				<div class="s-progress__bar" [style.width]="(projectRef | async)?.status?.downScaleProgress + '%'"></div>
 			</div>
 		</div>
-
+		
+		<!--once downscaled show controls-->
 		<div *ngIf="(projectRef | async)?.status?.downscaled">
 			<label class="btn btn-secondary btn-upload">
-				<input type="file" name="video" (change)="createNewProject($event)">Change Source
+				<input type="file" name="video" (change)="uploadSource($event)">Change Source
 			</label>
 			<button type="button" class="btn btn-secondary" (click)="addSubtitle()">Add Subtitle(U)</button>
 			<button type="button" class="btn btn-secondary" (click)="addToRenderQueue()">Render Movie(R)</button>
@@ -37,8 +38,6 @@
 	</div>
 	
 	<div class="s-sub-controls" *ngIf="(projectRef | async)?.status?.downscaled">
-		
-		<small class="">{{ projectRef | async | json }}</small><br>
 		
 		<!--subs-->
 		<div class="s-sub__wrapper">
@@ -50,17 +49,17 @@
 			</div>-->
 
 			<!--template column-->
-			<!--<div class="s-sub-templates">
+			<div class="s-sub-templates">
 				<div class="s-sub-template">
 					template 1
 				</div>
 				<div class="s-sub-template">
 					template 2
 				</div>
-			</div>-->
+			</div>
 
 			<!--inputs column-->
-			<!--<div class="s-sub-inputs">
+			<div class="s-sub-inputs">
 				<div class="">
 					inputs here
 				</div>
@@ -73,17 +72,23 @@
 				<div class="s-sub-input">
 					inputs here
 				</div>
-			</div>-->
+			</div>
 		</div>
 
 		<!--video-->
 		<div class="s-video_wrapper">
-			<!--<div class="s-video">
-				<vrtvideo-player [video]="project.clip" [subAr]="project.annotations | list"></vrtvideo-player>
-				<range-slider [subAr]="project.annotations | list" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>
+			<div class="s-video">
+				<vrtvideo-player 
+					[clip]="(clipRef | async)">
+				</vrtvideo-player>
+					<!--[subAr]="(projectRef | async)?.clip">-->
+
+				<!--<range-slider [subAr]="project.annotations | list" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>-->
 			</div>
-			<small>{{project.annotations | list | json}}</small>-->
 		</div>
 
 	</div>
+
+	<small class="">{{ projectRef | async | json }}</small><br>
+
 </div>

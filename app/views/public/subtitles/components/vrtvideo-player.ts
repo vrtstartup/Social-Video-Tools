@@ -6,32 +6,34 @@ import { VgAPI, VgFullscreenAPI } from 'videogular2/core';
     templateUrl: './vrtvideo-player.html'
 })
 export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
-    @Input() video;
-    @Input() subAr;
+    @Input() clip;
+    //@Input() subAr;
 
-    sources:Array<Object>;
-    controls:boolean = false;
-    autoplay:boolean = false;
-    preload:string = 'auto';
-    api:VgAPI;
-    fsAPI:VgFullscreenAPI;
+    sources: Array<Object>;
+    controls: boolean = false;
+    autoplay: boolean = false;
+    preload: string = 'auto';
+    api: VgAPI;
+    fsAPI: VgFullscreenAPI;
 
-    constructor(api:VgAPI) {
+    constructor(api: VgAPI) {
         this.fsAPI = VgFullscreenAPI;
         this.api = api;
         this.sources = [];
     }
 
-    ngOnInit(){}
-    ngAfterViewInit(){}
+    ngOnInit() {}
+    ngAfterViewInit() {}
 
-    ngOnChanges(){
-        if(this.video){
-          this.sources = [this.video];
+    ngOnChanges() {
+        if (this.clip) {
+            this.clip.lowResUrl = this.clip.lowResUrl + Math.floor((Math.random() * 10) + 1)
+            this.sources = [this.clip];
         }
-        
-        let seektime = ( parseFloat(this.subAr[0].start) / parseFloat(this.video.movieLength) * 100 ) ;
-        this.api.seekTime( seektime );
+
+        //let seektime = ( parseFloat(this.subAr[0].start) / parseFloat(this.video.movieLength) * 100 ) ;
+        //this.api.seekTime( seektime );
+
         // conflict
         // this.api.play();
     }
