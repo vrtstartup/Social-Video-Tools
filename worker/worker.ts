@@ -34,13 +34,13 @@ function handleQueue(jobs) {
   if (jobs && !busyProcessing) {
     logger.verbose("processing queue...");
 
-    const job = jobService.getFirst('to-process')
+    const job = jobService.getFirst('ffmpeg-queue')
       .then((job:any) => {
         jobService.setInProgress(job); // update job state
         projectService.getProjectByJob(job)
           .then( project => handleJob(job, project), errorHandler)
-          .then( project => jobService.resolve('to-process', job.id), errorHandler)
-          .then(done)
+          .then( project => jobService.resolve('ffmpeg-queue', job.id), errorHandler)
+          .then(done, errorHandler)
       }, (warning) => logger.warn(warning))
   }
 }
@@ -87,11 +87,8 @@ function processLowResJob(project, job) {
         .then(project => projectService.updateProject(project, { 
           clip: project['data']['clip']
         }))
-        .then(project => scaleDown(project, progressHandler, job))
-        .then(project => projectService.updateProject(project, { 
-          status: {
-            downscaled: true
-          }}))
+        .then(project => scaleDown(project, progressHandler, job), errorHandler)
+        .then(project => projectService.setProjectProperty(job.id, 'status/downscaled', true))
         .then(resolve)
         .catch(err => jobService.kill(job.id, err));
     });
@@ -122,12 +119,11 @@ function done() {
   jobService.checkQueue(handleQueue);
 }
 
-
-
 function progressHandler(message, job) {
   // #todo updating the 'progress' value on the job triggers the listener, creating a feedback loop
   if (typeof message == 'object') { // this is an ffmpeg progress message
-    jobService.updateFfmpegQueue(job, { 'progress': message.progress });
+    jobService.updateFfmpegQueue(job, {'progress': message.progress});
+    projectService.setProjectProperty(job.id, 'status/downScaleProgress', message.progress);
   }
 }
 

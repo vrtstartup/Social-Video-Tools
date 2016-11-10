@@ -6,7 +6,7 @@ export class Jobs {
   constructor(fireBase:any, logger: any) { 
     this.fireBase = fireBase;
     this.logger = logger;
-    this.refFfmpegQueue = this.fireBase.database.ref('to-process');
+    this.refFfmpegQueue = this.fireBase.database.ref('ffmpeg-queue');
   }
 
   resolveJob(queue:string, key: string) {
@@ -48,7 +48,7 @@ export class Jobs {
     // set a project up for processing in the firebase queue
 
     // has firebase been initialized? 
-    const refFfmpegQueue = this.fireBase.database.ref(`to-process/${projectId}`);
+    const refFfmpegQueue = this.fireBase.database.ref(`ffmpeg-queue/${projectId}`);
 
     return refFfmpegQueue.update({
       "operation": operation,
@@ -65,7 +65,7 @@ export class Jobs {
   kill(key, err) {
     this.logger.error(err);
     // make sure that faulty, error-throwing jobs dont get stuck in an execution loop
-    return this.fireBase.database.ref("to-process").child(key).update({
+    return this.fireBase.database.ref("ffmpeg-queue").child(key).update({
       status: 'error',
       error: {
         message: err.message ? err.message : 'none',
@@ -112,7 +112,7 @@ export class Jobs {
   updateFfmpegQueue(job:any, value: Object) {
     // Update the firebase entry property for a given project
     return new Promise((resolve, reject) => {
-      const ref = this.fireBase.database.ref(`to-process/${job.id}`);
+      const ref = this.fireBase.database.ref(`ffmpeg-queue/${job.id}`);
       ref.update(value)
         .then(resolve(job), reject);
     });
