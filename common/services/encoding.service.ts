@@ -9,7 +9,7 @@ const config = require('../config/encoding');
 // #todo order of parameters should be the same for each function...
 export function ffprobe (project) {
   logger.verbose('Starting FFprobe'); 
-  const baseDir = project.files.baseDir;
+  const baseDir = project.data.files.baseDir;
   const input = resolver.getFilePathByType('source', baseDir);
 
   return new Promise((resolve, reject) => {
@@ -42,9 +42,9 @@ export function ffprobe (project) {
             logger.verbose('Valid video stream found. FFprobe finished.');
 
             // Append new data to the project object 
-            project.clip.movieLength = outputObj.format.duration;
-            project.clip.type = 'video/mp4';
-            project.clip.frames = outputObj.streams[0].nb_frames // #todo how do we store which stream is eligible for stitching?
+            project.data.clip.movieLength = outputObj.format.duration;
+            project.data.clip.type = 'video/mp4';
+            project.data.clip.frames = outputObj.streams[0].nb_frames // #todo how do we store which stream is eligible for stitching?
             
             resolve(project);
           }
@@ -58,7 +58,7 @@ export function ffprobe (project) {
 };
 
 export function scaleDown(project, messageHandler, job) {
-    const baseDir = project.files.baseDir;
+    const baseDir = project.data.files.baseDir;
     const lowresFileName = resolver.getFileNameByType('lowres', baseDir);
     const input = resolver.getFilePathByType('source', baseDir);
     const output = resolver.destinationFile('lowres', baseDir, lowresFileName);
@@ -75,7 +75,7 @@ export function scaleDown(project, messageHandler, job) {
         .on('start', (commandLine) => {logger.verbose('Spawned Ffmpeg with command: ' + commandLine)})
         .on('progress', (msg) => { 
             // append some extra data to the progress message
-            msg.progress = Math.round((msg.frames / project.clip.frames) * 1000) / 10; // encoding progress
+            msg.progress = Math.round((msg.frames / project.data.clip.frames) * 1000) / 10; // encoding progress
             messageHandler(msg, job)
         })
         .on('end', () => {
@@ -88,7 +88,7 @@ export function scaleDown(project, messageHandler, job) {
 
 export function burnSrt(project) {
     // burn .srt file over video source file
-    const baseDir = project.files.baseDir; 
+    const baseDir = project.data.files.baseDir; 
     const input = resolver.getFilePathByType('source', baseDir);
     const srtFile = resolver.getFilePathByType('subtitle', baseDir);
 

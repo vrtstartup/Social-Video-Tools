@@ -32,16 +32,20 @@ const upload = multer({ storage });
 const file = upload.fields([{ name: 'video' }]);
 
 router.post('/', file, (req: any, res) => {
+  // services 
+  const projects = req.app.get('projects');
+  const jobs = req.app.get('jobs');
+
+  // parameters
   const projectId = req.body.projectId;
   const fileMeta = req.files.video[0];
   const fireBase = req.app.get('fireBase');
 
   // #todo: fix link for deployment
-  // const lowResUrl = `${req.protocol}://${req.host}:8080/video/${projectId}/source-lowres.mp4`; 
   const lowResUrl = resolve.staticUrl('lowres', projectId);
   
   // update project 
-  let proms = fireBase.setProjectProperties(projectId, {
+  let proms = projects.setProjectProperties(projectId, {
     files: {
       'baseDir': projectId,
       'source': fileMeta.filename,
@@ -56,7 +60,7 @@ router.post('/', file, (req: any, res) => {
 
   Promise.all(proms).then(
     // queue this project for lowres rendering
-    fireBase.queue(projectId, 'lowres')
+    jobs.queue('ffmpeg-queue', projectId, 'lowres')
   )
 
   // respond to client request

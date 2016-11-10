@@ -3,18 +3,22 @@ require('ts-node/register');
 import * as path from 'path';
 import * as fs from 'fs';
 import { FireBase } from '../common/services/firebase.service';
+import { Jobs } from '../common/services/jobs.service';
+import { Projects } from '../common/services/projects.service';
 import { ffprobe, scaleDown, burnSrt } from '../common/services/encoding.service';
 import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 
-// init database 
+// dependencies
 const fireBase = new FireBase();
+const projectService = new Projects(fireBase, logger);
+const jobService = new Jobs(fireBase, logger);
 const subtitle = new Subtitle(fireBase); //inject database
 
 let busyProcessing = false; // busy / idle state
 
 // attach listener to queue
-fireBase.listenQueue(handleQueue);
+jobService.listenQueue(handleQueue);
 
 function handleQueue(jobs) {
    /*
@@ -30,12 +34,12 @@ function handleQueue(jobs) {
   if (jobs && !busyProcessing) {
     logger.verbose("processing queue...");
 
-    const job = fireBase.getFirst('ffmpeg-queue')
+    const job = jobService.getFirst('ffmpeg-queue')
       .then((job:any) => {
-        fireBase.setInProgress(job); // update job state
-        fireBase.getProjectByJob(job)
+        jobService.setInProgress(job); // update job state
+        projectService.getProjectByJob(job)
           .then( project => handleJob(job, project), errorHandler)
-          .then( project => fireBase.resolveJob('ffmpeg-queue', job.id), errorHandler)
+          .then( project => jobService.resolve('ffmpeg-queue', job.id), errorHandler)
           .then(done, errorHandler)
       }, (warning) => logger.warn(warning))
   }
@@ -45,7 +49,6 @@ function handleJob(job, project) {
   /*
   * check the job operation and process accordingly 
   */
-
   const operation = job.operation
 
   return new Promise((resolve, reject) => {
@@ -81,13 +84,13 @@ function processLowResJob(project, job) {
 
     return new Promise((resolve, reject) => {
       ffprobe(project)
-        .then(project => fireBase.updateProject(project, { 
-          clip: project['clip']
-        }), errorHandler)
+        .then(project => projectService.updateProject(project, { 
+          clip: project['data']['clip']
+        }))
         .then(project => scaleDown(project, progressHandler, job), errorHandler)
-        .then(project => fireBase.setProjectProperty(
-          job.id, 'status/downscaled', true), errorHandler)
-        .then(resolve, errorHandler);
+        .then(project => projectService.setProjectProperty(job.id, 'status/downscaled', true))
+        .then(resolve)
+        .catch(err => jobService.kill(job.id, err));
     });
 }
 
@@ -113,14 +116,14 @@ function done() {
   logger.verbose("Done, new job possible");
   busyProcessing = false;
 
-  fireBase.checkQueue(handleQueue);
+  jobService.checkQueue(handleQueue);
 }
 
 function progressHandler(message, job) {
   // #todo updating the 'progress' value on the job triggers the listener, creating a feedback loop
   if (typeof message == 'object') { // this is an ffmpeg progress message
-    fireBase.updateFfmpegQueue(job, {'progress': message.progress});
-    fireBase.setProjectProperty(job.id, 'status/downScaleProgress', message.progress);
+    jobService.updateFfmpegQueue(job, {'progress': message.progress});
+    projectService.setProjectProperty(job.id, 'status/downScaleProgress', message.progress);
   }
 }
 
