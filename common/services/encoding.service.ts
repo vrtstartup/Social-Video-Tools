@@ -75,7 +75,7 @@ export function scaleDown(project, messageHandler, job) {
         .on('start', (commandLine) => {logger.verbose('Spawned Ffmpeg with command: ' + commandLine)})
         .on('progress', (msg) => { 
             // append some extra data to the progress message
-            msg.progress = msg.frames / project.clip.frames; // encoding progress
+            msg.progress = Math.round((msg.frames / project.clip.frames) * 1000) / 10; // encoding progress
             messageHandler(msg, job)
         })
         .on('end', () => {
