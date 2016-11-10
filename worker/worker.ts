@@ -4,29 +4,17 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { FireBase } from '../common/services/firebase.service';
 import { ffprobe, scaleDown, burnSrt } from '../common/services/encoding.service';
-import * as subtitle from '../common/services/subtitle.service';
+import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 
 // init database 
 const fireBase = new FireBase();
-const db = fireBase.getDatabase();
+const subtitle = new Subtitle(fireBase); //inject database
 
-const refProcess = db.ref('to-process');
 let busyProcessing = false; // busy / idle state
 
 // attach listener to queue
-listenQueue();
-
-function listenQueue() {
-  refProcess.on('value', (snapshot) => {
-    // this runs whenever a new job is created in the queue.
-    // logger.verbose('got new queue data'); //#todo feedback
-    const jobs = snapshot.val();
-    handleQueue(jobs);
-  }, (errorObject) => {
-    logger.error(`The read failed: ${errorObject.code}`);
-  });
-}
+fireBase.listenQueue(handleQueue);
 
 function handleQueue(jobs) {
    /*
@@ -42,23 +30,12 @@ function handleQueue(jobs) {
   if (jobs && !busyProcessing) {
     logger.verbose("processing queue...");
 
-    // this isnt possible because handleJob depends on both the results of 'job' and 'project'
-    // Promise.All syntax is ugly. 
-    // 
-    // const job = fireBase.getFirst('to-process', db)
-    //   .then(job => setInProgress(job), errorHandler)
-    //   .then(job => fireBase.getProjectByJob(job,db), errorHandler)
-    //   .then( project => handleJob(job, project), errorHandler)
-    //   .then( project => fireBase.resolveJob(job.id), errorHandler)
-    //   .then(done, errorHandler);
-
-    const job = fireBase.getFirst('to-process', db)
-    
-    job.then((job:any) => {
-        setInProgress(job); // update job state
-        fireBase.getProjectByJob(job, db)
+    const job = fireBase.getFirst('to-process')
+      .then((job:any) => {
+        fireBase.setInProgress(job); // update job state
+        fireBase.getProjectByJob(job)
           .then( project => handleJob(job, project), errorHandler)
-          .then( project => fireBase.resolveJob(job.id), errorHandler)
+          .then( project => fireBase.resolveJob('to-process', job.id), errorHandler)
           .then(done, errorHandler)
       }, (warning) => logger.warn(warning))
   }
@@ -104,9 +81,14 @@ function processLowResJob(project, job) {
 
     return new Promise((resolve, reject) => {
       ffprobe(project)
-        .then(updateClip, errorHandler)
+        .then(project => fireBase.updateProject(project, { 
+          clip: project['clip']
+        }), errorHandler)
         .then(project => scaleDown(project, progressHandler, job), errorHandler)
-        .then(updateProjectStatus, errorHandler)
+        .then(project => fireBase.updateProject(project, { 
+          status: {
+            downscaled: true
+          }}), errorHandler)
         .then(resolve, errorHandler);
     });
 }
@@ -133,56 +115,18 @@ function done() {
   logger.verbose("Done, new job possible");
   busyProcessing = false;
 
-  // check wether or not any jobs have been added to queue whilst processing was happening
-  refProcess.once('value', (snapshot) => {
-    const jobs = snapshot.val();
-
-    handleQueue(jobs);
-  }, (errorObject) => {
-    logger.error(`The read failed: ${errorObject.code}`);
-  });
+  fireBase.checkQueue(handleQueue);
 }
 
-function setInProgress(job) {
-  // busyProcessing = true;
 
-  // #todo do I have to wrap this in a promise? 
-  return new Promise((resolve, reject) => {
-    refProcess.child(job.id)
-      .update({ 'status': 'in progress' })
-      .then(resolve(job),reject);
-  })
-}
 
 function progressHandler(message, job) {
   // #todo updating the 'progress' value on the job triggers the listener, creating a feedback loop
-  if (typeof message == 'object') {
-    // this is an ffmpeg progress message
-    refProcess.child(job.id).update({ 'progress': message.progress });
+  if (typeof message == 'object') { // this is an ffmpeg progress message
+    fireBase.updateFfmpegQueue(job, { 'progress': message.progress });
   }
-}
-
-function updateClip(project:any) {
-  // Update clip field, resolve with full project
-  return new Promise((resolve, reject) => {
-    let promises = fireBase.setProjectProperties(project.id, { clip: project.clip });
-
-    // data variable contains the data returned by firebase, currently unused
-    Promise.all(promises)
-      .then(data => resolve(project), reject); 
-  });
 }
 
 function errorHandler(error) { 
   logger.error('Something went wrong while processing a job', error);
-}
-
-function updateProjectStatus(project) {
-  // #todo this needs to be a more general function
-  // i.e. which status, true/false, ...
-  return new Promise((resolve, reject) => {
-    fireBase.setProjectProperty(project.id, 'status/downscaled', true)
-    .then(fbData => resolve(project), reject);
-  }) 
-  
 }

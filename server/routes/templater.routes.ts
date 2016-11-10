@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { parseTitles } from '../../common/services/templater.service'
+import { Templater } from '../../common/services/templater.service'
 import { logger } from '../../common/config/winston';
 
 const router = express.Router();
@@ -7,7 +7,8 @@ const router = express.Router();
 router.get('/queue', (req, res) => {
   // return JSON object for templater to handle 
   const fireBase = req.app.get('fireBase');
-  const db = fireBase.getDatabase();
+  const templater = new Templater(fireBase);
+
   let data = [];
 
   /*
@@ -23,9 +24,9 @@ router.get('/queue', (req, res) => {
   *
   *   http://stackoverflow.com/a/28250697/1185774
   */
-  let templates = fireBase.getTemplates(db)
-  let project = fireBase.getFirst('templater-queue', db)
-    .then(job => fireBase.getProjectByJob(job, db), err => errorHandler(err));
+  let templates = fireBase.getTemplates()
+  let project = fireBase.getFirst('templater-queue')
+    .then(job => fireBase.getProjectByJob(job), err => errorHandler(err));
 
 
   Promise.all([
@@ -35,7 +36,7 @@ router.get('/queue', (req, res) => {
     const templates = data[0];
     const project = data[1];
 
-    res.send(parseTitles(project, templates));
+    res.send(templater.parseOverlays(project, templates));
   }, err => errorHandler(err));
 
 });
@@ -49,13 +50,13 @@ router.post('/status', (req, res) => {
     const titleId = req.body.titleId;
     const projectId = req.body.projectId;
     const status = req.body.status;
-
     const fireBase = req.app.get('fireBase');
-    const db = fireBase.getDatabase();
 
     // update title 
-    fireBase.updateAssetStatus(projectId, titleId, status).then(data => res.send(data), errorHandler);
-
+    fireBase.setProjectProperty(projectId, `annotations/${titleId}/render-status`, 'done')
+      .then(fbData => fireBase.getProjectById(projectId))
+      .then(project => fireBase.overlaysReady(project), errorHandler) 
+      .then(data => res.send(data), errorHandler);
 }); 
 
 function errorHandler(error) { 

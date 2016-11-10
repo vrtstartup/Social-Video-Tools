@@ -4,6 +4,7 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
 import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/video.service';
+import { getAnnotations, hasTitles } from '../../../common/services/project.service';
 
 @Component({
   providers: [UploadService],
@@ -36,19 +37,9 @@ export class SubtitlesComponent implements OnInit {
     this.projectTemplate = {
       name: '',
       clip: {},
-      subtitles: {
-        initial: {
-          text: 'Dit is een test',
-          start: '0.20',
-          end: '1.20',
-          options: {
-            "fade": true,
-            "size": 20
-          }
-        }
-      },
-      titles:{
+      annotations:{
           one:{
+            type: 'overlay',
             templateId: '-KVyfBD28LKYo8z04Vki',
             Text2DR: "Zo kennen we de Beenhouwersstraat in Brussel. Overal terrasjes en luifels.",
             start: '0.20',
@@ -56,6 +47,7 @@ export class SubtitlesComponent implements OnInit {
             "render-status": 'ready' 
           },
           two:{
+            type: 'overlay',
             templateId: '-KVyfBD28LKYo8z04Vki',
             Text2DR: "Zo ziet de straat er tegenwoordig uit. Terrassen en luifels moeten verdwijnen tijdens de wintermaanden.",
             start: '2.20',
@@ -63,11 +55,32 @@ export class SubtitlesComponent implements OnInit {
             "render-status": 'ready' 
           },
           three:{
+            type: 'overlay',
             templateId: '-KVyfBD28LKYo8z04Vki',
             Text2DR: "Enkele maanden geleden was er een brand in de wijk. De brandweer kon het brandende pand niet vlot bereiken.",
             start: '5.20',
             end: '6.20',
             "render-status": 'ready' 
+          },
+          four: {
+            type: 'subtitle',
+            text: 'Dit is een test',
+            start: '0.20',
+            end: '1.20',
+            options: {
+              "fade": true,
+              "size": 20
+            }
+          },
+          five: {
+            type: 'subtitle',
+            text: 'Dit is een test',
+            start: '0.20',
+            end: '1.20',
+            options: {
+              "fade": true,
+              "size": 20
+            }
           }
         },
       status: {
@@ -145,7 +158,7 @@ export class SubtitlesComponent implements OnInit {
   }
 
   queue() {
-    (this.hasTitles()) ? this.queueTitles() : this.queueSubtitles();
+    (hasTitles(this.project)) ? this.queueTitles() : this.queueSubtitles();
   }
 
   addSubtitle() {
@@ -163,22 +176,12 @@ export class SubtitlesComponent implements OnInit {
     this.firebaseSelectedSubKey = ref.key;
   }
 
-  hasTitles() {
-    // check wether or not this project containes titles
-    let children = false;
-
-    if(this.project.hasOwnProperty("titles")) {
-      children = Object.keys(this.project.titles).length !== 0;
-    } 
-
-    return children;
-  }
+  
 
   queueSubtitles() {
     // add a project ID to the 'to-process' list
     const key = this.firebaseProject.key;
-    this.firebaseToProcess.push({ 
-      projectId: key,
+    this.firebaseToProcess.update(key, { 
       operation: 'render',
       status: 'open',
     });
@@ -187,9 +190,6 @@ export class SubtitlesComponent implements OnInit {
   queueTitles() {
     // add project titles to 'templater-queue' list
     const key = this.firebaseProject.key;
-    this.firebaseTemplaterQueue.push({ 
-      projectId: key,
-      status: 'open',
-    });
+    this.firebaseTemplaterQueue.update(key, {status: 'open'});
   }
 }

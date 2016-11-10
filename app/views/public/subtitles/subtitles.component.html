@@ -33,7 +33,7 @@
 		<div class="s-sub__wrapper">
 			<!--subtitles column-->
 			<div class="s-sub-items">
-				<div *ngFor="let sub of project.subtitles | list" class="s-sub-item">
+				<div *ngFor="let sub of project.annotations | list" class="s-sub-item">
 					{{sub.text}}
 				</div>
 			</div>
@@ -68,10 +68,10 @@
 		<!--video-->
 		<div class="s-video_wrapper">
 			<div class="s-video">
-				<vrtvideo-player [video]="project.clip" [subAr]="project.subtitles | list"></vrtvideo-player>
-				<range-slider [subAr]="project.subtitles | list" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>
+				<vrtvideo-player [video]="project.clip" [subAr]="project.annotations | list"></vrtvideo-player>
+				<range-slider [subAr]="project.annotations | list" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>
 			</div>
-			<small>{{project.subtitles | list | json}}</small>
+			<small>{{project.annotations | list | json}}</small>
 		</div>
 
 	</div>

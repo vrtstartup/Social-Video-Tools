@@ -10,35 +10,37 @@ import { logger } from '../../common/config/winston';
 export class FireBase {
 
   public database: any;
+  public refFfmpegQueue: any;
 
   constructor() {
     // this operation is synchronous
     firebase.initializeApp( fbConfig );
 
     this.database = firebase.database();
+    this.refFfmpegQueue = this.database.ref('ffmpeg-queue');
   }
 
-  getDatabase() {
-    return this.database;
-  }
-
+  /*
+  * Job-related stuff
+  *
+  */
   queue(projectId, operation, firebaseDb?: any) {
     // set a project up for processing in the firebase queue
 
     // has firebase been initialized? 
-    const refQueue = this.database.ref('ffmpeg-queue');
+    const refFfmpegQueue = this.database.ref(`ffmpeg-queue/${projectId}`);
 
-    return refQueue.push({
-      "projectId": projectId,
+    return refFfmpegQueue.update({
       "operation": operation,
       "status": "open"
     });
   }
 
-  resolveJob(key) {
+  resolveJob(queue:string, key: string) {
     // get reference 
     logger.verbose('successfully processed job...');
-    return this.database.ref('ffmpeg-queue').child(key).remove();
+    
+    return this.database.ref(`${queue}`).child(key).remove();
   }
 
   killJob(key, err) {
@@ -54,9 +56,10 @@ export class FireBase {
     });
   }
 
-  getFirst(property:string, firebaseDb?: any) {
+  getFirst(property:string) {
+    // #todo implement logic for picking the proper job
     // get the first job from the queue stack
-    const refProperty = firebaseDb.ref(property);
+    const refProperty = this.database.ref(property);
 
     return new Promise((resolve, reject) => {
       refProperty.once('value', (snapshot) => {
@@ -82,11 +85,80 @@ export class FireBase {
     });
   }
 
-  getProjectByJob(job:any, firebaseDb?: any) {
-    const projectId = job.projectId;
-    const refProject = firebaseDb.ref(`projects/${projectId}`);
+  listenQueue(handler) {
+    this.refFfmpegQueue.on('value', (snapshot) => {
+      // this runs whenever a new job is created in the queue.
+      // logger.verbose('got new queue data'); //#todo feedback
+      const jobs = snapshot.val();
+      handler(jobs);
+    }, (errorObject) => {
+      logger.error(`The read failed: ${errorObject.code}`);
+    });
+  }
+
+  checkQueue(handler) {
+    // check wether or not any jobs have been added to queue whilst processing was happening
+    this.refFfmpegQueue.once('value', (snapshot) => {
+      const jobs = snapshot.val();
+
+      handler(jobs);
+    }, (errorObject) => {
+      logger.error(`The read failed: ${errorObject.code}`);
+    });
+  }
+
+  setInProgress(job) {
+    // busyProcessing = true;
+
+    // #todo do I have to wrap this in a promise? 
+    return new Promise((resolve, reject) => {
+      this.refFfmpegQueue.child(job.id)
+        .update({ 'status': 'in progress' })
+        .then(resolve(job),reject);
+    })
+  }
+
+  updateFfmpegQueue(job:any, value: Object) {
+    // Update the firebase entry property for a given project
+    return new Promise((resolve, reject) => {
+      const ref = this.database.ref(`ffmpeg-queue/${job.id}`);
+      ref.update(value)
+        .then(resolve(job), reject);
+    });
+  }
+
+  /*
+  * Project-related stuff
+  *
+  */
+  overlaysReady(project:any) {
+    // check if all assets have been rendered
+    // resolve job if they have 
+    return new Promise((resolve, reject) => {
+      let overlays = this.getAnnotations('overlay', project); 
+      let overlaysDone = true;
+
+      for(let key in overlays) {
+        if(overlays.hasOwnProperty(key)) {
+          overlaysDone = overlaysDone && (overlays[key]['render-status'] === 'done');
+        }
+      }
+
+      if(overlaysDone){
+        this.resolveJob('templater-queue', project.id)
+          .then(resolve);
+      } else{
+        resolve();
+      }
+    });
+
+  }
+
+  getProjectByJob(job:any) {
+    const refProject = this.database.ref(`projects/${job.id}`);
     
     // return the project.  
+    // #todo return value, wth?
     return refProject.once('value')
       .then( snapshot => {
         // for conveniece sake, append the project ID to the return object
@@ -96,16 +168,50 @@ export class FireBase {
       }, err => logger.error(err) )
   }
 
-  getTemplates(firebaseDb?: any) {
+  getProjectById(id:string) {
+    const refProject = this.database.ref(`projects/${id}`);
+
     return new Promise((resolve, reject) => {
-      firebaseDb.ref('templates').once('value')
+      refProject.once('value')
+      .then( snapshot => {
+        const project = snapshot.val();
+        project.id=snapshot.key;
+        resolve(project);
+      }, err => reject(err))
+    });
+  }
+
+  getAnnotations(type:string, project: any){
+    let annotations = project.annotations;
+    let collection = {};
+
+    Object.keys(annotations).forEach( key =>{
+      let obj = annotations[key];
+      if( obj.type === type) collection[key] = obj;
+    });
+
+    return collection;
+  }
+
+
+  /*
+  * Template-related stuff
+  *
+  */
+  getTemplates() {
+    return new Promise((resolve, reject) => {
+      this.database.ref('templates').once('value')
         .then(snapshot => resolve(snapshot.val()), err => logger.error(err));
     });
   }
 
-  updateAssetStatus(projectId, titleId, status) {
-    // #todo check wether status value is valid
-    return this.setProjectProperty(projectId, `titles/${titleId}/render-status`, status);
+  updateProject(project:any, value: Object) {
+    // Update the firebase entry property for a given project
+    return new Promise((resolve, reject) => {
+      const ref = this.database.ref(`projects/${project.id}`);
+      ref.update(value)
+        .then(resolve(project), reject);
+    });
   }
 
   setProjectProperty(projectId, property, value) {
