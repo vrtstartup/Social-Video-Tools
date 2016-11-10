@@ -85,10 +85,8 @@ function processLowResJob(project, job) {
           clip: project['clip']
         }), errorHandler)
         .then(project => scaleDown(project, progressHandler, job), errorHandler)
-        .then(project => fireBase.updateProject(project, { 
-          status: {
-            downscaled: true
-          }}), errorHandler)
+        .then(project => fireBase.setProjectProperty(
+          job.id, 'status/downscaled', true), errorHandler)
         .then(resolve, errorHandler);
     });
 }
@@ -118,12 +116,11 @@ function done() {
   fireBase.checkQueue(handleQueue);
 }
 
-
-
 function progressHandler(message, job) {
   // #todo updating the 'progress' value on the job triggers the listener, creating a feedback loop
   if (typeof message == 'object') { // this is an ffmpeg progress message
-    fireBase.updateFfmpegQueue(job, { 'progress': message.progress });
+    fireBase.updateFfmpegQueue(job, {'progress': message.progress});
+    fireBase.setProjectProperty(job.id, 'status/downScaleProgress', message.progress);
   }
 }
 

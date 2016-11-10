@@ -8,7 +8,8 @@
 			<button type="button" class="btn btn-secondary" (click)="''">Open</button>
 		</div>
 	</div>
-	<div class="s-submenu" *ngIf="firebaseProject">
+
+	<div class="s-submenu" *ngIf="(projectRef | async)">
 
 		<!--progressbar upload-->
 		<div class="s-progress" *ngIf="uploadProgress > 0 && uploadProgress < 100">
@@ -18,38 +19,48 @@
 			</div>
 		</div>
 
-		<div *ngIf="project.status.downscaled">
+		<!--progressbar downscaling-->
+		<div class="s-progress" *ngIf="(projectRef | async)?.status?.downScaleProgress > 0 && (projectRef | async)?.status?.downScaleProgress < 100">
+			<div class="s-progress__label">upload</div>
+			<div class="s-progress__bg" *ngIf="(projectRef | async)?.status.downScaleProgress">
+				<div class="s-progress__bar" [style.width]="(projectRef | async)?.status?.downScaleProgress + '%' "></div>
+			</div>
+		</div>
+
+		<div *ngIf="(projectRef | async)?.status?.downscaled">
 			<label class="btn btn-secondary btn-upload">
-				<input type="file" name="video" (change)="upload($event)">Change Source
+				<input type="file" name="video" (change)="createNewProject($event)">Change Source
 			</label>
-			<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="addSubtitle()">Add Subtitle(U)</button>
-			<button *ngIf="project.status.downscaled" type="button" class="btn btn-secondary" (click)="queue()">Render Movie(R)</button>
+			<button type="button" class="btn btn-secondary" (click)="addSubtitle()">Add Subtitle(U)</button>
+			<button type="button" class="btn btn-secondary" (click)="addToRenderQueue()">Render Movie(R)</button>
 		</div>
 	</div>
-
-	<div class="s-sub-controls" *ngIf="project && project.status.downscaled">
+	
+	<div class="s-sub-controls" *ngIf="(projectRef | async)?.status?.downscaled">
+		
+		<small class="">{{ projectRef | async | json }}</small><br>
 		
 		<!--subs-->
 		<div class="s-sub__wrapper">
 			<!--subtitles column-->
-			<div class="s-sub-items">
+			<!--<div class="s-sub-items">
 				<div *ngFor="let sub of project.annotations | list" class="s-sub-item">
 					{{sub.text}}
 				</div>
-			</div>
+			</div>-->
 
 			<!--template column-->
-			<div class="s-sub-templates">
+			<!--<div class="s-sub-templates">
 				<div class="s-sub-template">
 					template 1
 				</div>
 				<div class="s-sub-template">
 					template 2
 				</div>
-			</div>
+			</div>-->
 
 			<!--inputs column-->
-			<div class="s-sub-inputs">
+			<!--<div class="s-sub-inputs">
 				<div class="">
 					inputs here
 				</div>
@@ -62,19 +73,17 @@
 				<div class="s-sub-input">
 					inputs here
 				</div>
-			</div>
+			</div>-->
 		</div>
 
 		<!--video-->
 		<div class="s-video_wrapper">
-			<div class="s-video">
+			<!--<div class="s-video">
 				<vrtvideo-player [video]="project.clip" [subAr]="project.annotations | list"></vrtvideo-player>
 				<range-slider [subAr]="project.annotations | list" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>
 			</div>
-			<small>{{project.annotations | list | json}}</small>
+			<small>{{project.annotations | list | json}}</small>-->
 		</div>
 
 	</div>
-
-	<div class=""></div>
 </div>
