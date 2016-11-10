@@ -24,10 +24,9 @@ export class FireBase {
     // set a project up for processing in the firebase queue
 
     // has firebase been initialized? 
-    const refFfmpegQueue = this.database.ref('to-process');
+    const refFfmpegQueue = this.database.ref(`to-process/${projectId}`);
 
-    return refFfmpegQueue.push({
-      "projectId": projectId,
+    return refFfmpegQueue.update({
       "operation": operation,
       "status": "open"
     });

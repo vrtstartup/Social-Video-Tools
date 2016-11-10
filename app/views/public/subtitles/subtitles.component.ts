@@ -36,38 +36,50 @@ export class SubtitlesComponent implements OnInit {
     this.projectTemplate = {
       name: '',
       clip: {},
-      subtitles: {
-        initial: {
-          text: 'Dit is een test',
-          start: '0.20',
-          end: '1.20',
-          options: {
-            "fade": true,
-            "size": 20
-          }
-        }
-      },
-      titles:{
-          one:{
-            templateId: '-KVyfBD28LKYo8z04Vki',
-            Text2DR: "Zo kennen we de Beenhouwersstraat in Brussel. Overal terrasjes en luifels.",
+      annotations:{
+          // one:{
+          //   type: 'title',
+          //   templateId: '-KVyfBD28LKYo8z04Vki',
+          //   Text2DR: "Zo kennen we de Beenhouwersstraat in Brussel. Overal terrasjes en luifels.",
+          //   start: '0.20',
+          //   end: '1.20',
+          //   "render-status": 'ready' 
+          // },
+          // two:{
+          //   type: 'title',
+          //   templateId: '-KVyfBD28LKYo8z04Vki',
+          //   Text2DR: "Zo ziet de straat er tegenwoordig uit. Terrassen en luifels moeten verdwijnen tijdens de wintermaanden.",
+          //   start: '2.20',
+          //   end: '3.20',
+          //   "render-status": 'ready' 
+          // },
+          // three:{
+          //   type: 'title',
+          //   templateId: '-KVyfBD28LKYo8z04Vki',
+          //   Text2DR: "Enkele maanden geleden was er een brand in de wijk. De brandweer kon het brandende pand niet vlot bereiken.",
+          //   start: '5.20',
+          //   end: '6.20',
+          //   "render-status": 'ready' 
+          // },
+          four: {
+            type: 'subtitle',
+            text: 'Dit is een test',
             start: '0.20',
             end: '1.20',
-            "render-status": 'ready' 
+            options: {
+              "fade": true,
+              "size": 20
+            }
           },
-          two:{
-            templateId: '-KVyfBD28LKYo8z04Vki',
-            Text2DR: "Zo ziet de straat er tegenwoordig uit. Terrassen en luifels moeten verdwijnen tijdens de wintermaanden.",
-            start: '2.20',
-            end: '3.20',
-            "render-status": 'ready' 
-          },
-          three:{
-            templateId: '-KVyfBD28LKYo8z04Vki',
-            Text2DR: "Enkele maanden geleden was er een brand in de wijk. De brandweer kon het brandende pand niet vlot bereiken.",
-            start: '5.20',
-            end: '6.20',
-            "render-status": 'ready' 
+          five: {
+            type: 'subtitle',
+            text: 'Dit is een test',
+            start: '0.20',
+            end: '1.20',
+            options: {
+              "fade": true,
+              "size": 20
+            }
           }
         },
       status: {
@@ -177,8 +189,7 @@ export class SubtitlesComponent implements OnInit {
   queueSubtitles() {
     // add a project ID to the 'to-process' list
     const key = this.firebaseProject.key;
-    this.firebaseToProcess.push({ 
-      projectId: key,
+    this.firebaseToProcess.update(key, { 
       operation: 'render',
       status: 'open',
     });
