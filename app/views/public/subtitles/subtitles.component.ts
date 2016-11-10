@@ -23,6 +23,7 @@ export class SubtitlesComponent implements OnInit {
   projectRef: FirebaseObjectObservable<any[]>;
   projectId: string;
   annotationsRef: FirebaseListObservable<any[]>;
+  clipRef: FirebaseObjectObservable<any[]>;
 
   firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
   project: any; // this is the ngModel we use to update, receive and bind firebase data
@@ -56,11 +57,11 @@ export class SubtitlesComponent implements OnInit {
     // create new empty prject
     this.projectsRef.push('')
       .then((ref) => {
-        // set references
+        // set project-references
         this.projectId = ref.key ;
         this.projectRef = this.af.database.object(ref.toString())
         this.annotationsRef = this.af.database.list(`${ref.toString()}/annotations`)
-        //refProcess.child(ref.key)
+        this.clipRef = this.af.database.object(`${ref.toString()}/clip`)
         // upload
         this.uploadSource($event)
       })
@@ -73,10 +74,7 @@ export class SubtitlesComponent implements OnInit {
 
     // Upload video
     this.uploadService.makeFileRequest('api/upload', this.source, this.projectId)
-      .subscribe((data) => {
-        // response holds link to lowres video source
-        this.projectRef.update({ lowResUrl: data.lowResUrl });
-      });
+      .subscribe((data) => { });
   }
 
   /*
