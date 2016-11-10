@@ -1,4 +1,4 @@
-export const projectTemplate = {
+export default {
     name: '',
     clip: {},
     annotations: {

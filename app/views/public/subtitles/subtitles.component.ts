@@ -6,7 +6,8 @@ import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/video.service';
 
 // TODO remove | only for test purposes
-import testTemplate from './testTemplate.model';
+import testTemplate from './testModels/testTemplate.model';
+import annotationTemplate from './testModels/annotationTemplate.model';
 
 @Component({
   providers: [UploadService],
@@ -97,19 +98,12 @@ export class SubtitlesComponent implements OnInit {
   }
 
   addAnnotation() {
-    const annotationTemplate = {
-      type: 'subtitle',
-      start: '0.20',
-      end: '1.20',
-      data: '',
-    }
     this.annotationsRef.push(annotationTemplate);
   }
 
   updateAnnotation(event) {
     this.annotationsRef.update(event.$key, { start: event.start, end: event.end});
   }
-
 
 
   /*
