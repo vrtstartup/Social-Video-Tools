@@ -47,8 +47,11 @@ router.post('/', file, (req: any, res) => {
       'source': fileMeta.filename,
     },
     clip: {
-      'lowResUrl': lowResUrl,
-    } 
+      'lowResUrl': lowResUrl + '?' + Date.now(),
+    },
+    status: {
+      'downscaled': false,
+    }
   });
 
   Promise.all(proms).then(
