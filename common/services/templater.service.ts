@@ -1,33 +1,41 @@
-export function parseTitles( project, templates ) {
-  if(project.hasOwnProperty('titles')) {
-    // titles exist. 
-    const titles = project.titles;
-    const arrKeys = Object.keys(titles);
-    const arrReturn = [];
+export class Templater {
+  private fireBase;
 
-    if(arrKeys.length !== 0 && titles.constructor === Object) {
-      // has proper data type
-      arrKeys.forEach((key) => {
-        const title = titles[key];
-        const template = templates[title.templateId];
+  constructor(fireBase:any) { 
+    this.fireBase = fireBase;
+  }
 
-        // append some extra data so the templater bot can update status
-        title.titeId = key;
-        title.projectId = project.id;
+  parseOverlays( project, templates ) {
+    if(project.hasOwnProperty('annotations')) {
+      // titles exist. 
+      const overlays = this.fireBase.getAnnotations('overlay', project);
+      const arrKeys = Object.keys(overlays);
+      const arrReturn = [];
 
-        arrReturn.push(entry(title, template));
-      });
+      if(arrKeys.length !== 0 && overlays.constructor === Object) {
+        // has proper data type
+        arrKeys.forEach((key) => {
+          const overlay = overlays[key];
+          const template = templates[overlay.templateId];
+
+          // append some extra data so the templater bot can update status
+          overlay.titeId = key;
+          overlay.projectId = project.id;
+
+          arrReturn.push(this.entry(overlay, template));
+        });
+      }
+
+      return arrReturn;
+    }
+  }
+
+  entry( overlay, template ) {
+    // annotate template data with overlay data
+    for(let field in overlay) {
+      if(overlay.hasOwnProperty(field)) template[field] = overlay[field];
     }
 
-    return arrReturn;
+    return (<any>Object).assign({}, template);
   }
-}
-
-function entry( title, template ) {
-  // annotate template data with title data
-  for(let field in title) {
-    if(title.hasOwnProperty(field)) template[field] = title[field];
-  }
-
-  return (<any>Object).assign({}, template);
 }

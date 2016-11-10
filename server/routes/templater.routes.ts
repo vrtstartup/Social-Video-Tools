@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { parseTitles } from '../../common/services/templater.service'
+import { Templater } from '../../common/services/templater.service'
 import { logger } from '../../common/config/winston';
 
 const router = express.Router();
@@ -7,6 +7,8 @@ const router = express.Router();
 router.get('/queue', (req, res) => {
   // return JSON object for templater to handle 
   const fireBase = req.app.get('fireBase');
+  const templater = new Templater(fireBase);
+
   let data = [];
 
   /*
@@ -34,7 +36,7 @@ router.get('/queue', (req, res) => {
     const templates = data[0];
     const project = data[1];
 
-    res.send(parseTitles(project, templates));
+    res.send(templater.parseOverlays(project, templates));
   }, err => errorHandler(err));
 
 });
@@ -51,9 +53,9 @@ router.post('/status', (req, res) => {
     const fireBase = req.app.get('fireBase');
 
     // update title 
-    fireBase.setProjectProperty(projectId, `titles/${titleId}/render-status`, 'done')
+    fireBase.setProjectProperty(projectId, `annotations/${titleId}/render-status`, 'done')
       .then(fbData => fireBase.getProjectById(projectId))
-      .then(project => fireBase.titlesReady(project), errorHandler) 
+      .then(project => fireBase.overlaysReady(project), errorHandler) 
       .then(data => res.send(data), errorHandler);
 }); 
 

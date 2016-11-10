@@ -4,11 +4,12 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { FireBase } from '../common/services/firebase.service';
 import { ffprobe, scaleDown, burnSrt } from '../common/services/encoding.service';
-import * as subtitle from '../common/services/subtitle.service';
+import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 
 // init database 
 const fireBase = new FireBase();
+const subtitle = new Subtitle(fireBase); //inject database
 
 let busyProcessing = false; // busy / idle state
 
