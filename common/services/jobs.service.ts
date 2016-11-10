@@ -44,11 +44,11 @@ export class Jobs {
     });
   }
 
-  queue(projectId, operation) {
+  queue(queue, projectId, operation) {
     // set a project up for processing in the firebase queue
 
     // has firebase been initialized? 
-    const refFfmpegQueue = this.fireBase.database.ref(`ffmpeg-queue/${projectId}`);
+    const refFfmpegQueue = this.fireBase.database.ref(`${queue}/${projectId}`);
 
     return refFfmpegQueue.update({
       "operation": operation,

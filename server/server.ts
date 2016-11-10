@@ -27,6 +27,7 @@ const port = process.env.PORT || config.port;
 const uploadRoutes = require('./routes/upload.routes');
 const fileRoutes = require('./routes/file.routes');
 const templaterRoutes = require('./routes/templater.routes');
+const renderRoutes = require('./routes/render.routes');
 
 server.set('projects', projects);
 server.set('jobs', jobs);
@@ -58,6 +59,7 @@ server.use(cors(corsOptions));
 server.use('/api/upload', uploadRoutes);
 server.use('/api/file', fileRoutes);
 server.use('/api/templater', templaterRoutes);
+server.use('/api/render', renderRoutes);
 
 logger.verbose('listening on port: ' + port);
 server.listen(port);

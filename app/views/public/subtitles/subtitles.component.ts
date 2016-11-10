@@ -4,7 +4,6 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
 import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/video.service';
-import { getAnnotations, hasTitles } from '../../../common/services/project.service';
 
 @Component({
   providers: [UploadService],
@@ -80,6 +79,11 @@ export class SubtitlesComponent implements OnInit {
       });
   }
 
+  addToRenderQueue() {
+    this.http.post('api/render', {projectId: this.projectId})
+      .subscribe((data) => { console.log(data)});
+  }
+
   /*
   addSubtitle() {
     const ref = this.firebaseProject.child('subtitles').push({
@@ -136,10 +140,6 @@ export class SubtitlesComponent implements OnInit {
       }
   
       return children;
-    }
-  
-    addToRenderQueue() {
-      (this.hasTitles()) ? this.addToTemplaterQueue() : this.addToFFmpegQueue();
     }
   
     addToFFmpegQueue() {

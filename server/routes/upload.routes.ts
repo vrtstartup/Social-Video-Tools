@@ -57,7 +57,7 @@ router.post('/', file, (req: any, res) => {
 
   Promise.all(proms).then(
     // queue this project for lowres rendering
-    jobs.queue(projectId, 'lowres')
+    jobs.queue('ffmpeg-queue', projectId, 'lowres')
   )
 
   // respond to client request

@@ -34,6 +34,18 @@ export class Project {
     return collection;
   }
 
+  hasTitles() {
+    // check wether or not this project containes titles
+    let noTitles = false;
+
+    if(this.data.hasOwnProperty("annotations")) {
+      const annotations = this.getAnnotations('overlay');
+      noTitles = (Object.keys(annotations).length  !== 0 && annotations === Object);
+    } 
+
+    return !noTitles;
+  }
+
   parseOverlays( templates ) {
     // titles exist. 
     const overlays = this.getAnnotations('overlay');
