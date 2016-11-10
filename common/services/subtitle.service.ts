@@ -8,7 +8,7 @@ export class Subtitle {
 
   private fireBase;
 
-  constructor(fireBase:any) { // inject the database as a dependency
+  constructor(fireBase:any) { 
     this.fireBase = fireBase;
   }
 

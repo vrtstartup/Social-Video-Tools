@@ -1,14 +1,17 @@
 import * as express from 'express';
-import { Templater } from '../../common/services/templater.service'
 import { logger } from '../../common/config/winston';
 
 const router = express.Router();
 
 router.get('/queue', (req, res) => {
   // return JSON object for templater to handle 
-  const fireBase = req.app.get('fireBase');
-  const templater = new Templater(fireBase);
 
+  // services
+  const templateService = req.app.get('templates');
+  const jobService = req.app.get('jobs');
+  const projectService = req.app.get('projects');
+
+  // return data
   let data = [];
 
   /*
@@ -24,9 +27,9 @@ router.get('/queue', (req, res) => {
   *
   *   http://stackoverflow.com/a/28250697/1185774
   */
-  let templates = fireBase.getTemplates()
-  let project = fireBase.getFirst('templater-queue')
-    .then(job => fireBase.getProjectByJob(job), err => errorHandler(err));
+  let templates = templateService.getAll();
+  let project = jobService.getFirst('templater-queue')
+    .then(job => projectService.getProjectByJob(job), err => errorHandler(err));
 
 
   Promise.all([
@@ -36,7 +39,7 @@ router.get('/queue', (req, res) => {
     const templates = data[0];
     const project = data[1];
 
-    res.send(templater.parseOverlays(project, templates));
+    res.send(project.parseOverlays(templates));
   }, err => errorHandler(err));
 
 });
@@ -50,12 +53,19 @@ router.post('/status', (req, res) => {
     const titleId = req.body.titleId;
     const projectId = req.body.projectId;
     const status = req.body.status;
-    const fireBase = req.app.get('fireBase');
+
+    // services
+    const projectService = req.app.get('projects');
+    const jobService = req.app.get('jobs');
 
     // update title 
-    fireBase.setProjectProperty(projectId, `annotations/${titleId}/render-status`, 'done')
-      .then(fbData => fireBase.getProjectById(projectId))
-      .then(project => fireBase.overlaysReady(project), errorHandler) 
+    projectService.setProjectProperty(projectId, `annotations/${titleId}/render-status`, 'done')
+      .then(fbData => projectService.getProjectById(projectId))
+      .then(project => {
+        if (project.overlaysReady()) {
+          jobService.resolveJob('templater-queue', projectId);
+        }
+      }, errorHandler) 
       .then(data => res.send(data), errorHandler);
 }); 
 
