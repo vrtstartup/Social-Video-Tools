@@ -5,6 +5,9 @@ import 'rxjs/Rx';
 import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/video.service';
 
+// TODO remove | only for test purposes
+import testTemplate from './testTemplate.model';
+
 @Component({
   providers: [UploadService],
   selector: 'subtitles-component',
@@ -23,6 +26,8 @@ export class SubtitlesComponent implements OnInit {
   projectId: string;
   annotationsRef: FirebaseListObservable<any[]>;
   clipRef: FirebaseObjectObservable<any[]>;
+  templatesRef: FirebaseObjectObservable<any[]>;
+  selectedAnnotation: any;
 
   firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
   project: any; // this is the ngModel we use to update, receive and bind firebase data
@@ -33,13 +38,17 @@ export class SubtitlesComponent implements OnInit {
     private zone: NgZone,
     private http: Http,
     private uploadService: UploadService,
-    af: AngularFire){
+    af: AngularFire) {
 
     this.af = af;
     // General Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
     this.templaterQueueRef = af.database.list('/templater-queue');
     this.projectsRef = af.database.list('/projects');
+    this.templatesRef = af.database.object('/templates');
+    
+    // TODO remove | only for test purposes
+    this.templatesRef.set(testTemplate);
   }
 
   ngOnInit() {
@@ -53,46 +62,57 @@ export class SubtitlesComponent implements OnInit {
   }
 
   createNewProject($event) {
-    // create new empty prject
+    // reset some values
+    this.selectedAnnotation = false; 
+    // create new empty project
     this.projectsRef.push('')
       .then((ref) => {
         // set project-references
-        this.projectId = ref.key ;
+        this.projectId = ref.key;
         this.projectRef = this.af.database.object(ref.toString())
         this.annotationsRef = this.af.database.list(`${ref.toString()}/annotations`)
         this.clipRef = this.af.database.object(`${ref.toString()}/clip`)
         // upload
         this.uploadSource($event)
       })
-      .catch( err => console.log(err, 'could not create|upload a new project'));
+      .catch(err => console.log(err, 'could not create|upload a new project'));
   }
 
   uploadSource($event) {
     // File-ref to upload
     this.source = $event.target.files[0];
-
     // Upload video
     this.uploadService.makeFileRequest('api/upload', this.source, this.projectId)
       .subscribe((data) => { });
   }
 
   addToRenderQueue() {
-    this.http.post('api/render', {projectId: this.projectId})
-      .subscribe((data) => { console.log(data)});
+    this.http.post('api/render', { projectId: this.projectId })
+      .subscribe((data) => {});
   }
 
-  /*
-  addSubtitle() {
-    const ref = this.firebaseProject.child('subtitles').push({
-      text: 'Dit is een test',
-      start: '0.2',
-      end: '1.2',
-      options: {
-        "fade": true,
-        "size": 20
-      }
-    });
+  setSelectedAnnotation(annotation){
+    this.selectedAnnotation = annotation;
+    // reveal available templates (based on rights)
+  }
 
+  addAnnotation() {
+    const annotationTemplate = {
+      type: 'subtitle',
+      start: '0.20',
+      end: '1.20',
+      data: '',
+    }
+    this.annotationsRef.push(annotationTemplate);
+  }
+
+  updateAnnotation(event) {
+    this.annotationsRef.update(event.$key, { start: event.start, end: event.end});
+  }
+
+
+
+  /*
     // update the selected sub key
     this.firebaseSelectedSubKey = ref.key;
   }
@@ -105,27 +125,6 @@ export class SubtitlesComponent implements OnInit {
         const data = snapshot.val();
         this.project[child] = data;
       });
-    }
-  
-    // #todo write general update function instead of updateThis, updateThat...
-    updateSubtitles(event) {
-      const key = this.firebaseSelectedSubKey;
-      this.projectRef.child('subtitles').child(key).update(event);
-    }
-  
-    addSubtitle() {
-      const ref = this.projectRef.child('subtitles').push({
-        text: 'Dit is een test',
-        start: '0.2',
-        end: '1.2',
-        options: {
-          "fade": true,
-          "size": 20
-        }
-      });
-  
-      // update the selected sub key
-      this.firebaseSelectedSubKey = ref.key;
     }
   
     hasTitles() {

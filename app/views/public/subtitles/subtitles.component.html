@@ -32,7 +32,7 @@
 			<label class="btn btn-secondary btn-upload">
 				<input type="file" name="video" (change)="uploadSource($event)">Change Source
 			</label>
-			<button type="button" class="btn btn-secondary" (click)="addSubtitle()">Add Subtitle(U)</button>
+			<button type="button" class="btn btn-secondary" (click)="addAnnotation()">Add Annotation(U)</button>
 			<button type="button" class="btn btn-secondary" (click)="addToRenderQueue()">Render Movie(R)</button>
 		</div>
 	</div>
@@ -42,11 +42,13 @@
 		<!--subs-->
 		<div class="s-sub__wrapper">
 			<!--subtitles column-->
-			<!--<div class="s-sub-items">
-				<div *ngFor="let sub of project.annotations | list" class="s-sub-item">
-					{{sub.text}}
+			<div class="s-sub-items">
+				<div *ngFor="let annotation of annotationsRef | async" class="s-sub-item">
+					<div (click)="setSelectedAnnotation(annotation)">
+						{{annotation.start | json}} | {{annotation.end | json}}
+					</div> 
 				</div>
-			</div>-->
+			</div>
 
 			<!--template column-->
 			<div class="s-sub-templates">
@@ -79,16 +81,19 @@
 		<div class="s-video_wrapper">
 			<div class="s-video">
 				<vrtvideo-player 
-					[clip]="(clipRef | async)">
+					[clip]="(clipRef | async)"
+					[selectedAnnotation]="selectedAnnotation">
 				</vrtvideo-player>
-					<!--[subAr]="(projectRef | async)?.clip">-->
 
-				<!--<range-slider [subAr]="project.annotations | list" [video]="project.clip" (change)="updateSubtitles($event)"></range-slider>-->
+				<range-slider *ngIf="selectedAnnotation"
+					[selectedAnnotation]="selectedAnnotation" 
+					[clip]="(clipRef | async)" (change)="updateAnnotation($event)">
+				</range-slider>
 			</div>
 		</div>
 
 	</div>
-
+	
 	<small class="">{{ projectRef | async | json }}</small><br>
 
 </div>

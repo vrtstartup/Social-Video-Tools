@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, ElementRef, AfterViewInit, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ElementRef, OnChanges } from '@angular/core';
 
 //import { ElementRef } from '@angular/core';
 //import * as $ from 'jquery';
@@ -9,50 +9,61 @@ const noUiSlider = require('nouislider');
     selector: 'range-slider',
     template: `
     <div class="range-slider__wrapper">
-        <div class="range-slider__value">{{subAr[0].start}}|{{subAr[0].end}}|{{video.movielength}}</div> 
+        <div class="range-slider__value">{{selectedAnnotation.start}}|{{selectedAnnotation.end}}|{{clip.movielength}}</div> 
         <div id="range-slider"></div>
     </div>`,
 })
-export class RangeSliderComponent implements OnInit, AfterViewInit, OnChanges {
-    @Input() video: any;
-    @Input() subAr: any;
+export class RangeSliderComponent implements OnInit, OnChanges {
+    @Input() clip: any;
+    @Input() selectedAnnotation: any;
     @Output() change = new EventEmitter();
 
     rangeSlider: any;
 
     constructor(
         // private el: ElementRef
-        ){
+        ) {
+        console.log('Constructor');
     }
 
     ngOnInit() {
+        console.log('ngOnInit');
         // $( this.el.nativeElement ).find('button').on('click', function(){ alert('it works'); })
 
-        this.rangeSlider = document.getElementById('range-slider');
+    }
 
-        noUiSlider.create(this.rangeSlider, {
-            start: [ this.subAr[0].start, this.subAr[0].end ],
-            // step: 1,
-            behaviour: 'drag',
-            connect: true,
-            range: { 'min':  0, 'max':  parseFloat(this.video.movieLength) },
-            tooltips: true,
-        });
+    ngOnChanges() {
+        console.log('change in noUiSlider');
+        // everytime a new annotatin is selected change is detected
+        if(!this.rangeSlider){
+            this.rangeSlider = document.getElementById('range-slider');
+
+            noUiSlider.create(this.rangeSlider, {
+                start: [this.selectedAnnotation.start, this.selectedAnnotation.end],
+                // step: 1,
+                behaviour: 'drag',
+                connect: true,
+                range: { 'min': 0, 'max': parseFloat(this.clip.movieLength) },
+                tooltips: true,
+            });
+        } 
+        
+        this.rangeSlider.noUiSlider.set([this.selectedAnnotation.start, this.selectedAnnotation.end])
 
         this.rangeSlider.noUiSlider.on('update', () => {
 
-            this.subAr[0].start = this.rangeSlider.noUiSlider.get()[0]
-            this.subAr[0].end = this.rangeSlider.noUiSlider.get()[1]
+            this.selectedAnnotation.start = this.rangeSlider.noUiSlider.get()[0]
+            this.selectedAnnotation.end = this.rangeSlider.noUiSlider.get()[1]
 
-            this.change.emit(Object.assign({}, this.subAr[0]));
+            this.change.emit(Object.assign({}, this.selectedAnnotation));
         });
-    }
+        
 
-    ngAfterViewInit() {
-    }
 
-    ngOnChanges(){
-        console.log('change');
+        console.log('rangeslider exists:', this.rangeSlider)
+
+        //console.log( 'this.rangeSlider.noUiSlider :', this.rangeSlider )
+        //.set([this.selectedAnnotation.start, this.selectedAnnotation.end]);
         // Check on subtitle is selected/passed
         // if subtitle passed, set noUiSlider
         // on change update selected subtitle

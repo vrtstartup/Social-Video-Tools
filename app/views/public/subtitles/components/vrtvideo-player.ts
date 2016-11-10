@@ -7,7 +7,7 @@ import { VgAPI, VgFullscreenAPI } from 'videogular2/core';
 })
 export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
     @Input() clip;
-    //@Input() subAr;
+    @Input() selectedAnnotation;
 
     sources: Array<Object>;
     controls: boolean = false;
@@ -26,16 +26,19 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
     ngAfterViewInit() {}
 
     ngOnChanges() {
+
         if (this.clip) {
             this.clip.lowResUrl = this.clip.lowResUrl + Math.floor((Math.random() * 10) + 1)
             this.sources = [this.clip];
         }
 
-        //let seektime = ( parseFloat(this.subAr[0].start) / parseFloat(this.video.movieLength) * 100 ) ;
-        //this.api.seekTime( seektime );
+        if (this.selectedAnnotation){
+            let seektime = ( parseFloat(this.selectedAnnotation.start) / parseFloat(this.clip.movieLength) * 100 ) ;
+            this.api.seekTime( seektime );
+            this.api.play();
+        }
 
         // conflict
-        // this.api.play();
     }
 
     onPlayerReady() {
