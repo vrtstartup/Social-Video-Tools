@@ -30,12 +30,12 @@ function handleQueue(jobs) {
   if (jobs && !busyProcessing) {
     logger.verbose("processing queue...");
 
-    const job = fireBase.getFirst('to-process')
+    const job = fireBase.getFirst('ffmpeg-queue')
       .then((job:any) => {
         fireBase.setInProgress(job); // update job state
         fireBase.getProjectByJob(job)
           .then( project => handleJob(job, project), errorHandler)
-          .then( project => fireBase.resolveJob('to-process', job.id), errorHandler)
+          .then( project => fireBase.resolveJob('ffmpeg-queue', job.id), errorHandler)
           .then(done, errorHandler)
       }, (warning) => logger.warn(warning))
   }

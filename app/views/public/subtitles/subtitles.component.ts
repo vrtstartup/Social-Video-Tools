@@ -91,7 +91,7 @@ export class SubtitlesComponent implements OnInit {
     };
 
     // init AngularFire
-    this.firebaseToProcess = af.database.list('/to-process');
+    this.firebaseToProcess = af.database.list('/ffmpeg-queue');
     this.firebaseTemplaterQueue = af.database.list('/templater-queue');
     this.firebaseProjects = af.database.list('/projects');
 
@@ -158,6 +158,7 @@ export class SubtitlesComponent implements OnInit {
   }
 
   queue() {
+    console.log(hasTitles(this.project));
     (hasTitles(this.project)) ? this.queueTitles() : this.queueSubtitles();
   }
 
