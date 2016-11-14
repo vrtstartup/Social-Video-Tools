@@ -8,3 +8,4 @@ worker/bin
 npm-debug.log
 logs
 projects
+data
