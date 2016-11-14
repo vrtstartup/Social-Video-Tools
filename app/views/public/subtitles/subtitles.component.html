@@ -11,6 +11,9 @@
 
 	<div class="s-submenu" *ngIf="(projectRef | async)">
 
+		<!--erro message upload|project -->
+		<div class="" *ngIf="userMessage">{{userMessage}}</div>
+
 		<!--progressbar upload-->
 		<div class="s-progress" *ngIf="uploadProgress > 0 && uploadProgress < 100">
 			<div class="s-progress__label">upload</div>

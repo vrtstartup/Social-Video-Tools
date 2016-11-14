@@ -29,6 +29,7 @@ export class SubtitlesComponent implements OnInit {
   clipRef: FirebaseObjectObservable<any[]>;
   templatesRef: FirebaseObjectObservable<any[]>;
   selectedAnnotation: any;
+  userMessage: string = '';
 
   firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
   project: any; // this is the ngModel we use to update, receive and bind firebase data
@@ -85,7 +86,7 @@ export class SubtitlesComponent implements OnInit {
     // Upload video
     this.uploadService.makeFileRequest('api/upload', this.source, this.projectId)
       .subscribe(
-        data => { console.log('data', data) },
+        data => { },
         err => { console.log('err', err) }
       );
   }
