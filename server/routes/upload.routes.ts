@@ -8,17 +8,14 @@ const mkdirp = require('mkdirp');
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
+const storageLowres = multer.diskStorage({
   destination: (req, file, cb) => {
-    // #todo baseDir naming as project id is a project-wide convention, but not a flexible one
     const baseDir = req.body.projectId;
 
     // #todo this is out of place
     resolve.makeProjectDirectories(baseDir);
-    
-    const dest = resolve.destinationDirectory('source', baseDir );
 
-    // this is multer's weird-ass way of passing strings...
+    const dest = resolve.destinationDirectory('source', baseDir );
     cb(null, dest);
   },
   filename: (req, file, cb) => {
@@ -27,11 +24,35 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage });
+const storageOverlays = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const baseDir = req.body.projectId;
 
-const file = upload.fields([{ name: 'video' }]);
+    console.log('test');
+    console.log(req.body);
+    console.log('baseDir: ', baseDir);
 
-router.post('/', file, (req: any, res) => {
+    // #todo this is out of place
+    resolve.makeProjectDirectories(baseDir);
+
+    const dest = resolve.destinationDirectory('overlays', baseDir );
+    cb(null, dest);
+  },
+  filename: (req, file, cb) => {
+    const baseDir = req.body.projectId;
+    const overlayId = req.body.overlayId;
+
+    const filename = overlayId + resolve.getFileNameByType('overlays', baseDir);
+    cb(null, filename);
+  }
+});
+
+
+
+const uploadLowres = multer({ storage: storageLowres }).fields([{ name: 'video' }]);
+const uploadOverlays = multer({ storage: storageOverlays }).fields([{ name: 'video' }]);
+
+router.post('/', uploadLowres, (req: any, res) => {
   // services 
   const projects = req.app.get('projects');
   const jobs = req.app.get('jobs');
@@ -44,6 +65,8 @@ router.post('/', file, (req: any, res) => {
   // #todo: fix link for deployment
   const lowResUrl = resolve.staticUrl('lowres', projectId);
   
+  console.log(fileMeta.filename);
+
   // update project 
   let proms = projects.setProjectProperties(projectId, {
     files: {
@@ -71,6 +94,11 @@ router.post('/', file, (req: any, res) => {
     lowResUrl: lowResUrl,
   });
 
+});
+
+
+router.post('/overlay', uploadOverlays, (req:any, res) => {
+  res.json({success: true, info: 'file has been uploaded.'});
 });
 
 module.exports = router;

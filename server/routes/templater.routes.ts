@@ -50,7 +50,7 @@ router.get('/queue', (req, res) => {
 */ 
 router.post('/status', (req, res) => {
     // parse request
-    const titleId = req.body.titleId;
+    const overlayId = req.body.overlayId;
     const projectId = req.body.projectId;
     const status = req.body.status;
 
@@ -59,14 +59,14 @@ router.post('/status', (req, res) => {
     const jobService = req.app.get('jobs');
 
     // update title 
-    projectService.setProjectProperty(projectId, `annotations/${titleId}/render-status`, 'done')
+    projectService.setProjectProperty(projectId, `annotations/${overlayId}/render-status`, 'done')
       .then(fbData => projectService.getProjectById(projectId))
       .then(project => {
         if (project.overlaysReady()) {
           jobService.resolveJob('templater-queue', projectId);
         }
       }, errorHandler) 
-      .then(data => res.send(data), errorHandler);
+      .then(data => res.send({success: true, info: 'overlay status has been updated.'}), errorHandler);
 }); 
 
 function errorHandler(error) { 

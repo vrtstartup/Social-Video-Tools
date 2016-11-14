@@ -18,9 +18,6 @@ export class UploadService {
       let formData: FormData = new FormData()
       let xhr: XMLHttpRequest = new XMLHttpRequest()
 
-      // order is super important here
-      // server needs to know projectId before it can store the 
-      // video file in it's proper location
       formData.append('projectId', projectId);
       formData.append('video', file);
 
