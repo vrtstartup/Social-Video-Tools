@@ -22,7 +22,7 @@ const templates = new Templates(fireBase, logger);
 
 // init server
 const server = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
 const uploadRoutes = require('./routes/upload.routes');
 const fileRoutes = require('./routes/file.routes');
