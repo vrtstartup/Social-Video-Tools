@@ -87,13 +87,13 @@
 
 				<range-slider *ngIf="selectedAnnotation"
 					[selectedAnnotation]="selectedAnnotation" 
-					[clip]="(clipRef | async)" (change)="updateAnnotation($event)">
+					[clip]="(clipRef | async)" (changeAnno)="updateAnnotation($event)">
 				</range-slider>
 			</div>
 		</div>
 
 	</div>
 	
-	<small class="">{{ projectRef | async | json }}</small><br>
+	<!--<small class="">{{ projectRef | async | json }}</small><br>-->
 
 </div>
