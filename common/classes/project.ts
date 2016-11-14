@@ -8,8 +8,7 @@ export class Project {
   }
 
   overlaysReady() {
-    // check if all assets have been rendered
-    // resolve job if they have 
+    // check if all assets have been rendered, resolve job if they have 
     let overlays = this.getAnnotations('overlay'); 
     let overlaysDone = true;
 

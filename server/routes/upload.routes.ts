@@ -52,7 +52,7 @@ const storageOverlays = multer.diskStorage({
 const uploadLowres = multer({ storage: storageLowres }).fields([{ name: 'video' }]);
 const uploadOverlays = multer({ storage: storageOverlays }).fields([{ name: 'video' }]);
 
-router.post('/', uploadLowres, (req: any, res) => {
+router.post('/source', uploadLowres, (req: any, res) => {
   // services 
   const projects = req.app.get('projects');
   const jobs = req.app.get('jobs');
@@ -64,8 +64,6 @@ router.post('/', uploadLowres, (req: any, res) => {
 
   // #todo: fix link for deployment
   const lowResUrl = resolve.staticUrl('lowres', projectId);
-  
-  console.log(fileMeta.filename);
 
   // update project 
   let proms = projects.setProjectProperties(projectId, {
@@ -77,7 +75,7 @@ router.post('/', uploadLowres, (req: any, res) => {
       'lowResUrl': lowResUrl + '?' + Date.now(),
     },
     status: {
-      'downscaled': false,
+      'uploaded': true,
     }
   });
 

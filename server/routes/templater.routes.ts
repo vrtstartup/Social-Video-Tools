@@ -64,7 +64,9 @@ router.post('/status', (req, res) => {
       .then(fbData => projectService.getProjectById(projectId))
       .then(project => {
         if (project.overlaysReady()) {
+          // all overlays have been rendered, progress to next state 
           jobService.resolveJob('templater-queue', projectId);
+          projectService.setProjectProperty(projectId, 'status/overlaysReady', true);
         }
       }, errorHandler) 
       .then(data => res.send({success: true, info: 'overlay status has been updated.'}), errorHandler);

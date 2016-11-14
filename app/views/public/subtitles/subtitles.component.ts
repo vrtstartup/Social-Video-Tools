@@ -83,7 +83,7 @@ export class SubtitlesComponent implements OnInit {
     // File-ref to upload
     this.source = $event.target.files[0];
     // Upload video
-    this.uploadService.makeFileRequest('api/upload', this.source, this.projectId)
+    this.uploadService.makeFileRequest('api/upload/source', this.source, this.projectId)
       .subscribe((data) => { });
   }
 
