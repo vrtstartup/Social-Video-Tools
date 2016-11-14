@@ -1,1 +1,2 @@
-web: node worker --ext js,ts && node server --ext js,ts
+web: node worker --ext js,ts
+web: node server --ext js,ts
