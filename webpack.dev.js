@@ -7,7 +7,7 @@ const webpack = require('webpack');
 const webpackCommonConfig = require('./webpack.common.config.js');
 const webpackMerge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const config = require('./common/config');
+const config = require('./app/config/front.config');
 
 module.exports = function () {
     return webpackMerge(webpackCommonConfig(), {

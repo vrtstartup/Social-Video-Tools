@@ -1,5 +1,5 @@
 // #todo move to application config
-module.exports = {
+export const encodingConfig = {
 	"videoMaxWidth": 350,
 	"videoMaxDuration": 1800,
 	"sourceBucket": "newshub-video-in",

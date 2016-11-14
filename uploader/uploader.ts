@@ -1,8 +1,9 @@
 import * as fs from 'fs';
-import { logger } from '../common/config/winston';
+import { config } from '../common/config';
 
-const config = require('../common/config/encoding');
 const restler = require('restler');
+
+const logger = config.logger; 
 
 /*
 *
@@ -18,9 +19,10 @@ const restler = require('restler');
 *
 */ 
 
-// #todo config file 
-const endpointUpload = `http://localhost:3000/api/upload/overlay`;
-const endpointUpdate = `http://localhost:3000/api/templater/status`;
+// routing
+const baseUrl = `${config.routing.fileServer.protocol}://${config.routing.fileServer.domain}:${config.routing.fileServer.port}`;
+const endpointUpload = `${baseUrl}/api/upload/overlay`;
+const endpointUpdate = `${baseUrl}/api/templater/status`;
 
 // assign parameters passed by bot to process 
 // const filePath = process.argv[0];
@@ -47,7 +49,7 @@ function uploadVideo( filePath ) {
         data: {
           "projectId": projectId,
           "overlayId": overlayId,
-          "video": restler.file(filePath, null, stats.size, null, config.format.video.mimeType)
+          "video": restler.file(filePath, null, stats.size, null, config.encoding.format.video.mimeType)
         }
       }).on('complete', resolve);
     });

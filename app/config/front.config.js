@@ -3,7 +3,7 @@ const env = process.env.NODE_ENV || 'development';
 // Service message for console in case of unknown environment
 if (env !== 'development' && env !== 'production' && env !== 'staging') {
     console.log('Use: NODE_ENV=[development | production]');
-    console.log('Quiting...');
+    console.log('Quitting...');
     process.exit();
 }
 

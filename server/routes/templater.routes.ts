@@ -1,6 +1,7 @@
 import * as express from 'express';
-import { logger } from '../../common/config/winston';
+import { config } from '../../common/config';
 
+const logger = config.logger;
 const router = express.Router();
 
 router.get('/queue', (req, res) => {

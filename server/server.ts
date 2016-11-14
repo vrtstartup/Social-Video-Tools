@@ -4,14 +4,14 @@ import { Projects } from '../common/services/projects.service';
 import { Jobs } from '../common/services/jobs.service';
 import { Templates } from '../common/services/templates.service';
 import { resolve } from 'path';
-import { fileConfig } from '../common/config/files';
-import { logger } from '../common/config/winston';
+import { config } from '../common/config';
+
+const logger = config.logger;
 
 const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const config = require('../common/config');
 
 // init firebase
 // const db = FireBase.database();
@@ -22,7 +22,7 @@ const templates = new Templates(fireBase, logger);
 
 // init server
 const server = express();
-const port = process.env.PORT || config.port;
+const port = process.env.PORT;
 
 const uploadRoutes = require('./routes/upload.routes');
 const fileRoutes = require('./routes/file.routes');
@@ -34,7 +34,7 @@ server.set('jobs', jobs);
 server.set('templates', templates);
 server.use(bodyParser());
 
-let publicPath = fileConfig.workingDirectory;
+let publicPath = config.filesystem.workingDirectory;
 server.use('/video', express.static(publicPath)); 
 
 // when getting root, serve angular client
