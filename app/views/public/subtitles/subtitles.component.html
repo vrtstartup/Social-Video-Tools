@@ -11,6 +11,9 @@
 
 	<div class="s-submenu" *ngIf="(projectRef | async)">
 
+		<!--erro message upload|project -->
+		<div class="" *ngIf="userMessage">{{userMessage}}</div>
+
 		<!--progressbar upload-->
 		<div class="s-progress" *ngIf="uploadProgress > 0 && uploadProgress < 100">
 			<div class="s-progress__label">upload</div>
@@ -87,13 +90,13 @@
 
 				<range-slider *ngIf="selectedAnnotation"
 					[selectedAnnotation]="selectedAnnotation" 
-					[clip]="(clipRef | async)" (change)="updateAnnotation($event)">
+					[clip]="(clipRef | async)" (changeAnno)="updateAnnotation($event)">
 				</range-slider>
 			</div>
 		</div>
 
 	</div>
 	
-	<small class="">{{ projectRef | async | json }}</small><br>
+	<!--<small class="">{{ projectRef | async | json }}</small><br>-->
 
 </div>

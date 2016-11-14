@@ -22,23 +22,27 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
         this.sources = [];
     }
 
-    ngOnInit() {}
-    ngAfterViewInit() {}
+    ngOnInit() { 
+    }
+    ngAfterViewInit() { 
+    }
 
     ngOnChanges() {
+
+        console.log('event in child: video-player')
 
         if (this.clip) {
             this.clip.lowResUrl = this.clip.lowResUrl + Math.floor((Math.random() * 10) + 1)
             this.sources = [this.clip];
         }
 
-        if (this.selectedAnnotation){
-            let seektime = ( parseFloat(this.selectedAnnotation.start) / parseFloat(this.clip.movieLength) * 100 ) ;
-            this.api.seekTime( seektime );
+        if (this.selectedAnnotation) {
+
+            let seektime = parseFloat(this.selectedAnnotation.start);
+            this.api.seekTime(seektime);
             this.api.play();
         }
 
-        // conflict
     }
 
     onPlayerReady() {
