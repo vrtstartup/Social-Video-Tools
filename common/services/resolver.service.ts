@@ -1,28 +1,28 @@
 import { resolve } from 'path';
-import { fileConfig } from '../../common/config/files';
+import { config } from '../../common/config';
 import * as fs from 'fs';
 const mkdirp = require('mkdirp');
 
 export function destinationDirectory(fileType:string, baseDirectory:string) {
   // return a fully resolved path to a project file's directory
-  const workingDir = fileConfig.workingDirectory;
-  const subDir = fileConfig.files[fileType].directory;
+  const workingDir = config.filesystem.workingDirectory;
+  const subDir = config.filesystem.files[fileType].directory;
 
   return resolve(workingDir, baseDirectory, subDir);
 }
 
 export function destinationFile(fileType:string, baseDirectory:string, fileName:string) {
   //  return a fully resolved path to a project file
-  const workingDir = fileConfig.workingDirectory;
-  const subDir = fileConfig.files[fileType].directory;
+  const workingDir = config.filesystem.workingDirectory;
+  const subDir = config.filesystem.files[fileType].directory;
 
   return resolve(workingDir, baseDirectory, subDir, fileName);
 }
 
 export function getFilePathByType(fileType:string, baseDirectory){
   // shoud be able to say "get me this project's source file"
-  const file =  fileConfig.files[fileType];
-  const workingDir = fileConfig.workingDirectory;
+  const file =  config.filesystem.files[fileType];
+  const workingDir = config.filesystem.workingDirectory;
   const subDir = file.directory;
   const fileName = file.name;
 
@@ -37,7 +37,7 @@ export function getFilePathByType(fileType:string, baseDirectory){
 
 export function getFileNameByType(fileType:string, baseDirectory:string) {
   // return an unresovled project file's name, including extension as configured
-  const file =  fileConfig.files[fileType];
+  const file =  config.filesystem.files[fileType];
   let fileName = file.name;
 
   if(file.extension) fileName = `${fileName}.${file.extension}`;
@@ -47,7 +47,7 @@ export function getFileNameByType(fileType:string, baseDirectory:string) {
 
 export function staticUrl(fileType:string, baseDirectory:string) {
   // return a public url to file in the static folder
-  const file =  fileConfig.files[fileType]; //config
+  const file =  config.filesystem.files[fileType]; //config
   const fileName = this.getFileNameByType(fileType, baseDirectory);
 
   // #todo how do I get the base URL here ? 
@@ -55,8 +55,8 @@ export function staticUrl(fileType:string, baseDirectory:string) {
 }
 
 export function makeProjectDirectories(baseDirectory:string) {
-  const files = fileConfig.files;
-  const projectsDir = fileConfig.workingDirectory;
+  const files = config.filesystem.files;
+  const projectsDir = config.filesystem.workingDirectory;
 
   // make project directory
   if ( !fs.existsSync(projectsDir) ) fs.mkdirSync(projectsDir);

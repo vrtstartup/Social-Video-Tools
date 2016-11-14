@@ -3,7 +3,7 @@ import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'a
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
 import './subtitles.component.scss';
-import { UploadService } from '../../../common/services/video.service';
+import { UploadService } from '../../../common/services/upload.service';
 
 // TODO remove | only for test purposes
 import testTemplate from './testModels/testTemplate.model';

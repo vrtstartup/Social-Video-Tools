@@ -1,10 +1,12 @@
 // #todo: rename to encoding.service
 import {spawn, spawnSync, execFile} from 'child_process';
 import * as resolver from '../../common/services/resolver.service';
-import { logger } from '../../common/config/winston';
+import { config } from '../../common/config';
+
 var FfmpegCommand = require('fluent-ffmpeg');
 const path = require('path');
-const config = require('../config/encoding');
+
+const logger = config.logger;
 
 // #todo order of parameters should be the same for each function...
 export function ffprobe (project) {
@@ -32,7 +34,7 @@ export function ffprobe (project) {
           const outputObj = JSON.parse(stdout);
           const hasVideoStream = outputObj.streams.some(stream =>
               stream.codec_type === 'video' &&
-              (stream.duration || outputObj.format.duration) <= config.videoMaxDuration
+              (stream.duration || outputObj.format.duration) <= config.encoding.videoMaxDuration
           );
 
           if (!hasVideoStream)
@@ -62,7 +64,7 @@ export function scaleDown(project, messageHandler, job) {
     const lowresFileName = resolver.getFileNameByType('lowres', baseDir);
     const input = resolver.getFilePathByType('source', baseDir);
     const output = resolver.destinationFile('lowres', baseDir, lowresFileName);
-    const scaleFilter = `scale='min(${config.videoMaxWidth.toString()}\\,iw):-2'`;
+    const scaleFilter = `scale='min(${config.encoding.videoMaxWidth.toString()}\\,iw):-2'`;
 
     return new Promise((resolve:any, reject) => {
       let command = new FfmpegCommand(input, { logger: logger})
@@ -92,7 +94,6 @@ export function burnSrt(project) {
     const input = resolver.getFilePathByType('source', baseDir);
     const srtFile = resolver.getFilePathByType('subtitle', baseDir);
 
-    // #todo extension in resolver and config
     const output = `${resolver.getFilePathByType('subtitledSource', baseDir)}`;
 
     return new Promise((resolve, reject) => {

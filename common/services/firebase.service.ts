@@ -4,8 +4,8 @@ const firebase = require('firebase');
 const path = require('path');
 const fs = require('fs');
 
-import { fbConfig } from '../config/firebase';
-import { logger } from '../../common/config/winston';
+import { config } from '../config';
+const logger = config.logger;
 
 export class FireBase {
 
@@ -13,7 +13,7 @@ export class FireBase {
 
   constructor() {
     // this operation is synchronous
-    firebase.initializeApp( fbConfig );
+    firebase.initializeApp( config.firebase );
 
     this.database = firebase.database();
   }

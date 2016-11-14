@@ -32,6 +32,12 @@ export const fileConfig = {
       name: 'sourceSubtitled',
       extension: 'mp4',
       unique: true
+    },
+    overlays: {
+      directory: 'overlays',
+      name: '_overlay',
+      extension: 'mp4',
+      unique: false,
     }
   }
 };
