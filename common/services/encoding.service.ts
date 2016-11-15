@@ -90,24 +90,19 @@ export function scaleDown(project, messageHandler, job) {
     });
 };
 
-export function burnSrt(project) {
-    // burn .srt file over video source file
-    const baseDir = project.data.files.baseDir; 
-    const input = resolver.getFilePathByType('source', baseDir);
-    const srtFile = resolver.getFilePathByType('subtitle', baseDir);
-
-    const output = `${resolver.getFilePathByType('subtitledSource', baseDir)}`;
-
+export function makeAss(project) {
     return new Promise((resolve, reject) => {
-        let command = new FfmpegCommand(input, { logger: logger})
-            .outputOptions(`-vf subtitles=${srtFile}`)
-            .output(output)
+        const baseDir = project.data.files.baseDir; 
+        const srtFile = resolver.getFilePathByType('subtitle', baseDir);
+        const assFile = resolver.getFilePathByType('ass', baseDir);
+
+        let command = new FfmpegCommand(srtFile, {logger:logger})
+            .output(assFile)
             .on('error', (err) => { 
                 logger.error(err);
                 reject(err);
             })
             .on('start', (commandLine) => {logger.debug('Spawned Ffmpeg with command: ' + commandLine)})
-            .on('progress', (msg) => { logger.verbose(msg)})
             .on('end', () => {
                 logger.verbose('done burning subs'); 
                 resolve(project);
@@ -119,12 +114,15 @@ export function burnSrt(project) {
 export function stitch(project) {
     let arrOverlays = project.overlayArray();
 
+    const baseDir = project.data.files.baseDir; 
+    const assFile = resolver.getFilePathByType('ass', baseDir);
+
     let width = project.data.clip.width;
     let height = project.data.clip.height;
     let duration = project.data.clip.movieLength;
 
     let source = resolver.getFilePathByType('source', project.data.id);
-    let destination = resolver.getFilePathByType('render', project.data.id);
+    const output = `${resolver.getFilePathByType('render', project.data.id)}`;
 
     /* ------------------------------- */
     /* -- SET INPUTS ----------------- */
@@ -139,18 +137,24 @@ export function stitch(project) {
     // overlays
     arrOverlays.forEach((el) => command = command.input(el.path));
 
-    // final 
-    command
-        .complexFilter([makeComplexFilter(arrOverlays)], 'output')
-        .saveToFile(destination, (stdout, stderr) => logger.verbose(`file has been created: ${destination}`))
-        .on('start', command => logger.verbose(`Spawned ffmpeg with command: ${command}`))
-        .on('progress', progress => logger.verbose(progress))
-        .on('end', () => logger.verbose('movie rendering done.'))
-        .on('error', (err, stdout, stderr) => {
-            logger.error(err);
-            logger.debug(`encountered error during ffmpeg render: ${stdout}`);
-            logger.debug(`encountered error during ffmpeg render: ${stderr}`);
-        });
+    return new Promise((resolve, reject) => {
+        command
+            .complexFilter([makeComplexFilter(arrOverlays)], 'out_subs')
+            .output(output)
+            .on('start', command => logger.verbose(`Spawned ffmpeg with command: ${command}`))
+            .on('progress', progress => logger.verbose(progress))
+            .on('end', () => {
+                logger.verbose('movie rendering done.');
+                resolve(project)
+            })
+            .on('error', (err, stdout, stderr) => {
+                logger.error(err);
+                logger.debug(`encountered error during ffmpeg render: ${stdout}`);
+                logger.debug(`encountered error during ffmpeg render: ${stderr}`);
+                reject(err);
+            })
+            .run();
+    })
 
     
     /* ------------------------------- */
@@ -173,7 +177,47 @@ export function stitch(project) {
     /* ------------------------------- */
     function makeOverlayString(arrOverlays) {
         let overlayLine = '';
-        let output = '';
+        let output = 'movie';
+
+        let arrKeys = ['movie'];
+        arrOverlays.forEach((el, i) => arrKeys.push(`${i}`));
+        
+        // [ 'movie', '0', '1', '2', '3', '4' ]
+        while(arrKeys.length > 1){
+            output = `${arrKeys[0]}_${arrKeys[1]}`;
+
+            // #todo not including logos yet
+            overlayLine += `[${arrKeys[0]}][${arrKeys[1]}]overlay=x=0:y=0[${output}];`;
+
+            arrKeys.splice(0, 2, output);
+        }
+
+        if (arrKeys.length > 1) overlayLine = overlayLine.replace(output, 'output'); // replace output by outputname
+
+        return overlayLine ;
+    }
+
+    /* ------------------------------- */
+    /* -- COMBINE LINES -------------- */
+    /* ------------------------------- */
+    function makeComplexFilter(arrOverlays){
+        let complexLine = '';
+
+        // no logo - no bumper - no titles
+        // if(!arrOverlays.length) {
+        //     complexLine = '[0:v][1:v]overlay=x=0:y=0[output]';
+        //     complexLine += project.hasAnnotations('subtitle') ? `ass=${assFile}` : '';
+        //     return complexLine;
+        // }
+
+        complexLine = '[0:v][1:v]overlay=x=0:y=0[movie];'; // movie on black-container
+        complexLine += setStartPosAndScale(arrOverlays);
+
+        /* ------------------------------- */
+        /* -- OVERLAYS  ------------------ */
+        /* ------------------------------- */
+        let overlayLine = '';
+        let output = 'movie';
 
         let arrKeys = ['movie'];
         arrOverlays.forEach((el, i) => arrKeys.push(`${i}`));
@@ -188,27 +232,22 @@ export function stitch(project) {
             arrKeys.splice(0, 2, output);
         }
 
-        overlayLine = overlayLine.replace(output, 'output'); // replace output by outputname
-        return overlayLine ;
-    }
+        if (arrKeys.length > 1) overlayLine = overlayLine.replace(output, 'output'); // replace output by outputname
 
-    /* ------------------------------- */
-    /* -- COMBINE LINES -------------- */
-    /* ------------------------------- */
-    function makeComplexFilter(arrOverlays){
-        let complexLine = '';
+        complexLine += overlayLine;
 
-        // no logo - no bumper - no titles
-        if(!arrOverlays.length) {
-            complexLine = '[0:v][1:v]overlay=x=0:y=0[output]';
-            return complexLine;
-        }
 
-        complexLine = '[0:v][1:v]overlay=x=0:y=0[movie];'; // movie on black-container
-        complexLine += setStartPosAndScale(arrOverlays) + makeOverlayString(arrOverlays);
 
-        complexLine += 'amix=inputs=1:duration=first:dropout_transition=3' ; // audio 
-        // complexLine += '[output]ass=temp/test/subtitles.ass[out_subs]' // #todo
+        /* ------------------------------- */
+        /* -- AUDIO  --------------------- */
+        /* ------------------------------- */
+        complexLine += 'amix=inputs=1:duration=first:dropout_transition=3;' ;
+
+
+        /* ------------------------------- */
+        /* -- SUBTITLES  ----------------- */
+        /* ------------------------------- */
+        complexLine += project.hasAnnotations('subtitle') ? `[${output}]ass=${assFile}[out_subs]` : '';
 
         return `${complexLine}`;
     }

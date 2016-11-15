@@ -18,22 +18,24 @@ export class Subtitle {
   * add contents to a generated .srt file
   */
   makeSrt(project) {
-    const subs = this.fireBase.getAnnotations('subtitle', project);
+    const subs = project.getAnnotations('subtitle');
     let arrKeys: any[] = Object.keys(subs);
-    const file = resolve.getFilePathByType('subtitle', project.files.baseDir);
+    const file = resolve.getFilePathByType('subtitle', project.data.files.baseDir);
     const counter = 1;
     const captions = new subtitle();
 
-    arrKeys.forEach((key: any) => {
-      const sub = subs[key];
+    if(project.hasAnnotations('subtitle')){
+      arrKeys.forEach((key: any) => {
+        const sub = subs[key];
 
-      // convert to ms
-      sub.start *= 1000;
-      sub.end *= 1000;
+        // convert to ms
+        sub.start *= 1000;
+        sub.end *= 1000;
 
-      captions.add(sub);
-    });
-
+        captions.add(sub);
+      });
+    }
+    
     // Return a promise 
     return new Promise((resolve, reject) => {
       // wite to file 

@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { FireBase } from '../common/services/firebase.service';
 import { Jobs } from '../common/services/jobs.service';
 import { Projects } from '../common/services/projects.service';
-import { ffprobe, scaleDown, burnSrt, stitch } from '../common/services/encoding.service';
+import { ffprobe, scaleDown, stitch, makeAss } from '../common/services/encoding.service';
 import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 
@@ -105,15 +105,11 @@ function processRenderJob(project) {
     */
 
     return new Promise((resolve, reject) => {
-
-      if(!project.hasOverlays()) {
-        subtitle.makeSrt(project)
-          .then(burnSrt, errorHandler)
-          .then(resolve, errorHandler);
-      } else{
-        // make srt
-        stitch(project);
-      }
+      subtitle.makeSrt(project)
+        .then(makeAss)
+        .then(stitch)
+        .then(resolve)
+        .catch(errorHandler);
     });
 }
 

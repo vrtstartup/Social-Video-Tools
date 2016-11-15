@@ -38,16 +38,18 @@ export class Project {
   }
 
   hasOverlays() {
-    // check wether or not this project containes titles
-    // #todo can have only subtitle annotations
-    let noTitles = false;
+    return this.hasAnnotations('overlay');
+  }
+
+  hasAnnotations(type:string) {
+    let noAnnotations = false;
 
     if(this.data.hasOwnProperty("annotations")) {
-      const annotations = this.getAnnotations('overlay');
-      noTitles = (Object.keys(annotations).length  !== 0 && annotations === Object);
+      const annotations = this.getAnnotations(type);
+      noAnnotations = (Object.keys(annotations).length  === 0 && typeof annotations === 'object');
     } 
 
-    return !noTitles;
+    return !noAnnotations;
   }
 
   parseOverlays( templates ) {

@@ -21,6 +21,12 @@ export const fileConfig = {
       extension: 'srt',
       unique: true
     },
+    ass: {
+      directory: 'build_artefacts',
+      name: 'subtitles',
+      extension: 'ass',
+      unique: true,
+    },
     render: {
       directory: 'out',
       name: 'render',
