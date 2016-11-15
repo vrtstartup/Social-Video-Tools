@@ -67,6 +67,7 @@ router.post('/status', (req, res) => {
           // all overlays have been rendered, progress to next state 
           jobService.resolveJob('templater-queue', projectId);
           projectService.setProjectProperty(projectId, 'status/overlaysReady', true);
+          jobService.queue('ffmpeg-queue', projectId, 'render');
         }
       }, errorHandler) 
       .then(data => res.send({success: true, info: 'overlay status has been updated.'}), errorHandler);

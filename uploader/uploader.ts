@@ -30,9 +30,9 @@ const endpointUpdate = `${baseUrl}/api/templater/status`;
 // const overlayId = process.argv[2];
 
 // mock values
-const filePath = `/Users/matthiasdevriendt/Desktop/assets/kickoff_small.mp4`;
-const projectId = `-KWY1VMWDCMhXguwsd57`;
-const overlayId = '-KWY1dB3duD98DZMmshj'
+const filePath = `/Users/matthiasdevriendt/Movies/vrt_test/asset.mov`;
+const projectId = `-KWb63WvkyqXjOXVDlIp`;
+const overlayId = '-KWb64_xtsgglrGzHLO6';
 
 // Upload file 
 uploadVideo(filePath)

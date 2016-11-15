@@ -33,10 +33,10 @@ export const fileConfig = {
       extension: 'mp4',
       unique: true
     },
-    overlays: {
+    overlay: {
       directory: 'overlays',
-      name: '_overlay',
-      extension: 'mp4',
+      name: '_overlay', // this is prepended with the overlay's id
+      extension: 'mov',
       unique: false,
     }
   }

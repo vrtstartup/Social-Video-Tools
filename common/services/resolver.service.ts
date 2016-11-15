@@ -19,7 +19,7 @@ export function destinationFile(fileType:string, baseDirectory:string, fileName:
   return resolve(workingDir, baseDirectory, subDir, fileName);
 }
 
-export function getFilePathByType(fileType:string, baseDirectory){
+export function getFilePathByType(fileType:string, baseDirectory, fileId?:string){
   // shoud be able to say "get me this project's source file"
   const file =  config.filesystem.files[fileType];
   const workingDir = config.filesystem.workingDirectory;
@@ -28,7 +28,7 @@ export function getFilePathByType(fileType:string, baseDirectory){
 
   // resolve proper path
   const directory = resolve(workingDir, baseDirectory, subDir);
-  let filePath = resolve(directory, fileName);
+  let filePath = (fileType == 'overlay') ? resolve(directory, `${fileId}${fileName}`) : resolve(directory, fileName);
 
   if(file.extension) filePath = `${filePath}.${file.extension}`;
 

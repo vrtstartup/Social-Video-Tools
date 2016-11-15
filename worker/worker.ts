@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { FireBase } from '../common/services/firebase.service';
 import { Jobs } from '../common/services/jobs.service';
 import { Projects } from '../common/services/projects.service';
-import { ffprobe, scaleDown, burnSrt } from '../common/services/encoding.service';
+import { ffprobe, scaleDown, burnSrt, stitch } from '../common/services/encoding.service';
 import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 
@@ -24,7 +24,7 @@ function handleQueue(jobs) {
    /*
     * This function:
     *   - gets the first job from the queue
-    *   - sets job status to InProgress
+    *   - sets job status to InProgress\
     *   - gets the related project data
     *   - processes the job
     *   - resolves the job
@@ -58,11 +58,11 @@ function handleJob(job, project) {
         processLowResJob(project, job).then(resolve, reject);
         break;
 
-      case 'render':
+      case 'render': // render = no titles 
         logger.verbose('processing render operation...');
         processRenderJob(project).then(resolve, reject);
-        
         break;
+
       default:
         logger.warn('processing unknown operation!');
         break;
@@ -105,9 +105,15 @@ function processRenderJob(project) {
     */
 
     return new Promise((resolve, reject) => {
-      subtitle.makeSrt(project)
-        .then(burnSrt, errorHandler)
-        .then(resolve, errorHandler);
+
+      if(!project.hasOverlays()) {
+        subtitle.makeSrt(project)
+          .then(burnSrt, errorHandler)
+          .then(resolve, errorHandler);
+      } else{
+        // make srt
+        stitch(project);
+      }
     });
 }
 

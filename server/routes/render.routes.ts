@@ -13,8 +13,8 @@ router.post('/', (req, res) => {
 
   const project = projectService.getProjectById(projectId)
     .then( project => {
-      const queue = project.hasTitles() ? 'templater-queue' : 'ffmpeg-queue';
-      const operation = project.hasTitles() ? 'render-assets' : 'render';
+      const queue = project.hasOverlays() ? 'templater-queue' : 'ffmpeg-queue';
+      const operation = project.hasOverlays() ? 'render-assets' : 'render';
       jobService.queue(queue, projectId, operation);
     }).then(data => res.json({status: 'success'}));
 });

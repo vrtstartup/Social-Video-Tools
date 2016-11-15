@@ -1,3 +1,5 @@
+import * as resolver from '../../common/services/resolver.service';
+
 export class Project {
   public data;
   private logger;
@@ -22,19 +24,22 @@ export class Project {
   }
 
   getAnnotations(type:string){
-    let annotations = this.data.annotations;
     let collection = {};
 
-    Object.keys(annotations).forEach( key =>{
-      let obj = annotations[key];
-      if( obj.type === type) collection[key] = obj;
-    });
-
+    if(this.data.hasOwnProperty('annotations') && this.data.annotations !== null && this.data.annotations !== undefined){
+      let annotations = this.data.annotations;
+      Object.keys(annotations).forEach( key =>{
+        let obj = annotations[key];
+        if( obj.type === type) collection[key] = obj;
+      });
+    }
+    
     return collection;
   }
 
-  hasTitles() {
+  hasOverlays() {
     // check wether or not this project containes titles
+    // #todo can have only subtitle annotations
     let noTitles = false;
 
     if(this.data.hasOwnProperty("annotations")) {
@@ -63,6 +68,26 @@ export class Project {
 
         arrReturn.push(this.entry(overlay, template));
       });
+    }
+
+    return arrReturn;
+  }
+
+  overlayArray() {  
+    // returns overlay in a format suitable for the stitching operation
+    const overlays = this.getAnnotations('overlay');
+    const keys = Object.keys(overlays); 
+    let arrReturn = [];
+
+    for(let key of keys) {
+      if(overlays.hasOwnProperty(key) && overlays[key] !== null && overlays[key] !== undefined ){
+        arrReturn.push({
+          type: 'overlay',
+          path: resolver.getFilePathByType('overlay', this.data.id, key),
+          start: overlays[key]['start'],
+          end: overlays[key]['end']
+        })
+      }
     }
 
     return arrReturn;
