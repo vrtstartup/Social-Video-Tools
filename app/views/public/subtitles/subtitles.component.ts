@@ -84,7 +84,7 @@ export class SubtitlesComponent implements OnInit {
     // File-ref to upload
     this.source = $event.target.files[0];
     // Upload video
-    this.uploadService.makeFileRequest('api/upload', this.source, this.projectId)
+    this.uploadService.makeFileRequest('api/upload/source', this.source, this.projectId)
       .subscribe(
         data => { },
         err => { console.log('err', err) }
@@ -101,10 +101,6 @@ export class SubtitlesComponent implements OnInit {
   }
 
   updateAnnotation($event) {
-    // TODO check tot reduce event tracking here
-    // child fires one event, but parent just adds them up and logs multiple
-    // console.log('event in parent:updateAnnotation', $event)
-
     this.selectedAnnotation = $event;
     this.annotationsRef.update($event.$key, { start: $event.start, end: $event.end });
   }
@@ -137,15 +133,6 @@ export class SubtitlesComponent implements OnInit {
       }
   
       return children;
-    }
-  
-    addToFFmpegQueue() {
-      const key = this.projectRef.key;
-      this.ffmpegQueueRef.push({
-        projectId: key,
-        operation: 'render',
-        status: 'open',
-      });
     }
   
     addToTemplaterQueue() {
