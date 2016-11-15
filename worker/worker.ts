@@ -60,7 +60,7 @@ function handleJob(job, project) {
 
       case 'render': // render = no titles 
         logger.verbose('processing render operation...');
-        processRenderJob(project).then(resolve, reject);
+        processRenderJob(project, job).then(resolve, reject);
         break;
 
       default:
@@ -87,14 +87,14 @@ function processLowResJob(project, job) {
         .then(project => projectService.updateProject(project, { 
           clip: project['data']['clip']
         }))
-        .then(project => scaleDown(project, progressHandler, job), errorHandler)
+        .then(project => scaleDown(project, progressHandler, job))
         .then(project => projectService.setProjectProperty(job.id, 'status/downscaled', true))
         .then(resolve)
         .catch(err => jobService.kill(job.id, err));
     });
 }
 
-function processRenderJob(project) {
+function processRenderJob(project,job) {
     /*
     * This function:
     *   - creates an SRT file containing the project subtitles
@@ -107,9 +107,9 @@ function processRenderJob(project) {
     return new Promise((resolve, reject) => {
       subtitle.makeSrt(project)
         .then(makeAss)
-        .then(stitch)
+        .then(project => stitch(project, job, progressHandler))
         .then(resolve)
-        .catch(errorHandler);
+        .catch(err => jobService.kill(job.id, err));
     });
 }
 
@@ -121,11 +121,11 @@ function done() {
   jobService.checkQueue(handleQueue);
 }
 
-function progressHandler(message, job) {
+function progressHandler(message, job, targetField) {
   // #todo updating the 'progress' value on the job triggers the listener, creating a feedback loop
   if (typeof message == 'object') { // this is an ffmpeg progress message
     jobService.updateFfmpegQueue(job, {'progress': message.progress});
-    projectService.setProjectProperty(job.id, 'status/downScaleProgress', message.progress);
+    projectService.setProjectProperty(job.id, targetField, message.progress);
   }
 }
 

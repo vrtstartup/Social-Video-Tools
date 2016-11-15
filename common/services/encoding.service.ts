@@ -80,7 +80,7 @@ export function scaleDown(project, messageHandler, job) {
         .on('progress', (msg) => { 
             // append some extra data to the progress message
             msg.progress = Math.round((msg.frames / project.data.clip.frames) * 1000) / 10; // encoding progress
-            messageHandler(msg, job)
+            messageHandler(msg, job, 'status/downScaleProgress')
         })
         .on('end', () => {
           logger.verbose("Done processing")
@@ -111,7 +111,7 @@ export function makeAss(project) {
     });
 }
 
-export function stitch(project) {
+export function stitch(project, job, messageHandler) {
     let arrOverlays = project.overlayArray();
 
     const baseDir = project.data.files.baseDir; 
@@ -142,7 +142,11 @@ export function stitch(project) {
             .complexFilter([makeComplexFilter(arrOverlays)], 'out_subs')
             .output(output)
             .on('start', command => logger.verbose(`Spawned ffmpeg with command: ${command}`))
-            .on('progress', progress => logger.verbose(progress))
+            .on('progress', msg => {
+                // append some extra data to the progress message
+                msg.progress = Math.round((msg.frames / project.data.clip.frames) * 1000) / 10; // encoding progress
+                messageHandler(msg, job, 'status/stitchingProgress')
+            })
             .on('end', () => {
                 logger.verbose('movie rendering done.');
                 resolve(project)
