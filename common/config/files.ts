@@ -15,9 +15,9 @@ export const fileConfig = {
       extension: 'mp4',
       unique: true
     },
-    subtitle: {
+    srt: {
       directory: 'build_artefacts',
-      name: 'subtitle',
+      name: 'subtitles',
       extension: 'srt',
       unique: true
     },

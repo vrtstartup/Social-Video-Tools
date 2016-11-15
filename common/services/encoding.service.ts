@@ -93,7 +93,7 @@ export function scaleDown(project, messageHandler, job) {
 export function makeAss(project) {
     return new Promise((resolve, reject) => {
         const baseDir = project.data.files.baseDir; 
-        const srtFile = resolver.getFilePathByType('subtitle', baseDir);
+        const srtFile = resolver.getFilePathByType('srt', baseDir);
         const assFile = resolver.getFilePathByType('ass', baseDir);
 
         let command = new FfmpegCommand(srtFile, {logger:logger})
@@ -202,13 +202,6 @@ export function stitch(project) {
     /* ------------------------------- */
     function makeComplexFilter(arrOverlays){
         let complexLine = '';
-
-        // no logo - no bumper - no titles
-        // if(!arrOverlays.length) {
-        //     complexLine = '[0:v][1:v]overlay=x=0:y=0[output]';
-        //     complexLine += project.hasAnnotations('subtitle') ? `ass=${assFile}` : '';
-        //     return complexLine;
-        // }
 
         complexLine = '[0:v][1:v]overlay=x=0:y=0[movie];'; // movie on black-container
         complexLine += setStartPosAndScale(arrOverlays);
