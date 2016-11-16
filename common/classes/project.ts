@@ -34,7 +34,7 @@ export class Project {
       });
     }
     
-    return collection;
+    return Object.keys(collection).length === 0 ? false : collection;
   }
 
   hasOverlays() {
@@ -42,14 +42,14 @@ export class Project {
   }
 
   hasAnnotations(type:string) {
-    let noAnnotations = false;
+    let hasAnnotations = false;
 
     if(this.data.hasOwnProperty("annotations")) {
       const annotations = this.getAnnotations(type);
-      noAnnotations = (Object.keys(annotations).length  === 0 && typeof annotations === 'object');
+      hasAnnotations = (Object.keys(annotations).length  !== 0 && typeof annotations === 'object');
     } 
 
-    return !noAnnotations;
+    return hasAnnotations;
   }
 
   parseOverlays( templates ) {
@@ -83,16 +83,39 @@ export class Project {
 
     for(let key of keys) {
       if(overlays.hasOwnProperty(key) && overlays[key] !== null && overlays[key] !== undefined ){
-        arrReturn.push({
-          type: 'overlay',
-          path: resolver.getFilePathByType('overlay', this.data.id, key),
-          start: overlays[key]['start'],
-          end: overlays[key]['end']
-        })
+        const overlay = overlays[key];
+
+        const pushObject = {
+          type: overlay['type'],
+          filePath: resolver.getFilePathByType('overlay', this.data.id, key),
+          start: overlay['start'],
+          end: overlay['end']
+        };
+
+        if(overlay.hasOwnProperty('scale')) pushObject['scale'] = overlay['scale'];
+        if(overlay.hasOwnProperty('width')) pushObject['width'] = overlay['width'];
+        if(overlay.hasOwnProperty('height')) pushObject['height'] = overlay['height'];
+
+        arrReturn.push(pushObject);
       }
     }
 
     return arrReturn;
+  }
+
+  getOutro(){
+    const annotations = this.getAnnotations('outro');
+    const arrKeys = Object.keys(annotations);
+    const outro = annotations[arrKeys[0]];
+
+    return {
+      type: 'outro',
+      filePath: resolver.getFilePathByType('outro', this.data.id, arrKeys[0]),
+      start: Number(this.data.clip.movieLength) - Number(outro.transitionDuration),
+      duration: outro.duration,
+      transitionDuration: outro.transitionDuration
+    };
+    
   }
 
   entry( overlay, template ) {

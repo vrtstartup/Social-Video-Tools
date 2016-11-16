@@ -105,12 +105,28 @@ function processRenderJob(project,job) {
     */
 
     return new Promise((resolve, reject) => {
+        handleSubtitles(project)
+          .then(project => stitch(project, job, progressHandler))
+          .then(resolve)
+          .catch(err => jobService.kill(job.id, err));
+    });
+}
+
+function handleSubtitles(project) {
+  // check if a project contains subtitles
+  // render .srt and .ass files if it does
+  return new Promise((resolve, reject) => {
+    if(project.hasAnnotations('subtitle')){
+      logger.verbose('project has subtitles, preparing...');
       subtitle.makeSrt(project)
         .then(makeAss)
-        .then(project => stitch(project, job, progressHandler))
         .then(resolve)
-        .catch(err => jobService.kill(job.id, err));
-    });
+        .catch(errorHandler);
+    } else{
+      logger.verbose('project doesnt have subtitles, continue...');
+      resolve(project);
+    }
+  });
 }
 
 function done() {

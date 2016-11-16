@@ -112,35 +112,48 @@ export function makeAss(project) {
 }
 
 export function stitch(project, job, messageHandler) {
-    let arrOverlays = project.overlayArray();
+    // project data
+    const clipData = project.data.clip;
+    const baseDir = project.data.files.baseDir;
+    const arrOverlays = project.overlayArray();
+    const outro = project.hasAnnotations('outro') ? project.getOutro() : false;
 
-    const baseDir = project.data.files.baseDir; 
+    // composition data
+    const width = clipData.width;
+    const height = clipData.height;
+    const sourceLength = Number(clipData.movieLength);
+    let renderDuration = (outro) ? sourceLength + (Number(outro.duration) - Number(outro.transitionDuration)) : sourceLength;
+
+    // project files
     const assFile = resolver.getFilePathByType('ass', baseDir);
+    const sourceFile = resolver.getFilePathByType('source', baseDir);
+    const renderFile = resolver.getFilePathByType('render', baseDir);
+    const outroFile = resolver.getFilePathByType('outro', baseDir);
 
-    let width = project.data.clip.width;
-    let height = project.data.clip.height;
-    let duration = project.data.clip.movieLength;
+    // used to wire ffmpeg inputs and outputs together
+    const arrInputs = [];
+    const arrOutputs = ['1:v'];  // [1:v] is the black backdrop
 
-    let source = resolver.getFilePathByType('source', project.data.id);
-    const output = `${resolver.getFilePathByType('render', project.data.id)}`;
-
-    /* ------------------------------- */
-    /* -- SET INPUTS ----------------- */
-    /* ------------------------------- */
+    // instantiate new command
     let command = new FfmpegCommand();
 
-    command
-        .input(`color=c=black:s=${width}x${height},trim=duration=${duration}`)
-        .inputFormat('lavfi')   //0:v
-        .input(source);         //1:v
+    // add some always-there inputs (backdrop, source)
+    registerInput('0:v', {filePath: sourceFile}); // original source
+    registerInput('1:v', {filePath: `color=c=black:s=${width}x${height},trim=duration=${renderDuration}`},'lavfi');  // black backdrop
+    
+    // add overlay inputs 
+    arrOverlays.forEach(overlay => registerInput(`${arrInputs.length}:v`, overlay));
 
-    // overlays
-    arrOverlays.forEach((el) => command = command.input(el.path));
+    // add outro input
+     if(outro) registerInput(`${arrInputs.length}:v`, outro);
 
-    return new Promise((resolve, reject) => {
+     return new Promise((resolve, reject) => {
+        const filter = complexFilter();
+        const output = project.hasAnnotations('subtitle') ? 'out_subs' : lastOutput();
+
         command
-            .complexFilter([makeComplexFilter(arrOverlays)], 'out_subs')
-            .output(output)
+            .complexFilter([filter], output)
+            .output(renderFile)
             .on('start', command => logger.verbose(`Spawned ffmpeg with command: ${command}`))
             .on('progress', msg => {
                 // append some extra data to the progress message
@@ -158,97 +171,78 @@ export function stitch(project, job, messageHandler) {
                 reject(err);
             })
             .run();
-    })
+     });
 
-    
-    /* ------------------------------- */
-    /* -- SET START & SCALE ---------- */
-    /* ------------------------------- */
-    function setStartPosAndScale(arrOverlays) {
-        let startAndScaleLine = '';
-        
-        arrOverlays.forEach((el, i) => {
-            // skip first two inputs (backdrop & source)
-            const scale = el.scale ? width/el.scale : width; // only logo has extra scale value 
-            startAndScaleLine = `${startAndScaleLine}[${i+2}:v]setpts=PTS-STARTPTS+${el.start}/TB,scale=${scale}:-1[${i}];`
+     // encapsulated functions, operate on variables specific to stitch() function
+     function registerInput(inputName:string, overlayData:Object, format?:string) {  
+        // register input in arrInputs
+        arrInputs.push({
+            name: inputName,
+            data: overlayData
         });
 
-        return startAndScaleLine;
+        command = command.input(overlayData['filePath']);
+        if(format) command = command.inputFormat(format);
     }
 
-    /* ------------------------------- */
-    /* -- MERGE OVERLAYS  ------------ */
-    /* ------------------------------- */
-    function makeOverlayString(arrOverlays) {
-        let overlayLine = '';
-        let output = 'movie';
+    function complexFilter() {
+        let filter = '';
 
-        let arrKeys = ['movie'];
-        arrOverlays.forEach((el, i) => arrKeys.push(`${i}`));
-        
-        // [ 'movie', '0', '1', '2', '3', '4' ]
-        while(arrKeys.length > 1){
-            output = `${arrKeys[0]}_${arrKeys[1]}`;
+        // set starting position and scale for inputs
+        arrInputs.forEach(input => addLine(setPosAndScale(input)));
 
-            // #todo not including logos yet
-            overlayLine += `[${arrKeys[0]}][${arrKeys[1]}]overlay=x=0:y=0[${output}];`;
+        // source and backdrop overlay 
+        addLine(overlayFilter(lastOutput(), arrInputs[0]));
 
-            arrKeys.splice(0, 2, output);
+        // overlay filters for remaining other inputs
+        for(let i=2 ; i < arrInputs.length ; i++){ 
+            const input = arrInputs[i];
+           addLine(overlayFilter(lastOutput(), input));
         }
 
-        if (arrKeys.length > 1) overlayLine = overlayLine.replace(output, 'output'); // replace output by outputname
+        // audio
+        addLine('amix=inputs=1:duration=first:dropout_transition=3');
 
-        return overlayLine ;
-    }
+        // subtitles
+        filter += project.hasAnnotations('subtitle') ? `;[${lastOutput()}]ass=${assFile}[out_subs]` : ''; // #todo semicolon handling isnt very good. last filter should not have a semicolon
 
-    /* ------------------------------- */
-    /* -- COMBINE LINES -------------- */
-    /* ------------------------------- */
-    function makeComplexFilter(arrOverlays){
-        let complexLine = '';
+        return filter;
 
-        complexLine = '[0:v][1:v]overlay=x=0:y=0[movie];'; // movie on black-container
-        complexLine += setStartPosAndScale(arrOverlays);
-
-        /* ------------------------------- */
-        /* -- OVERLAYS  ------------------ */
-        /* ------------------------------- */
-        let overlayLine = '';
-        let output = 'movie';
-
-        let arrKeys = ['movie'];
-        arrOverlays.forEach((el, i) => arrKeys.push(`${i}`));
-        
-        // [ 'movie', '0', '1', '2', '3', '4' ]
-        while(arrKeys.length > 1){
-            output = `${arrKeys[0]}_${arrKeys[1]}`;
-
-            // not including logos yet
-            overlayLine += `[${arrKeys[0]}][${arrKeys[1]}]overlay=x=0:y=0[${output}];`;
-
-            arrKeys.splice(0, 2, output);
+        function addLine(line:string){
+            if(line) filter += (filter === '') ? line : ';' + line;
         }
-
-        if (arrKeys.length > 1) overlayLine = overlayLine.replace(output, 'output'); // replace output by outputname
-
-        complexLine += overlayLine;
-
-
-
-        /* ------------------------------- */
-        /* -- AUDIO  --------------------- */
-        /* ------------------------------- */
-        complexLine += 'amix=inputs=1:duration=first:dropout_transition=3;' ;
-
-
-        /* ------------------------------- */
-        /* -- SUBTITLES  ----------------- */
-        /* ------------------------------- */
-        complexLine += project.hasAnnotations('subtitle') ? `[${output}]ass=${assFile}[out_subs]` : '';
-
-        return `${complexLine}`;
     }
 
+    function lastOutput() { return arrOutputs[ arrOutputs.length - 1 ] }
+
+    function setPosAndScale(input:Object) {
+        let line = '';
+        let outputName = input['name'];
+        const blacklist = ['0:v', '1:v']; // don't translate or scale these inputs #todo 0:v and 1:v are source and backdrop respectively
+
+        if(blacklist.indexOf(input['name']) === -1){
+            const inputName = input['name'];
+            outputName = inputName.replace(':v', '_scaled');
+            logger.debug(input['data']);
+            const scaleWidth = input['data'].scale ? input['data'].width * input['data'].scale : width;
+
+            line = `[${input['name']}]setpts=PTS-STARTPTS+${input['data']['start']}/TB,scale=${scaleWidth}:-1[${outputName}]`
+        };
+       
+        input['name'] = outputName; // input has a new name
+
+        return line;
+    }
+
+    function overlayFilter(output:string, input:Object){
+        const newOutputName = input['name'] + '_' + output;
+        arrOutputs.push(newOutputName);
+
+        return `[${output}][${input['name']}]overlay=x=0:y=0[${newOutputName}]`;
+    }
 }
+
+
+
 
 
