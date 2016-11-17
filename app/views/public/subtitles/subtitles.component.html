@@ -55,41 +55,27 @@
 					(click)="setSelectedAnnotation(annotation)"
 					class="s-sub-item">
 					
-						<div class="s-sub-item__info">
-							<small>{{i}} | {{annotation.start | json}} - {{annotation.end | json}} </small>
-						</div>
-						<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation.$key)">
-							<span>x</span>
-						</div>
+					<div class="s-sub-item__info">
+						<small>{{i}} | {{annotation.start | json}} - {{annotation.end | json}} </small>
+					</div>
+					<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation.$key)">
+						<span>x</span>
+					</div>
 					 
 				</div>
 
 			</div>
-
+			
 			<!--template column-->
 			<div class="s-sub-templates">
-				<div class="s-sub-template">
-					template 1
-				</div>
-				<div class="s-sub-template">
-					template 2
-				</div>
+				<div class="s-sub-template" *ngFor="let template of (templates | list)">
+					<div class="">{{template.name | json}}</div> 
+				</div><hr>
 			</div>
 
 			<!--inputs column-->
 			<div class="s-sub-inputs">
-				<div class="">
-					inputs here
-				</div>
-				<div class="s-sub-input">
-					inputs here
-				</div>
-				<div class="s-sub-input">
-					inputs here
-				</div>
-				<div class="s-sub-input">
-					inputs here
-				</div>
+				<div class="">Input here</div>
 			</div>
 		</div>
 

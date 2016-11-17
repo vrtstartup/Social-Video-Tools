@@ -20,6 +20,8 @@ export class SubtitlesComponent implements OnInit {
   userMessage: string = '';
   authenticated: boolean;
   errorMessage: string;
+  uploadProgress: any;
+  downScaleProgress: any;
 
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
@@ -32,12 +34,8 @@ export class SubtitlesComponent implements OnInit {
   clipRef: FirebaseObjectObservable<any[]>;
   clip: any[];
   templatesRef: FirebaseObjectObservable<any[]>;
+  templates: any[];
   selectedAnnotation: any;
-
-  //firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
-  project: any; // this is the ngModel we use to update, receive and bind firebase data
-  uploadProgress: any;
-  downScaleProgress: any;
 
   constructor(
     private zone: NgZone,
@@ -52,9 +50,10 @@ export class SubtitlesComponent implements OnInit {
     this.templaterQueueRef = af.database.list('/templater-queue');
     this.projectsRef = af.database.list('/projects');
     this.templatesRef = af.database.object('/templates');
-
+    this.templatesRef.subscribe((s:any) => this.templates = s)
+    
     // // TODO remove | only for test purposes
-    // this.templatesRef.set(testTemplate);
+    this.templatesRef.set(testTemplate);
   }
 
   authenticationStatus(status:boolean) {
@@ -97,6 +96,7 @@ export class SubtitlesComponent implements OnInit {
 
         this.clipRef = this.af.database.object(`${ref.toString()}/clip`)
         this.clipRef.subscribe( (s:any) => this.clip = s ) 
+
         // upload
         this.uploadSource($event)
       })
