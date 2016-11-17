@@ -17,10 +17,9 @@ import annotationTemplate from './models/annotationTemplate.model';
 })
 export class SubtitlesComponent implements OnInit {
 
-  snapshotRef: any;
+  userMessage: string = '';
+
   af: AngularFire;
-  video: any;
-  source: any;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
   templaterQueueRef: FirebaseListObservable<any[]>;
   projectsRef: FirebaseListObservable<any[]>;
@@ -32,9 +31,8 @@ export class SubtitlesComponent implements OnInit {
   clip: any[];
   templatesRef: FirebaseObjectObservable<any[]>;
   selectedAnnotation: any;
-  userMessage: string = '';
 
-  firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
+  //firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
   project: any; // this is the ngModel we use to update, receive and bind firebase data
   uploadProgress: any;
   downScaleProgress: any;
@@ -64,7 +62,7 @@ export class SubtitlesComponent implements OnInit {
         this.zone.run(() => {
           this.uploadProgress = data;
         });
-      }, (err) => { console.log(err) });
+      }, (err) => { console.log(err)});
   }
 
   createNewProject($event) {
@@ -78,12 +76,10 @@ export class SubtitlesComponent implements OnInit {
         this.projectRef = this.af.database.object(ref.toString())
 
         this.annotationsRef = this.af.database.list(`${ref.toString()}/annotations`, { query: { orderByChild: 'end' } })
-        this.annotationsRef.subscribe((s:any) => {
-          this.annotations = s
-        })
+        this.annotationsRef.subscribe( (s:any) => this.annotations = s)
 
         this.clipRef = this.af.database.object(`${ref.toString()}/clip`)
-        this.clipRef.subscribe((snapShot:any)=>{ this.clip = snapShot }) 
+        this.clipRef.subscribe( (s:any) => this.clip = s ) 
         // upload
         this.uploadSource($event)
       })
@@ -92,9 +88,9 @@ export class SubtitlesComponent implements OnInit {
 
   uploadSource($event) {
     // File-ref to upload
-    this.source = $event.target.files[0];
+    let source = $event.target.files[0];
     // Upload video
-    this.uploadService.makeFileRequest('api/upload/source', this.source, this.projectId)
+    this.uploadService.makeFileRequest('api/upload/source', source, this.projectId)
       .subscribe(
         data => { this.userMessage = '' },
         err => {
@@ -104,7 +100,12 @@ export class SubtitlesComponent implements OnInit {
       );
   }
 
-  setSelectedAnnotation(annotation, index) {
+  updateSource($event) {
+    // TODO optionally highlight out of range annotations
+    this.uploadSource($event)
+  }
+
+  setSelectedAnnotation(annotation) {
     this.selectedAnnotation = annotation;
     // TODO reveal available templates (based on rights)
   }
@@ -132,12 +133,21 @@ export class SubtitlesComponent implements OnInit {
       start: startTime,
       end: endTime
     })
+    .then((ref) => {
+        let freshAnno = this.annotations[(this.annotations.length -1)]
+        this.setSelectedAnnotation( freshAnno )
+      }
+    )
 
   }
 
   updateAnnotation($event) {
     this.selectedAnnotation = $event;
     this.annotationsRef.update($event.$key, { start: $event.start, end: $event.end });
+  }
+
+  deleteAnnotation(id) {
+    this.annotationsRef.remove(id) 
   }
 
   addToRenderQueue() {
