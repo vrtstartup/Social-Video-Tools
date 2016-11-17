@@ -11,7 +11,6 @@
     "server:dev": "nodemon server --ext js,ts",
     "uploader:dev": "node uploader --ext js,ts",
     "clean": "rm -rf dist",
-    "ngc": "ngc -p ./tsconfig-prod.json",
     "build-dev": "npm run clean && webpack --config webpack.dev.js",
     "build-prod": "npm run clean && webpack --config webpack.prod.js"
   },

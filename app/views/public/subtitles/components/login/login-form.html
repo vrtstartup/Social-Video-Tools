@@ -1,0 +1,7 @@
+<div class="login">
+    <form [formGroup]="loginForm" (submit)="login($event)">
+        <input formControlName="email" type="email" placeholder="Your email">
+        <input formControlName="password" type="password" placeholder="Your password">
+      <button type="submit">Log in</button>
+    </form>
+</div>
