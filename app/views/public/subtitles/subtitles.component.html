@@ -33,10 +33,10 @@
 	<div class="s-submenu" *ngIf="(projectRef | async)">
 		<!--once downscaled show controls-->
 		<div *ngIf="(projectRef | async)?.status?.downscaled">
-			<label class="btn btn-secondary btn-upload">
-				<input type="file" name="video" (change)="uploadSource($event)">Change Source
-			</label>
 			<button type="button" class="btn btn-secondary" (click)="addAnnotation()">Add Annotation(U)</button>
+			<label class="btn btn-secondary btn-upload">
+				<input type="file" name="video" (change)="updateSource($event)">Update Source
+			</label>
 			<button type="button" class="btn btn-secondary" (click)="addToRenderQueue()">Render Movie(R)</button>
 		</div>
 	</div>
@@ -51,10 +51,14 @@
        				[class.highlight]="selectedAnnotation.$key === annotation.$key"
 					(click)="setSelectedAnnotation(annotation)"
 					class="s-sub-item">
-					<div>
-						<!--<small>{{i}} - isLast={{last}} </small>-->
-						<small>{{annotation.start | json}} | {{annotation.end | json}}</small>
-					</div> 
+					
+						<div class="s-sub-item__info">
+							<small>{{i}} | {{annotation.start | json}} - {{annotation.end | json}} </small>
+						</div>
+						<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation.$key)">
+							<span>x</span>
+						</div>
+					 
 				</div>
 
 			</div>
