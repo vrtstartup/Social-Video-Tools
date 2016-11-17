@@ -76,6 +76,7 @@ router.post('/source', uploadLowres, (req: any, res) => {
     },
     status: {
       'uploaded': true,
+      'downscaled': false,
     }
   });
 
