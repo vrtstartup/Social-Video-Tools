@@ -44,9 +44,9 @@ export function ffprobe (project) {
             logger.verbose('Valid video stream found. FFprobe finished.');
 
             // Append new data to the project object 
-            project.data.clip.movieLength = outputObj.format.duration;
+            project.data.clip.movieLength = parseFloat(outputObj.format.duration);
             project.data.clip.type = 'video/mp4';
-            project.data.clip.frames = outputObj.streams[0].nb_frames // #todo how do we store which stream is eligible for stitching?
+            project.data.clip.frames = parseFloat(outputObj.streams[0].nb_frames) // TODO how do we store which stream is eligible for stitching?
             project.data.clip.width = outputObj.streams[0].width
             project.data.clip.height = outputObj.streams[0].height
             
