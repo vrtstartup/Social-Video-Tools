@@ -44,6 +44,12 @@ export const fileConfig = {
       name: '_overlay', // this is prepended with the overlay's id
       extension: 'mov',
       unique: false,
+    },
+    outro: {
+      directory: 'overlays',
+      name: 'outro',
+      extension: 'mov',
+      unique: true
     }
   }
 };
