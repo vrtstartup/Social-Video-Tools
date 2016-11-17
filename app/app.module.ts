@@ -21,6 +21,7 @@ import { VrtAppsComponent } from './views/public/vrtapps.component';
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { listPipe } from './common/pipes/list.pipe';
+import { SortTimePipe } from './common/pipes/sortTime.pipe';
 import firebaseConfig from './config/firebase.config';
 
 @NgModule({
@@ -30,7 +31,8 @@ import firebaseConfig from './config/firebase.config';
         VrtAppsComponent,
         SubtitlesComponent,
         RangeSliderComponent,
-        listPipe
+        listPipe,
+        SortTimePipe
     ],
     imports: [
         BrowserModule, 
