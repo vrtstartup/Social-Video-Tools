@@ -21,11 +21,13 @@
     background-image: linear-gradient(to bottom, #fff 0, #f2f2f2 100%);   
 }
 
-.s-submenu {
-    border:1px solid #f2f2f2;
-    flex: 0 1 auto;
-    flex-direction: row; 
-    padding: .5rem;
+.s-status {
+    display: flex;
+    flex-direction: column;
+    > div { 
+        border-bottom: 1px solid #f2f2f2;
+        padding: .5rem;
+    }
 }
 
 .s-progress {
@@ -33,14 +35,14 @@
     .s-progress__label {
         flex: 1 1 auto;
         font-size: .75rem;
-        padding: 0 1rem;
+        padding-right: 1rem;
     }
     .s-progress__bg {
-            background: rgba(#0288d1, 0.3);
-            border-radius: 4px;
-            flex: 1 1 auto;
-            overflow: hidden;
-            width: 100%;
+        background: rgba(#0288d1, 0.3);
+        border-radius: 4px;
+        flex: 1 1 auto;
+        overflow: hidden;
+        width: 100%;
     }
     .s-progress__bar {
         background: #0288d1;
@@ -49,11 +51,22 @@
     }
 }
 
+.s-submenu {
+    border: 1px solid #f2f2f2;
+    flex: 0 1 auto;
+    flex-direction: row; 
+    padding: .5rem;
+}
+
+.s-status-error {
+    font-size: .75rem;
+    padding: .5rem 0;
+}
 
 .s-sub-controls {
-    display:flex; 
+    display: flex; 
     flex: 1;
-    flex-direction:row;
+    flex-direction: row;
     .s-sub__wrapper {
         flex: 0 0 50%; display:flex;
     }
@@ -66,6 +79,9 @@
     .s-sub-item {
         border: 1px solid #f2f2f2;
         flex: 0;
+        &.highlight {
+            background: #f2f2f2;
+        }
     }
     .s-sub-templates {
         border: 1px solid #f2f2f2;

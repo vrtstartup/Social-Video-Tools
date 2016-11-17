@@ -2,12 +2,13 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
+import 'rxjs/add/operator/take'
 import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/upload.service';
 
 // TODO remove | only for test purposes
-import testTemplate from './testModels/testTemplate.model';
-import annotationTemplate from './testModels/annotationTemplate.model';
+import testTemplate from './models/testTemplate.model';
+import annotationTemplate from './models/annotationTemplate.model';
 
 @Component({
   providers: [UploadService],
@@ -26,7 +27,9 @@ export class SubtitlesComponent implements OnInit {
   projectRef: FirebaseObjectObservable<any[]>;
   projectId: string;
   annotationsRef: FirebaseListObservable<any[]>;
+  annotations: any[];
   clipRef: FirebaseObjectObservable<any[]>;
+  clip: any[];
   templatesRef: FirebaseObjectObservable<any[]>;
   selectedAnnotation: any;
   userMessage: string = '';
@@ -57,6 +60,7 @@ export class SubtitlesComponent implements OnInit {
     // subscribe to service observable
     this.uploadService.progress$
       .subscribe(data => {
+        // trigger change
         this.zone.run(() => {
           this.uploadProgress = data;
         });
@@ -72,8 +76,14 @@ export class SubtitlesComponent implements OnInit {
         // set project-references
         this.projectId = ref.key;
         this.projectRef = this.af.database.object(ref.toString())
-        this.annotationsRef = this.af.database.list(`${ref.toString()}/annotations`)
+
+        this.annotationsRef = this.af.database.list(`${ref.toString()}/annotations`, { query: { orderByChild: 'end' } })
+        this.annotationsRef.subscribe((s:any) => {
+          this.annotations = s
+        })
+
         this.clipRef = this.af.database.object(`${ref.toString()}/clip`)
+        this.clipRef.subscribe((snapShot:any)=>{ this.clip = snapShot }) 
         // upload
         this.uploadSource($event)
       })
@@ -86,18 +96,43 @@ export class SubtitlesComponent implements OnInit {
     // Upload video
     this.uploadService.makeFileRequest('api/upload/source', this.source, this.projectId)
       .subscribe(
-        data => { },
-        err => { console.log('err', err) }
+        data => { this.userMessage = '' },
+        err => {
+          console.log('error: makeFileRequest:', err)
+          this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
+        }
       );
   }
 
-  setSelectedAnnotation(annotation) {
+  setSelectedAnnotation(annotation, index) {
     this.selectedAnnotation = annotation;
     // TODO reveal available templates (based on rights)
   }
 
   addAnnotation() {
-    this.annotationsRef.push(annotationTemplate);
+
+    let startTime = 0;
+    let timeSpan = 4;
+    let endTime = startTime + timeSpan;
+
+    if(this.annotations.length > 0){
+      let maxTime = this.annotations[(this.annotations.length -1)].end
+      let movieLength = this.clip['movieLength']
+
+      if( (movieLength - maxTime) <= timeSpan ) {
+        startTime = movieLength - timeSpan
+        endTime = movieLength
+      } else {
+        startTime = maxTime
+        endTime = startTime + timeSpan;
+      }
+    }
+
+    this.annotationsRef.push({
+      start: startTime,
+      end: endTime
+    })
+
   }
 
   updateAnnotation($event) {
@@ -110,38 +145,37 @@ export class SubtitlesComponent implements OnInit {
       .subscribe((data) => { });
   }
 
-
-
-  /*
-
-    listen() {
-      // when data in firebase updates, propagate it to our working model
-      // only update the relevant nodes
-      this.projectRef.on('child_changed', (snapshot) => {
-        const child = snapshot.key;
-        const data = snapshot.val();
-        this.project[child] = data;
-      });
-    }
-  
-    hasTitles() {
-      // check wether or not this project containes titles
-      let children = false;
-  
-      if (this.project.hasOwnProperty("titles")) {
-        children = Object.keys(this.project.titles).length !== 0;
-      }
-  
-      return children;
-    }
-  
-    addToTemplaterQueue() {
-      const key = this.projectRef.key;
-      this.templaterQueueRef.push({
-        projectId: key,
-        status: 'open',
-      });
-    }
-    */
-
 }
+
+
+
+/*
+  listen() {
+    // when data in firebase updates, propagate it to our working model
+    // only update the relevant nodes
+    this.projectRef.on('child_changed', (snapshot) => {
+      const child = snapshot.key;
+      const data = snapshot.val();
+      this.project[child] = data;
+    });
+  }
+
+  hasTitles() {
+    // check wether or not this project containes titles
+    let children = false;
+
+    if (this.project.hasOwnProperty("titles")) {
+      children = Object.keys(this.project.titles).length !== 0;
+    }
+
+    return children;
+  }
+
+  addToTemplaterQueue() {
+    const key = this.projectRef.key;
+    this.templaterQueueRef.push({
+      projectId: key,
+      status: 'open',
+    });
+  }
+  */

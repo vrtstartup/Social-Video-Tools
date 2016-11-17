@@ -22,13 +22,13 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
         this.sources = [];
     }
 
-    ngOnInit() { 
+    ngOnInit() {
     }
-    ngAfterViewInit() { 
+    ngAfterViewInit() {
     }
 
     ngOnChanges() {
-
+        // on setSelectedAnnotation & on rangeslider on('end')
         console.log('event in child: video-player')
 
         if (this.clip) {
@@ -37,10 +37,19 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
         }
 
         if (this.selectedAnnotation) {
-
-            let seektime = parseFloat(this.selectedAnnotation.start);
-            this.api.seekTime(seektime);
+            
+            let seekTime = parseFloat(this.selectedAnnotation.start);
+            this.api.seekTime(seekTime);
             this.api.play();
+            
+            // loop function
+            this.api.subscriptions.timeUpdate
+                .subscribe(() => {
+                    if( this.api.currentTime >= parseFloat(this.selectedAnnotation.end)) {
+                        this.api.seekTime(parseFloat(this.selectedAnnotation.start))
+                        this.api.play()
+                    }
+                })
         }
 
     }
@@ -48,5 +57,4 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
     onPlayerReady() {
         // console.log("player ready");
     }
-
 }

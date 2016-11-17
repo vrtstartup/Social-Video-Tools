@@ -9,14 +9,13 @@
 		</div>
 	</div>
 
-	<div class="s-submenu" *ngIf="(projectRef | async)">
-
+	<div class="s-status" *ngIf="(projectRef | async)">
 		<!--erro message upload|project -->
-		<div class="" *ngIf="userMessage">{{userMessage}}</div>
+		<div class="s-status-error" *ngIf="userMessage">{{userMessage}}</div>
 
 		<!--progressbar upload-->
 		<div class="s-progress" *ngIf="uploadProgress > 0 && uploadProgress < 100">
-			<div class="s-progress__label">upload</div>
+			<div class="s-progress__label">uploading</div>
 			<div class="s-progress__bg" *ngIf="uploadProgress">
 				<div class="s-progress__bar" [style.width]="uploadProgress + '%'"></div>
 			</div>
@@ -29,7 +28,9 @@
 				<div class="s-progress__bar" [style.width]="(projectRef | async)?.status?.downScaleProgress + '%'"></div>
 			</div>
 		</div>
-		
+	</div>
+
+	<div class="s-submenu" *ngIf="(projectRef | async)">
 		<!--once downscaled show controls-->
 		<div *ngIf="(projectRef | async)?.status?.downscaled">
 			<label class="btn btn-secondary btn-upload">
@@ -46,11 +47,16 @@
 		<div class="s-sub__wrapper">
 			<!--subtitles column-->
 			<div class="s-sub-items">
-				<div *ngFor="let annotation of annotationsRef | async" class="s-sub-item">
-					<div (click)="setSelectedAnnotation(annotation)">
-						{{annotation.start | json}} | {{annotation.end | json}}
+				<div *ngFor="let annotation of (annotationsRef | async) ; let i = index; let last = last; trackBy:annotation?.$key" 
+       				[class.highlight]="selectedAnnotation.$key === annotation.$key"
+					(click)="setSelectedAnnotation(annotation)"
+					class="s-sub-item">
+					<div>
+						<!--<small>{{i}} - isLast={{last}} </small>-->
+						<small>{{annotation.start | json}} | {{annotation.end | json}}</small>
 					</div> 
 				</div>
+
 			</div>
 
 			<!--template column-->
@@ -98,5 +104,4 @@
 	</div>
 	
 	<!--<small class="">{{ projectRef | async | json }}</small><br>-->
-
 </div>

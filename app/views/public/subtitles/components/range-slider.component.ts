@@ -43,8 +43,8 @@ export class RangeSliderComponent implements OnInit, OnChanges, AfterViewInit {
         this.rangeSlider.noUiSlider.on('end', () => {
             if (this.selectedAnnotation) {
 
-                this.selectedAnnotation.start = this.rangeSlider.noUiSlider.get()[0]
-                this.selectedAnnotation.end = this.rangeSlider.noUiSlider.get()[1]
+                this.selectedAnnotation.start = parseFloat(this.rangeSlider.noUiSlider.get()[0])
+                this.selectedAnnotation.end = parseFloat(this.rangeSlider.noUiSlider.get()[1])
 
                 this.changeAnno.emit(Object.assign({}, this.selectedAnnotation))
             }
