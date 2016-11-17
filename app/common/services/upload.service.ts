@@ -22,6 +22,7 @@ export class UploadService {
       formData.append('video', file);
 
       xhr.onreadystatechange = () => {
+
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
             observer.next(JSON.parse(xhr.response));
@@ -30,17 +31,22 @@ export class UploadService {
             observer.error(xhr.response);
           }
         }
+
       };
 
       xhr.upload.onprogress = (event) => {
         this.progress = Math.round(event.loaded / event.total * 100);
-
+        
         this.progressObserver
           .next(this.progress)
-      };
+        };
+
+      xhr.upload.onerror = (e) => { observer.error(e);}
+      xhr.upload.ontimeout = (e) => { observer.error(e);}
 
       xhr.open('POST', url, true);
       xhr.send(formData);
+
     });
   }
 }
