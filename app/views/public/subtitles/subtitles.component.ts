@@ -1,5 +1,5 @@
 import { Component, OnInit, NgZone } from '@angular/core';
-import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
+import { AngularFire, FirebaseAuth, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
 import './subtitles.component.scss';
@@ -30,6 +30,8 @@ export class SubtitlesComponent implements OnInit {
   templatesRef: FirebaseObjectObservable<any[]>;
   selectedAnnotation: any;
   userMessage: string = '';
+  authenticated: boolean;
+  errorMessage: string;
 
   firebaseSelectedSubKey: string; // points to the firebase subtitle entry we're editing
   project: any; // this is the ngModel we use to update, receive and bind firebase data
@@ -40,17 +42,32 @@ export class SubtitlesComponent implements OnInit {
     private zone: NgZone,
     private http: Http,
     private uploadService: UploadService,
-    af: AngularFire) {
+    af: AngularFire,
+    public auth: FirebaseAuth) {
 
     this.af = af;
-    // General Firebase-references
+    // // General Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
     this.templaterQueueRef = af.database.list('/templater-queue');
     this.projectsRef = af.database.list('/projects');
     this.templatesRef = af.database.object('/templates');
 
-    // TODO remove | only for test purposes
-    this.templatesRef.set(testTemplate);
+    // // TODO remove | only for test purposes
+    // this.templatesRef.set(testTemplate);
+  }
+
+  authenticationStatus(status:boolean) {
+    this.authenticated = status;
+    this.errorMessage = null;
+  }
+
+  authenticationError(error) {
+    this.errorMessage = error.message;
+  } 
+
+  logout(event) {
+      this.auth.logout();
+      this.authenticated = false; 
   }
 
   ngOnInit() {
@@ -109,39 +126,4 @@ export class SubtitlesComponent implements OnInit {
     this.http.post('api/render', { projectId: this.projectId })
       .subscribe((data) => { });
   }
-
-
-
-  /*
-
-    listen() {
-      // when data in firebase updates, propagate it to our working model
-      // only update the relevant nodes
-      this.projectRef.on('child_changed', (snapshot) => {
-        const child = snapshot.key;
-        const data = snapshot.val();
-        this.project[child] = data;
-      });
-    }
-  
-    hasTitles() {
-      // check wether or not this project containes titles
-      let children = false;
-  
-      if (this.project.hasOwnProperty("titles")) {
-        children = Object.keys(this.project.titles).length !== 0;
-      }
-  
-      return children;
-    }
-  
-    addToTemplaterQueue() {
-      const key = this.projectRef.key;
-      this.templaterQueueRef.push({
-        projectId: key,
-        status: 'open',
-      });
-    }
-    */
-
 }

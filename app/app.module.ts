@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AngularFireModule } from 'angularfire2';
 import { HttpModule } from '@angular/http';
@@ -16,7 +16,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
 import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
-
+import { LoginForm } from './views/public/subtitles/components/login/login-form';
 import { VrtAppsComponent } from './views/public/vrtapps.component';
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
@@ -30,22 +30,28 @@ import firebaseConfig from './config/firebase.config';
         VrtAppsComponent,
         SubtitlesComponent,
         RangeSliderComponent,
+        LoginForm,
         listPipe
     ],
     imports: [
         BrowserModule, 
         FormsModule,
+        ReactiveFormsModule,
         NgbModule,
         VgCore, 
         VgControlsModule, 
         VgOverlayPlayModule, 
         VgBufferingModule,
         HttpModule,
-        AngularFireModule.initializeApp( firebaseConfig() ),
+        AngularFireModule.initializeApp( firebaseConfig()['firebaseConfig'], firebaseConfig()['firebaseAuthConfig']  ),
         RouterModule.forRoot([
             { path: 'subtitles', component: SubtitlesComponent },
             { path: '', component: SubtitlesComponent },
         ]),
+    ],
+    exports: [
+        FormsModule,
+        ReactiveFormsModule,
     ],
     providers: [ExtBrowserXhr],
     bootstrap: [AppComponent],

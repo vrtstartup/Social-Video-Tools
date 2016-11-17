@@ -1,11 +1,14 @@
-<div class="socialvideotool">
-	
+<login-form *ngIf="!authenticated" (onAuthStatusChange)="authenticationStatus($event)" (onError)="authenticationError($event)"></login-form>
+{{errorMessage}}
+
+<div *ngIf="authenticated" class="socialvideotool">
 	<div class="s-mainmenu">
 		<div>
 			<label class="btn btn-secondary btn-upload">
 				<input type="file" name="video" (change)="createNewProject($event)">New
 			</label>
 			<button type="button" class="btn btn-secondary" (click)="''">Open</button>
+			<button (click)="logout()" class="btn btn-secondary">Sign Out</button>
 		</div>
 	</div>
 
