@@ -1,4 +1,5 @@
 import { Component, OnInit, NgZone } from '@angular/core';
+import { Router } from '@angular/router';
 import { AngularFire, FirebaseAuth, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
@@ -15,11 +16,10 @@ import annotationTemplate from './models/annotationTemplate.model';
   selector: 'subtitles-component',
   templateUrl: 'subtitles.component.html',
 })
+
 export class SubtitlesComponent implements OnInit {
 
   userMessage: string = '';
-  authenticated: boolean;
-  errorMessage: string;
 
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
@@ -43,6 +43,7 @@ export class SubtitlesComponent implements OnInit {
     private zone: NgZone,
     private http: Http,
     private uploadService: UploadService,
+    private router: Router,
     af: AngularFire,
     public auth: FirebaseAuth) {
 
@@ -57,18 +58,9 @@ export class SubtitlesComponent implements OnInit {
     // this.templatesRef.set(testTemplate);
   }
 
-  authenticationStatus(status:boolean) {
-    this.authenticated = status;
-    this.errorMessage = null;
-  }
-
-  authenticationError(error) {
-    this.errorMessage = error.message;
-  } 
-
   logout(event) {
       this.auth.logout();
-      this.authenticated = false; 
+      this.router.navigate(['auth']);
   }
 
   ngOnInit() {

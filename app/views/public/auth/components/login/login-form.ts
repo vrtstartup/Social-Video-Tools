@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import {Router} from '@angular/router';
 import { AngularFire, FirebaseAuth, FirebaseAuthState } from 'angularfire2';
 
 @Component({
@@ -13,7 +14,7 @@ export class LoginForm implements OnInit {
 
     private loginForm;
 
-    constructor(fb: FormBuilder, public auth: FirebaseAuth) {
+    constructor(fb: FormBuilder, public auth: FirebaseAuth, private router: Router) {
       // populate form
       this.loginForm = fb.group({
         email: ['', Validators.required],
@@ -31,7 +32,7 @@ export class LoginForm implements OnInit {
       const form = this.loginForm.value;
 
       // #todo filter user input
-      this.auth.login({ email: form.email, password: form.password }).then(console.log, this.errorHandler.bind(this));
+      this.auth.login({ email: form.email, password: form.password }).then( user => this.router.navigate(['subtitles']), this.errorHandler.bind(this));
     }
 
     loginStatusChange(state:FirebaseAuthState) {

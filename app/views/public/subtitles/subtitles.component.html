@@ -1,7 +1,6 @@
-<login-form *ngIf="!authenticated" (onAuthStatusChange)="authenticationStatus($event)" (onError)="authenticationError($event)"></login-form>
-{{errorMessage}}
+<menu-bar></menu-bar>
 
-<div *ngIf="authenticated" class="socialvideotool">
+<div class="socialvideotool">
 	<div class="s-mainmenu">
 		<div>
 			<label class="btn btn-secondary btn-upload">
