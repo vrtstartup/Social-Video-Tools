@@ -49,46 +49,34 @@
 		<div class="s-sub__wrapper">
 			<!--subtitles column-->
 			<div class="s-sub-items">
-				<div *ngFor="let annotation of (annotationsRef | async) ; let i = index; let last = last; trackBy:annotation?.$key" 
+				<div *ngFor="let annotation of (annotationsRef | async) ; 
+					let i = index; let last = last; trackBy:annotation?.$key" 
        				[class.highlight]="selectedAnnotation.$key === annotation.$key"
 					(click)="setSelectedAnnotation(annotation)"
 					class="s-sub-item">
 					
-						<div class="s-sub-item__info">
-							<small>{{i}} | {{annotation.start | json}} - {{annotation.end | json}} </small>
-						</div>
-						<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation.$key)">
-							<span>x</span>
-						</div>
-					 
+					<div class="s-sub-item__info">
+						<small>{{i}} | {{annotation.start | json}} - {{annotation.end | json}} </small>
+					</div>
+					<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation.$key)">
+						<span>x</span>
+					</div>
 				</div>
-
 			</div>
-
+			
 			<!--template column-->
-			<div class="s-sub-templates">
-				<div class="s-sub-template">
-					template 1
-				</div>
-				<div class="s-sub-template">
-					template 2
-				</div>
+			<div class="s-sub-templates" *ngIf="selectedAnnotation">
+				<div *ngFor="let template of (templates | list)"
+					(click)="setSelectedTemplate(template)"
+					[class.highlight]="selectedTemplate === template"
+					class="s-sub-template">
+						<small>{{template.name | json}}</small>
+				</div><hr>
 			</div>
 
 			<!--inputs column-->
 			<div class="s-sub-inputs">
-				<div class="">
-					inputs here
-				</div>
-				<div class="s-sub-input">
-					inputs here
-				</div>
-				<div class="s-sub-input">
-					inputs here
-				</div>
-				<div class="s-sub-input">
-					inputs here
-				</div>
+				<div class="">Input here</div>
 			</div>
 		</div>
 

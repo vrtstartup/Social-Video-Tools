@@ -10,7 +10,10 @@ export class listPipe implements PipeTransform {
         // loop through the object,
         // pushing input to the return array
         keyArr.forEach((key: any) => {
-            dataArr.push(input[key]);
+            // remove firebase stuff from object
+            if( key != '$exists' && key != '$key'){
+                dataArr.push(input[key]);
+            }
         });
         
         // return the resulting array
