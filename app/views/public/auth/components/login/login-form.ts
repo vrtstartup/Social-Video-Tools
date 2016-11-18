@@ -30,9 +30,10 @@ export class LoginForm implements OnInit {
     login(event) {
       event.preventDefault();
       const form = this.loginForm.value;
-
+      const credentials = { email: form.email, password: form.password };
+      
       // #todo filter user input
-      this.auth.login({ email: form.email, password: form.password }).then( user => this.router.navigate(['subtitles']), this.errorHandler.bind(this));
+      this.auth.login(credentials).then( user => this.router.navigate(['subtitles']), err => this.errorHandler(err, credentials));
     }
 
     loginStatusChange(state:FirebaseAuthState) {
@@ -40,8 +41,16 @@ export class LoginForm implements OnInit {
       this.onAuthStatusChange.emit(status);
     }
 
-    errorHandler(err){ 
-      this.onError.emit(err);
+    register(credentials) {
+      if(credentials.email.indexOf('@vrt') > -1){
+        this.auth.createUser(credentials)
+          .then(user => this.router.navigate(['subtitles']), this.registerHandler.bind(this));
+      } else this.registerHandler({message: 'only @vrt addresses allowed, sorry!'});
+    
     }
+
+    errorHandler(err, credentials){ (err.code === 'auth/user-not-found') ? this.register(credentials) :  this.onError.emit(err) }
+
+    registerHandler(err) { this.onError.emit(err) }
 
 }
