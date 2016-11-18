@@ -1,6 +1,6 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { AngularFire, FirebaseAuth, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
+import { AngularFire, FirebaseAuth, FirebaseAuthState, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
 import './subtitles.component.scss';
@@ -17,6 +17,7 @@ import testTemplate from './models/testTemplate.model';
 
 export class SubtitlesComponent implements OnInit {
 
+  userId: string;
   userMessage: string = '';
   uploadProgress: any;
   downScaleProgress: any;
@@ -70,6 +71,12 @@ export class SubtitlesComponent implements OnInit {
           this.uploadProgress = data;
         });
       }, err => console.log(err));
+
+      this.af.auth.subscribe(this.onAuthStatusChange.bind(this))
+  }
+
+  onAuthStatusChange(state:FirebaseAuthState) {
+    if(state !== null) this.userId = state.uid;
   }
 
   createNewProject($event) {
@@ -86,6 +93,10 @@ export class SubtitlesComponent implements OnInit {
         { query: { orderByChild: 'end'}})
         this.annotationsRef.subscribe( (s:any) => this.annotations = s)
 
+        // attach project id to user 
+        this.af.database.object(`/users/${this.userId}/projects/${this.projectId}`).set(true);
+          
+        // this.usersRef.set();
         this.clipRef = this.af.database.object(`${ref.toString()}/clip`)
         this.clipRef.subscribe( (s:any) => this.clip = s ) 
 
