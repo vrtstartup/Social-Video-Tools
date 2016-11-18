@@ -13,8 +13,11 @@ export class LoginForm implements OnInit {
     @Output() onError = new EventEmitter();
 
     private loginForm;
+    private af;
 
-    constructor(fb: FormBuilder, public auth: FirebaseAuth, private router: Router) {
+    constructor(af: AngularFire, fb: FormBuilder, public auth: FirebaseAuth, private router: Router) {
+      this.af = af;
+      
       // populate form
       this.loginForm = fb.group({
         email: ['', Validators.required],
@@ -44,7 +47,10 @@ export class LoginForm implements OnInit {
     register(credentials) {
       if(credentials.email.indexOf('@vrt') > -1){
         this.auth.createUser(credentials)
-          .then(user => this.router.navigate(['subtitles']), this.registerHandler.bind(this));
+          .then(user => {
+             this.af.database.object(`/users/${user.uid}/role`).set('user');
+            this.router.navigate(['subtitles'])
+          }, this.registerHandler.bind(this));
       } else this.registerHandler({message: 'only @vrt addresses allowed, sorry!'});
     
     }

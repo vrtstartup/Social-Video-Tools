@@ -96,7 +96,6 @@ export class SubtitlesComponent implements OnInit {
         // attach project id to user 
         this.af.database.object(`/users/${this.userId}/projects/${this.projectId}`).set(true);
           
-        // this.usersRef.set();
         this.clipRef = this.af.database.object(`${ref.toString()}/clip`)
         this.clipRef.subscribe( (s:any) => this.clip = s ) 
 
