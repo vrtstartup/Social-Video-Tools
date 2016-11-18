@@ -2,13 +2,11 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { AngularFire, FirebaseAuth, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
-import 'rxjs/add/operator/take'
 import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/upload.service';
 
 // TODO remove | only for test purposes
 import testTemplate from './models/testTemplate.model';
-import annotationTemplate from './models/annotationTemplate.model';
 
 @Component({
   providers: [UploadService],
@@ -36,6 +34,7 @@ export class SubtitlesComponent implements OnInit {
   templatesRef: FirebaseObjectObservable<any[]>;
   templates: any[];
   selectedAnnotation: any;
+  selectedTemplate: any;
 
   constructor(
     private zone: NgZone,
@@ -45,14 +44,14 @@ export class SubtitlesComponent implements OnInit {
     public auth: FirebaseAuth) {
 
     this.af = af;
-    // // General Firebase-references
+    // General Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
     this.templaterQueueRef = af.database.list('/templater-queue');
     this.projectsRef = af.database.list('/projects');
     this.templatesRef = af.database.object('/templates');
     this.templatesRef.subscribe((s:any) => this.templates = s)
     
-    // // TODO remove | only for test purposes
+    // TODO remove | only for test purposes
     this.templatesRef.set(testTemplate);
   }
 
@@ -78,7 +77,7 @@ export class SubtitlesComponent implements OnInit {
         this.zone.run(() => {
           this.uploadProgress = data;
         });
-      }, (err) => { console.log(err)});
+      }, err => console.log(err));
   }
 
   createNewProject($event) {
@@ -91,7 +90,8 @@ export class SubtitlesComponent implements OnInit {
         this.projectId = ref.key;
         this.projectRef = this.af.database.object(ref.toString())
 
-        this.annotationsRef = this.af.database.list(`${ref.toString()}/annotations`, { query: { orderByChild: 'end' } })
+        this.annotationsRef = this.af.database.list(`${ref.toString()}/annotations`, 
+        { query: { orderByChild: 'end'}})
         this.annotationsRef.subscribe( (s:any) => this.annotations = s)
 
         this.clipRef = this.af.database.object(`${ref.toString()}/clip`)
@@ -100,13 +100,13 @@ export class SubtitlesComponent implements OnInit {
         // upload
         this.uploadSource($event)
       })
-      .catch(err => console.log(err, 'could not create|upload a new project'));
+      .catch( err => console.log( err, 'could not create|upload a new project'));
   }
 
   uploadSource($event) {
-    // File-ref to upload
+    // file-ref to upload
     let source = $event.target.files[0];
-    // Upload video
+    // upload video
     this.uploadService.makeFileRequest('api/upload/source', source, this.projectId)
       .subscribe(
         data => { this.userMessage = '' },
@@ -114,61 +114,71 @@ export class SubtitlesComponent implements OnInit {
           console.log('error: makeFileRequest:', err)
           this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
         }
-      );
+      )
   }
 
   updateSource($event) {
-    // TODO optionally highlight out of range annotations
     this.uploadSource($event)
+    // TODO optionally highlight out-of-range annotations
   }
 
   setSelectedAnnotation(annotation) {
     this.selectedAnnotation = annotation;
+    this.setSelectedTemplate( this.templates[annotation.data.name])
     // TODO reveal available templates (based on rights)
   }
 
   addAnnotation() {
+    let spanTm = 4 
+    let strtTm = 0
 
-    let startTime = 0;
-    let timeSpan = 4;
-    let endTime = startTime + timeSpan;
+    if( this.annotations.length > 0){
+      strtTm = this.annotations[(this.annotations.length -1)].end
+      const leftTm = this.clip['movieLength'] - strtTm
 
-    if(this.annotations.length > 0){
-      let maxTime = this.annotations[(this.annotations.length -1)].end
-      let movieLength = this.clip['movieLength']
-
-      if( (movieLength - maxTime) <= timeSpan ) {
-        startTime = movieLength - timeSpan
-        endTime = movieLength
-      } else {
-        startTime = maxTime
-        endTime = startTime + timeSpan;
-      }
+      if( leftTm <= spanTm) {
+        strtTm = this.clip['movieLength'] - spanTm
+      } 
     }
 
-    this.annotationsRef.push({
-      start: startTime,
-      end: endTime
-    })
-    .then((ref) => {
-        let freshAnno = this.annotations[(this.annotations.length -1)]
-        this.setSelectedAnnotation( freshAnno )
-      }
-    )
+    let endTm = strtTm + spanTm
 
+    // add new anno
+    this.annotationsRef
+      .push({ 
+        start: strtTm, 
+        end: endTm, 
+        data: this.templates['subtitle']
+      })
+      .then((ref) => {
+          let freshAnno = this.annotations[(this.annotations.length -1)]
+          this.setSelectedAnnotation(freshAnno)
+          this.setSelectedTemplate(this.templates['subtitle'])
+        }
+      )
   }
 
   updateAnnotation($event) {
     this.selectedAnnotation = $event;
-    this.annotationsRef.update($event.$key, { start: $event.start, end: $event.end });
+    this.annotationsRef.update($event.$key, { start: $event.start, end: $event.end});
   }
 
   deleteAnnotation(id) {
     this.annotationsRef.remove(id) 
   }
 
+  setSelectedTemplate(template) {
+    // pass item in this.templates
+    this.selectedTemplate = template
+    // update the selected annotation with selected template
+    if( this.selectedAnnotation){
+      this.annotationsRef
+        .update(this.selectedAnnotation.$key, { data: template})
+    }
+  }
+
   addToRenderQueue() {
     this.http.post('api/render', { projectId: this.projectId })
-      .subscribe((data) => { });
+      .subscribe((data) => {});
   }
 }
