@@ -36,6 +36,17 @@ export class Projects {
     });
   }
 
+  getEmailByProject(project: Project) {
+    const userId = project.data.user;
+
+    return new Promise((resolve, reject) => {
+      this.fireBase.database
+        .ref(`users/${userId}/email`)
+        .once('value')
+        .then(snapshot => resolve(snapshot.val()))
+    });
+  }
+
   updateProject(project:any, value: Object) {
     // Update the firebase entry property for a given project
     return new Promise((resolve, reject) => {
@@ -48,6 +59,10 @@ export class Projects {
   setProjectProperty(projectId, property, value) {
     const refProject = this.fireBase.database.ref(`projects/${projectId}`);
     return refProject.child(property).set(value);
+  }
+
+  removeProjectProperty(projectId: string, property: string) {
+    return this.fireBase.database.ref(`projects/${projectId}/${property}`).remove();
   }
 
   setProjectProperties(projectId, properties) {

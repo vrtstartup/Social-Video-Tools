@@ -5,13 +5,16 @@ import * as fs from 'fs';
 import { FireBase } from '../common/services/firebase.service';
 import { Jobs } from '../common/services/jobs.service';
 import { Projects } from '../common/services/projects.service';
+import { Project } from '../common/classes/project';
+import { State } from '../common/services/state.service';
 import { ffprobe, scaleDown, stitch, makeAss } from '../common/services/encoding.service';
 import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 
-// dependencies
+// services and dependencies
 const fireBase = new FireBase();
 const projectService = new Projects(fireBase, logger);
+const stateService = new State(fireBase, logger);
 const jobService = new Jobs(fireBase, logger);
 const subtitle = new Subtitle(fireBase); //inject database
 
@@ -36,6 +39,7 @@ function handleQueue(jobs) {
 
     const job = jobService.getFirst('ffmpeg-queue')
       .then((job:any) => {
+        busyProcessing = true;
         jobService.setInProgress(job); // update job state
         projectService.getProjectByJob(job)
           .then( project => handleJob(job, project), errorHandler)
@@ -55,12 +59,16 @@ function handleJob(job, project) {
     switch (operation) {
       case 'lowres':
         logger.verbose('processing lowres operation...');
-        processLowResJob(project, job).then(resolve, reject);
+        processLowResJob(project, job)
+          .then((project:Project) => stateService.updateState(project, 'downscaled', true))
+          .then(resolve, reject);
         break;
 
-      case 'render': // render = no titles 
+      case 'render':
         logger.verbose('processing render operation...');
-        processRenderJob(project, job).then(resolve, reject);
+        processRenderJob(project, job)
+          .then((project:Project) => stateService.updateState(project, 'render', 'done'))
+          .then(resolve, reject);
         break;
 
       default:
@@ -88,7 +96,6 @@ function processLowResJob(project, job) {
           clip: project['data']['clip']
         }))
         .then(project => scaleDown(project, progressHandler, job))
-        .then(project => projectService.setProjectProperty(job.id, 'status/downscaled', true))
         .then(resolve)
         .catch(err => jobService.kill(job.id, err));
     });

@@ -3,6 +3,7 @@ import { FireBase } from '../common/services/firebase.service';
 import { Projects } from '../common/services/projects.service';
 import { Jobs } from '../common/services/jobs.service';
 import { Templates } from '../common/services/templates.service';
+import { State } from '../common/services/state.service';
 import { resolve } from 'path';
 import { config } from '../common/config';
 
@@ -17,6 +18,7 @@ const bodyParser = require('body-parser');
 // const db = FireBase.database();
 const fireBase = new FireBase();
 const projects = new Projects(fireBase, logger);
+const state = new State(fireBase, logger);
 const jobs = new Jobs(fireBase, logger);
 const templates = new Templates(fireBase, logger);
 
@@ -30,6 +32,7 @@ const templaterRoutes = require('./routes/templater.routes');
 const renderRoutes = require('./routes/render.routes');
 
 server.set('projects', projects);
+server.set('state', state);
 server.set('jobs', jobs);
 server.set('templates', templates);
 server.use(bodyParser());

@@ -2,14 +2,19 @@ const subtitle = require('subtitle');
 
 import * as fs from 'fs';
 import * as resolve from '../../common/services/resolver.service';
+import { State } from '../../common/services/state.service';
 import { logger } from '../../common/config/winston';
 
 export class Subtitle {
 
   private fireBase;
+  private state: State;
+  private logger;
 
   constructor(fireBase:any) { 
     this.fireBase = fireBase;
+    this.logger = logger;
+    this.state = new State(this.fireBase, this.logger);
   }
 
 
@@ -26,11 +31,11 @@ export class Subtitle {
 
     if(project.hasAnnotations('subtitle')){
       arrKeys.forEach((key: any) => {
-        const sub = subs[key];
-
-        // convert to ms
-        sub.start *= 1000;
-        sub.end *= 1000;
+        const sub = {
+          start: String(subs[key]['start'] *= 1000),
+          end: String(subs[key]['end'] *= 1000),
+          text: subs[key]['text']
+        }
 
         captions.add(sub);
       });
@@ -53,7 +58,8 @@ export class Subtitle {
         const stream = fs.createWriteStream(file);
         stream.write(captions.stringify(), 'utf-8', () => {
           stream.close();
-          resolve(project);
+          this.state.updateState(project, 'subtitles', true)
+            .then(resolve)
         });
         stream.on('error', (err) => reject(err));
       });

@@ -83,7 +83,7 @@ export class SubtitlesComponent implements OnInit {
     // reset some values
     this.selectedAnnotation = false;
     // create new empty project
-    this.projectsRef.push('')
+    this.projectsRef.push({ user: this.userId })
       .then((ref) => {
         // set project-references
         this.projectId = ref.key;

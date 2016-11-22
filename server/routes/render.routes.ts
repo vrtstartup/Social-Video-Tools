@@ -2,7 +2,10 @@ import * as express from 'express';
 
 const router = express.Router();
 
-// this can be used for downloading videos by users
+/*
+* endpoint to queue a project for rendering. Decide to queue
+* in ffmpeg queue or templater queue
+*/
 router.post('/', (req, res) => {
   // services
   const projectService = req.app.get('projects');

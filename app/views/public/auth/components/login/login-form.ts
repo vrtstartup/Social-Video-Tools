@@ -48,7 +48,9 @@ export class LoginForm implements OnInit {
       if(credentials.email.indexOf('@vrt') > -1){
         this.auth.createUser(credentials)
           .then(user => {
-             this.af.database.object(`/users/${user.uid}/role`).set('user');
+            this.af.database.object(`/users/${user.uid}/role`).set('user'); // set user role
+            this.af.database.object(`/users/${user.uid}/email`).set(user.auth.email); //set user email
+
             this.router.navigate(['subtitles'])
           }, this.registerHandler.bind(this));
       } else this.registerHandler({message: 'only @vrt addresses allowed, sorry!'});
