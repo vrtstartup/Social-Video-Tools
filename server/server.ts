@@ -7,6 +7,7 @@ import { State } from '../common/services/state.service';
 import { resolve } from 'path';
 import { config } from '../common/config';
 
+const fServer = config.routing.fileServer;
 const logger = config.logger;
 
 const morgan = require('morgan');
@@ -46,7 +47,7 @@ const pathToClient = path.join(__dirname, '../dist');
 server.use('/', express.static(pathToClient));
 
 const originsWhitelist = [
-  'http://localhost:3000',
+`${fServer.protocol}://${fServer.domain}:${fServer.port}`,
 ];
 
 const corsOptions = {

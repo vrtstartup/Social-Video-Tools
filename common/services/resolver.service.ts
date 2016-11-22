@@ -3,6 +3,9 @@ import { config } from '../../common/config';
 import * as fs from 'fs';
 const mkdirp = require('mkdirp');
 
+const fServer = config.routing.fileServer;
+
+
 export function destinationDirectory(fileType:string, baseDirectory:string) {
   // return a fully resolved path to a project file's directory
   const workingDir = config.filesystem.workingDirectory;
@@ -50,8 +53,7 @@ export function staticUrl(fileType:string, baseDirectory:string) {
   const file =  config.filesystem.files[fileType]; //config
   const fileName = this.getFileNameByType(fileType, baseDirectory);
 
-  // #todo how do I get the base URL here ? 
-  return `http://localhost:3000/video/${baseDirectory}/${file.directory}/${fileName}`;
+  return `${fServer.protocol}://${fServer.domain}:${fServer.port}/video/${baseDirectory}/${file.directory}/${fileName}`;
 }
 
 export function makeProjectDirectories(baseDirectory:string) {

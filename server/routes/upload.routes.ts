@@ -63,7 +63,6 @@ router.post('/source', uploadLowres, (req: any, res) => {
   const fileMeta = req.files.video[0];
   const fireBase = req.app.get('fireBase');
 
-  // #todo: fix link for deployment
   const lowResUrl = resolve.staticUrl('lowres', projectId);
 
   // update project 
