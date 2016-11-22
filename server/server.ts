@@ -63,5 +63,7 @@ server.use('/api/file', fileRoutes);
 server.use('/api/templater', templaterRoutes);
 server.use('/api/render', renderRoutes);
 
+server.use('*', express.static(pathToClient));
+
 logger.verbose('listening on port: ' + port);
 server.listen(port);

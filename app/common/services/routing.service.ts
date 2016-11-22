@@ -5,7 +5,7 @@ import { SubtitlesComponent } from '../../views/public/subtitles/subtitles.compo
 import { AuthComponent } from '../../views/public/auth/authentication.component';
 
 const appRoutes: Routes = [
-    { path: 'subtitles', component: SubtitlesComponent, canActivate: [AuthGuard] },
+    { path: 'subtitles', component: SubtitlesComponent },
     { path: 'auth', component: AuthComponent },
     { path: '', component: AuthComponent },
 ];
