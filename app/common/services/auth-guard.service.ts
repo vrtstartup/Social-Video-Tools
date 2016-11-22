@@ -4,8 +4,18 @@ import { FirebaseAuth, FirebaseAuthState } from 'angularfire2'; // FirebaseAuth 
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(public auth: FirebaseAuth) {}
+  constructor(
+    public auth: FirebaseAuth, 
+    private router: Router) { }
 
-  canActivate() { return this.auth.getAuth() !== null; }
-  
+  canActivate() {
+    console.log('this.auth.getAuth() =', this.auth.getAuth())
+    if (this.auth.getAuth() !== null) {
+      return true;
+    } 
+    console.log('token expired');
+    this.router.navigate(['/']);
+    return false;
+  }
+
 }
