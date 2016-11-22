@@ -8,9 +8,15 @@ export default {
     bumper: {
         name: 'bumper', 
         imageUrl: 'http://placehold.it/250x250',
-        type: 'outro',
         duration: 7,
-        transitionDuration: 3
+        transitionDuration: 3,
+        type: 'outro',
+    },
+    logo: {
+        name:'logo',
+        imageUrl: 'http://placehold.it/250x250',
+        scale: 1,
+        type: 'overlay',
     },
     overlayKetnet: { 
         name: 'overlayKetnet',
@@ -19,6 +25,7 @@ export default {
             text2: 'eerste tekstje'
         }, 
         imageUrl: 'http://placehold.it/250x250',
+        "render-status": 'ready',
         type: 'overlay'
     },
     overlayStubru: { 
@@ -28,6 +35,7 @@ export default {
             text2: 'eerste tekstje'
         },
         imageUrl: 'http://placehold.it/250x250',
+        "render-status": 'ready',
         type: 'overlay',
     },    
 }

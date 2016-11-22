@@ -52,7 +52,7 @@ export class Project {
     return hasAnnotations;
   }
 
-  parseOverlays( templates ) {
+  parseOverlays() {
     // titles exist. 
     const overlays = this.getAnnotations('overlay');
     const arrKeys = Object.keys(overlays);
@@ -62,13 +62,7 @@ export class Project {
       // has proper data type
       arrKeys.forEach((key) => {
         const overlay = overlays[key];
-        const template = templates[overlay.templateId];
-
-        // append some extra data so the templater bot can update status
-        overlay.titeId = key;
-        overlay.projectId = this.data.id;
-
-        arrReturn.push(this.entry(overlay, template));
+        arrReturn.push(overlay['data']);
       });
     }
 
@@ -118,14 +112,5 @@ export class Project {
       transitionDuration: data.transitionDuration
     };
     
-  }
-
-  entry( overlay, template ) {
-    // annotate template data with overlay data
-    for(let field in overlay) {
-      if(overlay.hasOwnProperty(field)) template[field] = overlay[field];
-    }
-
-    return (<any>Object).assign({}, template);
   }
 }
