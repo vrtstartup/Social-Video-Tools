@@ -173,10 +173,8 @@ export class SubtitlesComponent implements OnInit {
     // pass item in this.templates
     this.selectedTemplate = template
     // update the selected annotation with selected template
-    if( this.selectedAnnotation){
-      this.annotationsRef
-        .update(this.selectedAnnotation.$key, { data: template})
-    }
+    if(this.selectedAnnotation) this.annotationsRef.update(this.selectedAnnotation.$key, {data: template})
+    
   }
 
   addToRenderQueue() {

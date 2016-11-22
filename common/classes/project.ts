@@ -30,7 +30,7 @@ export class Project {
       let annotations = this.data.annotations;
       Object.keys(annotations).forEach( key =>{
         let obj = annotations[key];
-        if( obj.type === type) collection[key] = obj;
+        if( obj['data']['type'] === type) collection[key] = obj;
       });
     }
     

@@ -1,11 +1,9 @@
 export default {
     subtitle: {
         name: 'subtitle', 
-        text: { 
-            text1: 'eerste tekstje',
-            text2: 'eerste tekstje'
-        },
+        text: 'Dit is de tekst van de ondertitel.',
         imageUrl: 'http://placehold.it/250x250',
+        type: 'subtitle'
     },
     overlayKetnet: { 
         name: 'overlayKetnet',
@@ -14,6 +12,7 @@ export default {
             text2: 'eerste tekstje'
         }, 
         imageUrl: 'http://placehold.it/250x250',
+        type: 'overlay'
     },
     overlayStubru: { 
         name: 'overlayStubru',
@@ -22,5 +21,6 @@ export default {
             text2: 'eerste tekstje'
         },
         imageUrl: 'http://placehold.it/250x250',
+        type: 'overlay',
     },    
 }

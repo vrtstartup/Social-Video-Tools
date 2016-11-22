@@ -46,9 +46,7 @@ const pathToClient = path.join(__dirname, '../dist');
 
 server.use('/', express.static(pathToClient));
 
-const originsWhitelist = [
-`${fServer.protocol}://${fServer.domain}:${fServer.port}`,
-];
+const originsWhitelist = [`${fServer.protocol}://${fServer.domain}:${fServer.port}`];
 
 const corsOptions = {
   origin: (origin, callback) => {

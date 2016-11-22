@@ -31,10 +31,12 @@ export class Subtitle {
 
     if(project.hasAnnotations('subtitle')){
       arrKeys.forEach((key: any) => {
+        const data = subs[key]['data'];
+
         const sub = {
           start: String(subs[key]['start'] *= 1000),
           end: String(subs[key]['end'] *= 1000),
-          text: subs[key]['text']
+          text: data['text']
         }
 
         captions.add(sub);
