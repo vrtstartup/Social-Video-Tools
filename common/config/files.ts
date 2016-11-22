@@ -1,7 +1,8 @@
 import { resolve } from 'path';
 
 export const fileConfig = {
-  workingDirectory: `${resolve('data')}`,
+  workingDirectory: resolve('data'),
+  sharedDirectory: resolve('data', 'shared'),
   files: {
     source: {
       directory: 'source',
@@ -46,7 +47,7 @@ export const fileConfig = {
       unique: false,
     },
     outro: {
-      directory: 'overlays',
+      directory: 'bumpers',
       name: 'outro',
       extension: 'mov',
       unique: true

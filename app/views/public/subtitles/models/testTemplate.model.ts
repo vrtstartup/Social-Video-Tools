@@ -5,6 +5,13 @@ export default {
         imageUrl: 'http://placehold.it/250x250',
         type: 'subtitle'
     },
+    bumper: {
+        name: 'bumper', 
+        imageUrl: 'http://placehold.it/250x250',
+        type: 'outro',
+        duration: 7,
+        transitionDuration: 3
+    },
     overlayKetnet: { 
         name: 'overlayKetnet',
         text: { 

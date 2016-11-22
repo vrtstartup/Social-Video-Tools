@@ -22,7 +22,10 @@ export function destinationFile(fileType:string, baseDirectory:string, fileName:
   return resolve(workingDir, baseDirectory, subDir, fileName);
 }
 
-export function getFilePathByType(fileType:string, baseDirectory, fileId?:string){
+export function getFilePathByType(fileType:string, baseDirectory?:string, fileId?:string){
+  // if baseDirectory isnt given, default to the shared directory
+  const baseDir = baseDirectory ? baseDirectory : config.filesystem.sharedDirectory;
+
   // shoud be able to say "get me this project's source file"
   const file =  config.filesystem.files[fileType];
   const workingDir = config.filesystem.workingDirectory;
@@ -30,7 +33,7 @@ export function getFilePathByType(fileType:string, baseDirectory, fileId?:string
   const fileName = file.name;
 
   // resolve proper path
-  const directory = resolve(workingDir, baseDirectory, subDir);
+  const directory = resolve(workingDir, baseDir, subDir);
   let filePath = (fileType == 'overlay') ? resolve(directory, `${fileId}${fileName}`) : resolve(directory, fileName);
 
   if(file.extension) filePath = `${filePath}.${file.extension}`;

@@ -107,13 +107,14 @@ export class Project {
     const annotations = this.getAnnotations('outro');
     const arrKeys = Object.keys(annotations);
     const outro = annotations[arrKeys[0]];
+    const data = outro['data'];
 
     return {
       type: 'outro',
-      filePath: resolver.getFilePathByType('outro', this.data.id, arrKeys[0]),
-      start: Number(this.data.clip.movieLength) - Number(outro.transitionDuration),
-      duration: outro.duration,
-      transitionDuration: outro.transitionDuration
+      filePath: resolver.getFilePathByType('outro', '', arrKeys[0]),
+      start: Number(this.data.clip.movieLength) - Number(data.transitionDuration),
+      duration: data.duration,
+      transitionDuration: data.transitionDuration
     };
     
   }
