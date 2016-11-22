@@ -28,10 +28,6 @@ const storageOverlays = multer.diskStorage({
   destination: (req, file, cb) => {
     const baseDir = req.body.projectId;
 
-    console.log('test');
-    console.log(req.body);
-    console.log('baseDir: ', baseDir);
-
     // #todo this is out of place
     resolve.makeProjectDirectories(baseDir);
 
@@ -39,10 +35,8 @@ const storageOverlays = multer.diskStorage({
     cb(null, dest);
   },
   filename: (req, file, cb) => {
-    const baseDir = req.body.projectId;
     const overlayId = req.body.overlayId;
-
-    const filename = overlayId + resolve.getFileNameByType('overlay', baseDir);
+    const filename = resolve.getFileNameByType('overlay', overlayId);
     cb(null, filename);
   }
 });

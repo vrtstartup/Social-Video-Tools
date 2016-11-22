@@ -8,49 +8,39 @@ export const fileConfig = {
       directory: 'source',
       name: 'source_file',
       extension: 'mp4',
-      unique: true
     },
     lowres: {
       directory: 'build_artefacts',
       name: 'scaled_down',
       extension: 'mp4',
-      unique: true
     },
     srt: {
       directory: 'build_artefacts',
       name: 'subtitles',
       extension: 'srt',
-      unique: true
     },
     ass: {
       directory: 'build_artefacts',
       name: 'subtitles',
       extension: 'ass',
-      unique: true,
     },
     render: {
       directory: 'out',
       name: 'render',
       extension: 'mp4',
-      unique: true
     },
     subtitledSource: {
       directory: 'build_artefacts',
       name: 'sourceSubtitled',
       extension: 'mp4',
-      unique: true
     },
     overlay: {
       directory: 'overlays',
-      name: '_overlay', // this is prepended with the overlay's id
       extension: 'mov',
-      unique: false,
     },
     outro: {
       directory: 'bumpers',
-      name: 'outro',
       extension: 'mov',
-      unique: true
     }
   }
 };

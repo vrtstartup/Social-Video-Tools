@@ -30,21 +30,20 @@ export function getFilePathByType(fileType:string, baseDirectory?:string, fileId
   const file =  config.filesystem.files[fileType];
   const workingDir = config.filesystem.workingDirectory;
   const subDir = file.directory;
-  const fileName = file.name;
 
   // resolve proper path
   const directory = resolve(workingDir, baseDir, subDir);
-  let filePath = (fileType == 'overlay') ? resolve(directory, `${fileId}${fileName}`) : resolve(directory, fileName);
+  let filePath = file.hasOwnProperty('name') ? resolve(directory, file.name) : resolve(directory, fileId);
 
   if(file.extension) filePath = `${filePath}.${file.extension}`;
 
   return filePath;
 }
 
-export function getFileNameByType(fileType:string, baseDirectory:string) {
+export function getFileNameByType(fileType:string, fileId:string) {
   // return an unresovled project file's name, including extension as configured
   const file =  config.filesystem.files[fileType];
-  let fileName = file.name;
+  let fileName = file.hasOwnProperty('name') ? file.name : fileId;
 
   if(file.extension) fileName = `${fileName}.${file.extension}`;
 

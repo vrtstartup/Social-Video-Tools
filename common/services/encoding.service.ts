@@ -128,7 +128,7 @@ export function stitch(project, job, messageHandler) {
     const assFile = resolver.getFilePathByType('ass', baseDir);
     const sourceFile = resolver.getFilePathByType('source', baseDir);
     const renderFile = resolver.getFilePathByType('render', baseDir);
-    const outroFile = resolver.getFilePathByType('outro', baseDir);
+    const outroFile = outro.filePath;
 
     // used to wire ffmpeg inputs and outputs together
     const arrInputs = [];
@@ -223,7 +223,6 @@ export function stitch(project, job, messageHandler) {
         if(blacklist.indexOf(input['name']) === -1){
             const inputName = input['name'];
             outputName = inputName.replace(':v', '_scaled');
-            logger.debug(input['data']);
             const scaleWidth = input['data'].scale ? input['data'].width * input['data'].scale : width;
 
             line = `[${input['name']}]setpts=PTS-STARTPTS+${input['data']['start']}/TB,scale=${scaleWidth}:-1[${outputName}]`
