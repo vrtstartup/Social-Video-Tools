@@ -16,8 +16,8 @@ router.get('/queue', (req, res) => {
   let data = [];
 
   let project = jobService.getFirst('templater-queue')
-    .then(job => projectService.getProjectByJob(job), reason => res.send([]))
-    .then( project => res.send(project.parseOverlays()))
+    .then(job => projectService.getProjectByJob(job), reason => res.json([]))
+    .then( project => res.json(project.parseOverlays()))
     .catch(errorHandler);
 
 });
@@ -37,7 +37,7 @@ router.post('/status', (req, res) => {
     const jobService = req.app.get('jobs');
 
     // update title 
-    projectService.setProjectProperty(projectId, `annotations/${overlayId}/render-status`, 'done')
+    projectService.setProjectProperty(projectId, `annotations/${overlayId}/data/bot/render-status`, 'done')
       .then(fbData => projectService.getProjectById(projectId))
       .then(project => {
         if (project.overlaysReady()) {

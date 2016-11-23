@@ -26,8 +26,11 @@ export default {
             text1: 'eerste tekstje in overlayKetnet',
             text2: 'eerste tekstje'
         }, 
+        bot: {
+            "render-status": 'ready',
+            aep: '/path/to/proper/aep/file.aep'
+        },
         imageUrl: 'http://placehold.it/250x250',
-        "render-status": 'ready',
         type: 'overlay'
     },
     overlayStubru: { 
@@ -36,8 +39,11 @@ export default {
             text1: 'eerste tekstje in overlayStubru',
             text2: 'eerste tekstje'
         },
+        bot: {
+            "render-status": 'ready',
+            aep: '/path/to/proper/aep/file.aep'
+        },
         imageUrl: 'http://placehold.it/250x250',
-        "render-status": 'ready',
         type: 'overlay',
     },    
 }

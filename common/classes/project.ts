@@ -16,7 +16,7 @@ export class Project {
 
     for(let key in overlays) {
       if(overlays.hasOwnProperty(key)) {
-        overlaysDone = overlaysDone && (overlays[key]['render-status'] === 'done');
+        overlaysDone = overlaysDone && (overlays[key]['data']['bot']['render-status'] === 'done');
       }
     }
 
@@ -58,11 +58,29 @@ export class Project {
     const arrKeys = Object.keys(overlays);
     const arrReturn = [];
 
+
     if(arrKeys.length !== 0 && overlays.constructor === Object) {
-      // has proper data type
       arrKeys.forEach((key) => {
         const overlay = overlays[key];
-        arrReturn.push(overlay['data']);
+        const obj = {};
+
+        // append some variable props
+        obj['id'] = key;
+        obj['output'] = key;
+
+        // append templater bot fields
+        const arrOverlayBotKeys = Object.keys(overlay['data']['bot']);
+        arrOverlayBotKeys.forEach( key => obj[key] = overlay['data']['bot'][key] );
+
+        // append text fields 
+        const arrOverlayTextKeys = Object.keys(overlay['data']['text']);
+        arrOverlayTextKeys.forEach( key => obj[key] = overlay['data']['text'][key] );
+
+        // append afterjob vars
+        obj['projectId'] = this.data.id;
+        obj['overlayId'] = key;
+
+        arrReturn.push(obj);
       });
     }
 
