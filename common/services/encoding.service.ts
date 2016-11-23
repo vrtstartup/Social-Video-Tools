@@ -12,7 +12,7 @@ const logger = config.logger;
 export function ffprobe (project) {
   logger.verbose('Starting FFprobe'); 
   const baseDir = project.data.files.baseDir;
-  const input = resolver.getFilePathByType('source', baseDir);
+  const input = resolver.getProjectFilePath('source', baseDir);
 
   return new Promise((resolve, reject) => {
       const args = [
@@ -64,7 +64,7 @@ export function ffprobe (project) {
 export function scaleDown(project, messageHandler, job) {
     const baseDir = project.data.files.baseDir;
     const lowresFileName = resolver.getFileNameByType('lowres', baseDir);
-    const input = resolver.getFilePathByType('source', baseDir);
+    const input = resolver.getProjectFilePath('source', baseDir);
     const output = resolver.destinationFile('lowres', baseDir, lowresFileName);
     const scaleFilter = `scale='min(${config.encoding.videoMaxWidth.toString()}\\,iw):-2'`;
 
@@ -93,8 +93,8 @@ export function scaleDown(project, messageHandler, job) {
 export function makeAss(project) {
     return new Promise((resolve, reject) => {
         const baseDir = project.data.files.baseDir; 
-        const srtFile = resolver.getFilePathByType('srt', baseDir);
-        const assFile = resolver.getFilePathByType('ass', baseDir);
+        const srtFile = resolver.getProjectFilePath('srt', baseDir);
+        const assFile = resolver.getProjectFilePath('ass', baseDir);
 
         let command = new FfmpegCommand(srtFile, {logger:logger})
             .output(assFile)
@@ -115,7 +115,8 @@ export function stitch(project, job, messageHandler) {
     // project data
     const clipData = project.data.clip;
     const baseDir = project.data.files.baseDir;
-    const arrOverlays = project.overlayArray();
+    const arrOverlays = project.overlayArray('overlay');
+    const arrLogos = project.overlayArray('logo');
     const outro = project.hasAnnotations('outro') ? project.getOutro() : false;
 
     // composition data
@@ -125,9 +126,9 @@ export function stitch(project, job, messageHandler) {
     let renderDuration = (outro) ? sourceLength + (Number(outro.duration) - Number(outro.transitionDuration)) : sourceLength;
 
     // project files
-    const assFile = resolver.getFilePathByType('ass', baseDir);
-    const sourceFile = resolver.getFilePathByType('source', baseDir);
-    const renderFile = resolver.getFilePathByType('render', baseDir);
+    const assFile = resolver.getProjectFilePath('ass', baseDir);
+    const sourceFile = resolver.getProjectFilePath('source', baseDir);
+    const renderFile = resolver.getProjectFilePath('render', baseDir);
     const outroFile = outro.filePath;
 
     // used to wire ffmpeg inputs and outputs together
@@ -143,6 +144,9 @@ export function stitch(project, job, messageHandler) {
     
     // add overlay inputs 
     arrOverlays.forEach(overlay => registerInput(`${arrInputs.length}:v`, overlay));
+
+    // add logo inputs
+    arrLogos.forEach(logo => registerInput(`${arrInputs.length}:v`, logo));
 
     // add outro input
      if(outro) registerInput(`${arrInputs.length}:v`, outro);

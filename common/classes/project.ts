@@ -69,26 +69,30 @@ export class Project {
     return arrReturn;
   }
 
-  overlayArray() {  
+  overlayArray(type:string) {  
     // returns overlay in a format suitable for the stitching operation
-    const overlays = this.getAnnotations('overlay');
+    const overlays = this.getAnnotations(type);
     const keys = Object.keys(overlays); 
     let arrReturn = [];
 
     for(let key of keys) {
       if(overlays.hasOwnProperty(key) && overlays[key] !== null && overlays[key] !== undefined ){
         const overlay = overlays[key];
+        const projectName = this.data.id;
+
+        const fileName = resolver.isUniqueFile(type) ? false : key;
+        const filePath = resolver.isSharedFile(type) ? resolver.getSharedFilePath(type, overlay['data']['name']) : resolver.getProjectFilePath(type, projectName, fileName);
 
         const pushObject = {
-          type: overlay['type'],
-          filePath: resolver.getFilePathByType('overlay', this.data.id, key),
+          type: overlay['data']['type'],
+          filePath: filePath, 
           start: overlay['start'],
           end: overlay['end']
         };
 
-        if(overlay.hasOwnProperty('scale')) pushObject['scale'] = overlay['scale'];
-        if(overlay.hasOwnProperty('width')) pushObject['width'] = overlay['width'];
-        if(overlay.hasOwnProperty('height')) pushObject['height'] = overlay['height'];
+        if(overlay['data'].hasOwnProperty('scale')) pushObject['scale'] = overlay['data']['scale'];
+        if(overlay['data'].hasOwnProperty('width')) pushObject['width'] = overlay['data']['width'];
+        if(overlay['data'].hasOwnProperty('height')) pushObject['height'] = overlay['data']['height'];
 
         arrReturn.push(pushObject);
       }
@@ -106,7 +110,7 @@ export class Project {
     
     return {
       type: 'outro',
-      filePath: resolver.getFilePathByType('outro', '', data['name']),
+      filePath: resolver.getSharedFilePath('outro', data['name']),
       start: Number(this.data.clip.movieLength) - Number(data.transitionDuration),
       duration: data.duration,
       transitionDuration: data.transitionDuration

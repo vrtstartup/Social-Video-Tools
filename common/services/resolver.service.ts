@@ -22,22 +22,37 @@ export function destinationFile(fileType:string, baseDirectory:string, fileName:
   return resolve(workingDir, baseDirectory, subDir, fileName);
 }
 
-export function getFilePathByType(fileType:string, baseDirectory?:string, fileId?:string){
-  // if baseDirectory isnt given, default to the shared directory
-  const baseDir = baseDirectory ? baseDirectory : config.filesystem.sharedDirectory;
+export function isSharedFile(type: string){ 
+  const fileConfig = getFileConfigByType(type);
+  return fileConfig.hasOwnProperty('shared') && fileConfig['shared'];
+}
 
-  // shoud be able to say "get me this project's source file"
-  const file =  config.filesystem.files[fileType];
+export function isUniqueFile(type: string) {
+  const fileConfig = getFileConfigByType(type);
+  return fileConfig.hasOwnProperty('name');
+}
+
+function getFileConfigByType(type: string): Object{ return config.filesystem.files[type] }
+
+export function getSharedFilePath(type: string, fileName: string) {
+  // get configuration 
+  const fileConfig = getFileConfigByType(type);
   const workingDir = config.filesystem.workingDirectory;
-  const subDir = file.directory;
+  const sharedDir = config.filesystem.sharedDirectory;
+  const subDir = fileConfig['directory'];
+  const ext = fileConfig['extension'];
 
-  // resolve proper path
-  const directory = resolve(workingDir, baseDir, subDir);
-  let filePath = file.hasOwnProperty('name') ? resolve(directory, file.name) : resolve(directory, fileId);
+  return resolve(workingDir, sharedDir, subDir, `${fileName}.${ext}`);
+}
 
-  if(file.extension) filePath = `${filePath}.${file.extension}`;
+export function getProjectFilePath(type: string, projectName: string, fileName?: any){
+  const fileConfig = getFileConfigByType(type);
+  const workingDir = config.filesystem.workingDirectory;
+  const subDir = fileConfig['directory'];
+  const fName = fileName ? fileName : fileConfig['name']; // if fileName is not explicitly set, it's a unique file whose name has been set in the config 
+  const ext = fileConfig['extension'];
 
-  return filePath;
+  return resolve(workingDir, projectName, subDir, `${fName}.${ext}`);
 }
 
 export function getFileNameByType(fileType:string, fileId:string) {

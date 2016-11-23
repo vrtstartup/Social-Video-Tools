@@ -13,10 +13,12 @@ export default {
         type: 'outro',
     },
     logo: {
-        name:'logo',
+        name:'logo1',
         imageUrl: 'http://placehold.it/250x250',
         scale: 1,
-        type: 'overlay',
+        width: 266,
+        height: 130,
+        type: 'logo',
     },
     overlayKetnet: { 
         name: 'overlayKetnet',

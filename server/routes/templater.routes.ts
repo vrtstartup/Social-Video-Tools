@@ -40,8 +40,8 @@ router.get('/queue', (req, res) => {
     const templates = data[0];
     const project = data[1];
 
-    res.send(project.parseOverlays(templates));
-  }, err => errorHandler(err));
+    res.send(project.parseOverlays());
+  }).catch(errorHandler);
 
 });
 
