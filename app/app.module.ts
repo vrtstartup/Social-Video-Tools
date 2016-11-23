@@ -13,7 +13,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import{ routing } from './common/services/routing.service';
 import firebaseConfig from './config/firebase.config';
-import { AuthGuard } from './common/services/auth-guard.service';
+import { AuthGuard } from './common/guards/auth';
+import { NoAuthGuard } from './common/guards/noAuth';
 
 import { AppComponent } from './app.component';
 import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
@@ -58,7 +59,7 @@ import { SortTimePipe } from './common/pipes/sortTime.pipe';
         FormsModule,
         ReactiveFormsModule,
     ],
-    providers: [ExtBrowserXhr, AuthGuard],
+    providers: [ExtBrowserXhr, AuthGuard, NoAuthGuard],
     bootstrap: [AppComponent],
 })
 export class AppModule {}
