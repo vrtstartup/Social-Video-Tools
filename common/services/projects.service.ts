@@ -32,7 +32,7 @@ export class Projects {
         const projectData = snapshot.val();
         projectData.id=snapshot.key;
         resolve(new Project(projectData, this.logger));
-      }, err => reject(err))
+      }).catch(reject);
     });
   }
 

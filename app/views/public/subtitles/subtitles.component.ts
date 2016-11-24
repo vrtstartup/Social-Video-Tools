@@ -89,7 +89,7 @@ export class SubtitlesComponent implements OnInit {
     // create new empty project
     this.projectsRef.push({ user: this.userId })
       .then((ref) => {
-        
+        console.log(ref.key);
         // TODO remove to service
         // set project-references
         this.projectKey = ref.key;
@@ -213,8 +213,8 @@ export class SubtitlesComponent implements OnInit {
 
   }
 
-  addToRenderQueue() {
-    this.http.post('api/render', { projectKey: this.projectKey })
+  addToRenderQueue(key) {
+    this.http.post('api/render', { projectId: key })
       .subscribe((data) => { });
   }
 

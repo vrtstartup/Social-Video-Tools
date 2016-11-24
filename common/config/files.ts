@@ -41,6 +41,12 @@ export const fileConfig = {
     outro: {
       directory: 'bumpers',
       extension: 'mov',
+      shared: true
+    },
+    logo: {
+      directory: 'logo',
+      extension: 'mov',
+      shared: true,
     }
   }
 };

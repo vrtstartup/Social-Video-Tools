@@ -15,8 +15,11 @@ export default {
     overlayKetnet: { 
         name: 'overlayKetnet',
         imageUrl: 'http://placehold.it/250x250',
-        "render-status": 'ready',
         type: 'overlay',
+        bot: {
+            "render-status": 'ready',
+            aep: '/path/to/proper/aep/file.aep'
+        },
         text: {
             textInpt01: {
                 label: 'overlayKetnet: Title',
@@ -37,8 +40,11 @@ export default {
     overlayStubru: { 
         name: 'overlayStubru',
         imageUrl: 'http://placehold.it/250x250',
-        "render-status": 'ready',
         type: 'overlay',
+        bot: {
+            "render-status": 'ready',
+            aep: '/path/to/proper/aep/file.aep'
+        },
         text: {
             textInpt01: {
                 label: 'overlayStubru: Title',
@@ -64,9 +70,11 @@ export default {
         type: 'outro',
     },
     logo: {
-        name:'logo',
+        name:'logo1',
         imageUrl: 'http://placehold.it/250x250',
         scale: 1,
-        type: 'overlay',
+        width: 266,
+        height: 130,
+        type: 'logo',
     },
 }

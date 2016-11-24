@@ -25,7 +25,7 @@ export class Subtitle {
   makeSrt(project) {
     const subs = project.getAnnotations('subtitle');
     let arrKeys: any[] = Object.keys(subs);
-    const file = resolve.getFilePathByType('srt', project.data.files.baseDir);
+    const file = resolve.getProjectFilePath('srt', project.data.files.baseDir);
     const counter = 1;
     const captions = new subtitle();
 
