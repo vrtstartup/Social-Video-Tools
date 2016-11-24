@@ -1,0 +1,33 @@
+<div class="s-mainmenu">
+    <button type="button" class="btn btn-secondary" (click)="''">Open</button>
+    <button (click)="logout()" class="btn btn-secondary">Sign Out</button>
+    <button class="btn btn-primary right" (click)="download()">Download</button>
+</div>
+
+<div id="download">
+  <vg-player>
+    <vg-overlay-play></vg-overlay-play>
+    <vg-buffering></vg-buffering>
+
+    <vg-scrub-bar>
+        <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+        <vg-scrub-bar-buffering-time></vg-scrub-bar-buffering-time>
+    </vg-scrub-bar>
+
+    <vg-controls>
+        <vg-play-pause></vg-play-pause>
+
+        <vg-time-display property="current" format="mm:ss"></vg-time-display>
+
+        <vg-scrub-bar style="pointer-events: none;"></vg-scrub-bar>
+
+        <vg-mute></vg-mute>
+        <vg-volume></vg-volume>
+    </vg-controls>
+
+    <video vg-media #media id="singleVideo" preload="auto">
+        <source *ngFor="let video of sources" [src]="video.src" [type]="video.type">
+    </video>
+</vg-player>
+</div>
+

@@ -10,7 +10,7 @@ router.get('/render/:baseDir', (req, res) => {
 
   // #todo: this is placeholdercontent
   const filePath = getProjectFilePath('render', baseDir);
-  res.sendFile(filePath);
+  res.download(filePath);
 });
 
 module.exports = router;
