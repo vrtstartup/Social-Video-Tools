@@ -112,12 +112,26 @@
             background: #2a7dd0;
             color: #a3d1ff;
         }
+        &__thumb { 
+            width: 30px;
+        }
+        &__name { 
+            font-size: .8rem;
+        }
     }
     .s-sub-inputs {
         border: 1px solid #f2f2f2;        
         display: flex;
         flex: 1 1 20%;
         flex-direction: column;
+        padding: 0.5rem;
+        &__label {
+            color: #aaa;
+            font-size: .8rem;
+        }
+        &__input {
+            font-size: .8rem;
+        }
     }
     .s-sub-input {
         border: 1px solid #f2f2f2;

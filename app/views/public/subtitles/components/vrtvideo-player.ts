@@ -35,7 +35,7 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
             this.clip.lowResUrl = this.clip.lowResUrl + Math.floor((Math.random() * 10) + 1)
             this.sources = [this.clip];
         }
-
+        
         if (this.selectedAnnotation) {
             
             let seekTime = parseFloat(this.selectedAnnotation.start);
