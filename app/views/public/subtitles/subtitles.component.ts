@@ -21,21 +21,27 @@ export class SubtitlesComponent implements OnInit {
   userMessage: string = '';
   uploadProgress: any;
   downScaleProgress: any;
+  selectedAnnotationInputs: any;
 
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
   templaterQueueRef: FirebaseListObservable<any[]>;
   projectsRef: FirebaseListObservable<any[]>;
   projectRef: FirebaseObjectObservable<any[]>;
-  projectId: string;
+  project: any[];
+  projectKey: string;
   annotationsRef: FirebaseListObservable<any[]>;
   annotations: any[];
+  selectedAnnotationRef: FirebaseObjectObservable<any[]>;
+  selectedAnnotation: any;
+  selectedAnnotationTextInputRef: FirebaseListObservable<any[]>;
+  selectedAnnotationTextInput: any;
   clipRef: FirebaseObjectObservable<any[]>;
   clip: any[];
   templatesRef: FirebaseObjectObservable<any[]>;
   templates: any[];
-  selectedAnnotation: any;
   selectedTemplate: any;
+  selectedAnnoSubscription: any;
 
   constructor(
     private zone: NgZone,
@@ -46,37 +52,35 @@ export class SubtitlesComponent implements OnInit {
     public auth: FirebaseAuth) {
 
     this.af = af;
-    // General Firebase-references
+    // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
     this.templaterQueueRef = af.database.list('/templater-queue');
     this.projectsRef = af.database.list('/projects');
     this.templatesRef = af.database.object('/templates');
-    this.templatesRef.subscribe((s:any) => this.templates = s)
-    
+    this.templatesRef.subscribe((s: any) => this.templates = s);
+
     // TODO remove | only for test purposes
     this.templatesRef.set(testTemplate);
   }
 
   logout(event) {
-      this.auth.logout();
-      this.router.navigate(['auth']);
+    this.auth.logout();
+    this.router.navigate(['auth']);
   }
 
   ngOnInit() {
     // subscribe to service observable
     this.uploadService.progress$
       .subscribe(data => {
-        // trigger change
-        this.zone.run(() => {
-          this.uploadProgress = data;
-        });
+        // force to trigger change
+        this.zone.run(() => this.uploadProgress = data);
       }, err => console.log(err));
 
-      this.af.auth.subscribe(this.onAuthStatusChange.bind(this))
+    this.af.auth.subscribe(this.onAuthStatusChange.bind(this));
   }
 
-  onAuthStatusChange(state:FirebaseAuthState) {
-    if(state !== null) this.userId = state.uid;
+  onAuthStatusChange(state: FirebaseAuthState) {
+    if (state !== null) this.userId = state.uid;
   }
 
   createNewProject($event) {
@@ -85,100 +89,133 @@ export class SubtitlesComponent implements OnInit {
     // create new empty project
     this.projectsRef.push({ user: this.userId })
       .then((ref) => {
+        console.log(ref.key);
+        // TODO remove to service
         // set project-references
-        this.projectId = ref.key;
-        this.projectRef = this.af.database.object(ref.toString())
+        this.projectKey = ref.key;
+        this.projectRef = this.af.database.object(ref.toString());
+        this.projectRef.subscribe((s: any) => { 
+          this.project = s;
+        });
 
-        this.annotationsRef = this.af.database.list(`${ref.toString()}/annotations`, 
-        { query: { orderByChild: 'end'}})
-        this.annotationsRef.subscribe( (s:any) => this.annotations = s)
+        this.annotationsRef = this.af.database.list(`${ref.toString()}/annotations`, { query: { orderByChild: 'end' } });
+        this.annotationsRef.subscribe((s: any) => {
+          this.annotations = s;
+        });
 
         // attach project id to user 
-        this.af.database.object(`/users/${this.userId}/projects/${this.projectId}`).set(true);
-          
-        this.clipRef = this.af.database.object(`${ref.toString()}/clip`)
-        this.clipRef.subscribe( (s:any) => this.clip = s ) 
+        this.af.database.object(`/users/${this.userId}/projects/${ref.key}`).set(true);
+
+        this.clipRef = this.af.database.object(`${ref.toString()}/clip`);
+        this.clipRef.subscribe((s: any) => {
+           this.clip = s;
+        });
 
         // upload
-        this.uploadSource($event)
+        this.uploadSource($event);
       })
-      .catch( err => console.log( err, 'could not create|upload a new project'));
+      .catch(err => console.log(err, 'could not create|upload a new project'));
   }
 
   uploadSource($event) {
     // file-ref to upload
     let source = $event.target.files[0];
     // upload video
-    this.uploadService.makeFileRequest('api/upload/source', source, this.projectId)
+    this.uploadService.makeFileRequest('api/upload/source', source, this.projectKey)
       .subscribe(
-        data => { this.userMessage = '' },
-        err => {
-          console.log('error: makeFileRequest:', err)
-          this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
-        }
-      )
+      data => { this.userMessage = '' },
+      err => {
+        console.log('error: makeFileRequest:', err);
+        this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
+      }
+      );
   }
 
   updateSource($event) {
-    this.uploadSource($event)
+    this.uploadSource($event);
     // TODO optionally highlight out-of-range annotations
   }
 
-  setSelectedAnnotation(annotation) {
-    this.selectedAnnotation = annotation;
-    this.setSelectedTemplate( this.templates[annotation.data.name])
-    // TODO reveal available templates (based on rights)
-  }
-
   addAnnotation() {
-    let spanTm = 4 
-    let strtTm = 0
+    let strtTm = 0;
+    let spanTm = 4;
 
-    if( this.annotations.length > 0){
-      strtTm = this.annotations[(this.annotations.length -1)].end
-      const leftTm = this.clip['movieLength'] - strtTm
+    if (this.annotations.length > 0) {
+      strtTm = this.annotations[(this.annotations.length - 1)].end;
+      const leftTm = this.clip['movieLength'] - strtTm;
 
-      if( leftTm <= spanTm) {
-        strtTm = this.clip['movieLength'] - spanTm
-      } 
+      if (leftTm <= spanTm) {
+        strtTm = this.clip['movieLength'] - spanTm;
+      }
     }
 
-    let endTm = strtTm + spanTm
+    let endTm = strtTm + spanTm;
 
     // add new anno
-    this.annotationsRef
-      .push({ 
-        start: strtTm, 
-        end: endTm, 
-        data: this.templates['subtitle']
-      })
+    this.annotationsRef.push({ start: strtTm, end: endTm, data: this.templates['subtitle'] })
       .then((ref) => {
-          let freshAnno = this.annotations[(this.annotations.length -1)]
-          this.setSelectedAnnotation(freshAnno)
-          this.setSelectedTemplate(this.templates['subtitle'])
-        }
-      )
+        let newAnno = this.annotations[(this.annotations.length - 1)];
+        // set Refs
+        this.setSelectedAnnotation(newAnno);
+        this.setSelectedAnnotationTextInput(newAnno);
+      });
+  }
+
+  // TODO reveal available templates (based on rights)
+  setSelectedAnnotation(annotation) {
+    // ref to selected annotation
+    this.selectedAnnotationRef = this.af.database.object(`projects/${this.projectKey}/annotations/${annotation.$key}`)
+    this.selectedAnnoSubscription = this.selectedAnnotationRef.subscribe((s: any) => {
+      // issue-fix  when remove is triggerd on this.annotationsRef
+      if(s['$value'] !== null ){
+        this.selectedAnnotation = s;
+        this.setSelectedAnnotationTextInput(s);
+      } 
+    })
+  }
+
+  setSelectedAnnotationTextInput(annotation) {
+    // extra ref to point to Text Input
+    if (annotation.data.text != null) {
+      this.selectedAnnotationTextInputRef = this.af.database.list(`projects/${this.projectKey}/annotations/${annotation.$key}/data/text`);
+      this.selectedAnnotationTextInputRef.subscribe((s: any) => {
+        this.selectedAnnotationTextInput = s;
+      })
+    }
+  }
+
+  updateAnnotationTemplate(template) {
+    // only update if you select a different template for the annotation
+    if (template.name != this.selectedAnnotation.data.name) {
+      this.annotationsRef.update(this.selectedAnnotation.$key, { data: template });
+    }
+  }
+
+  updateSelAnnoTextInput(event: any, key) {
+    let value = event.target.value;
+    this.selectedAnnotationTextInputRef.update(key, { text: value });
   }
 
   updateAnnotation($event) {
     this.selectedAnnotation = $event;
-    this.annotationsRef.update($event.$key, { start: $event.start, end: $event.end});
+    this.annotationsRef.update($event.$key, { start: $event.start, end: $event.end });
   }
 
-  deleteAnnotation(id) {
-    this.annotationsRef.remove(id) 
+  deleteAnnotation(annotation) {
+    // when you delete the selected
+    if (this.selectedAnnotation.$key === annotation.$key) {
+      this.selectedAnnoSubscription.unsubscribe();
+      this.selectedAnnotation = false;
+      this.selectedAnnotationTextInput = false;
+    }
+    // triggers issue in selectedAnnotationRef
+    this.annotationsRef.remove(annotation.$key)
+
   }
 
-  setSelectedTemplate(template) {
-    // pass item in this.templates
-    this.selectedTemplate = template
-    // update the selected annotation with selected template
-    if(this.selectedAnnotation) this.annotationsRef.update(this.selectedAnnotation.$key, {data: template})
-    
+  addToRenderQueue(key) {
+    this.http.post('api/render', { projectId: key })
+      .subscribe((data) => { });
   }
 
-  addToRenderQueue() {
-    this.http.post('api/render', { projectId: this.projectId })
-      .subscribe((data) => {});
-  }
 }

@@ -27,6 +27,7 @@ import { RangeSliderComponent } from './views/public/subtitles/components/range-
 
 import { listPipe } from './common/pipes/list.pipe';
 import { SortTimePipe } from './common/pipes/sortTime.pipe';
+import { KeysPipe } from './common/pipes/keys.pipe';
 
 
 @NgModule({
@@ -38,9 +39,10 @@ import { SortTimePipe } from './common/pipes/sortTime.pipe';
         AuthComponent,
         MenuComponent,
         RangeSliderComponent,
+        LoginForm,
         listPipe,
         SortTimePipe,
-        LoginForm
+        KeysPipe
     ],
     imports: [
         BrowserModule, 

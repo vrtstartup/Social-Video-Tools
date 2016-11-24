@@ -8,11 +8,10 @@
 			</label>
 			<button type="button" class="btn btn-secondary" (click)="''">Open</button>
 			<button (click)="logout()" class="btn btn-secondary">Sign Out</button>
-			<span>userId: {{ userId }}</span>
 		</div>
 	</div>
 
-	<div class="s-status" *ngIf="(projectRef | async)">
+	<div class="s-status" *ngIf="project">
 		<!--erro message upload|project -->
 		<div class="s-status-error" *ngIf="userMessage">{{userMessage}}</div>
 
@@ -25,41 +24,41 @@
 		</div>
 
 		<!--progressbar downscaling-->
-		<div class="s-progress" *ngIf="(projectRef | async)?.status?.downScaleProgress > 0 && (projectRef | async)?.status?.downScaleProgress < 100">
+		<div class="s-progress" *ngIf="project?.status?.downScaleProgress > 0 && project?.status?.downScaleProgress < 100">
 			<div class="s-progress__label">downscaling</div>
-			<div class="s-progress__bg" *ngIf="(projectRef | async)?.status.downScaleProgress">
-				<div class="s-progress__bar" [style.width]="(projectRef | async)?.status?.downScaleProgress + '%'"></div>
+			<div class="s-progress__bg" *ngIf="project?.status.downScaleProgress">
+				<div class="s-progress__bar" [style.width]="project?.status?.downScaleProgress + '%'"></div>
 			</div>
 		</div>
 	</div>
 
-	<div class="s-submenu" *ngIf="(projectRef | async)">
+	<div class="s-submenu" *ngIf="project">
 		<!--once downscaled show controls-->
-		<div *ngIf="(projectRef | async)?.status?.downscaled">
+		<div *ngIf="project?.status?.downscaled">
 			<button type="button" class="btn btn-secondary" (click)="addAnnotation()">Add Annotation(U)</button>
 			<label class="btn btn-secondary btn-upload">
 				<input type="file" name="video" (change)="updateSource($event)">Update Source
 			</label>
-			<button type="button" class="btn btn-secondary" (click)="addToRenderQueue()">Render Movie(R)</button>
+			<button type="button" class="btn btn-secondary" (click)="addToRenderQueue(projectKey)">Render Movie(R)</button>
 		</div>
 	</div>
-	
-	<div class="s-sub-controls" *ngIf="(projectRef | async)?.status?.downscaled">
+
+	<div class="s-sub-controls" *ngIf="project?.status?.downscaled">
 		
 		<!--subs-->
 		<div class="s-sub__wrapper">
 			<!--subtitles column-->
 			<div class="s-sub-items">
-				<div *ngFor="let annotation of (annotationsRef | async) ; 
+				<div *ngFor="let annotation of annotations ; 
 					let i = index; let last = last; trackBy:annotation?.$key" 
        				[class.highlight]="selectedAnnotation.$key === annotation.$key"
 					(click)="setSelectedAnnotation(annotation)"
 					class="s-sub-item">
-					
 					<div class="s-sub-item__info">
-						<small>{{i}} | {{annotation.start | json}} - {{annotation.end | json}} </small>
+						<small>({{i}}) {{annotation.start | json}}-{{annotation.end | json}} </small><br>
+						<small>{{annotation.data.name}}</small>
 					</div>
-					<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation.$key)">
+					<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation)">
 						<span>x</span>
 					</div>
 				</div>
@@ -68,16 +67,25 @@
 			<!--template column-->
 			<div class="s-sub-templates" *ngIf="selectedAnnotation">
 				<div *ngFor="let template of (templates | list)"
-					(click)="setSelectedTemplate(template)"
-					[class.highlight]="selectedTemplate === template"
+					(click)="updateAnnotationTemplate(template)"
+					[class.highlight]="template.name === selectedAnnotation.data.name"
 					class="s-sub-template">
-						<small>{{template.name | json}}</small>
+						<img class="s-sub-template__thumb" [src]="template.imageUrl">
+						<small class="s-sub-template__name">{{template.name}}</small>
 				</div><hr>
 			</div>
 
 			<!--inputs column-->
 			<div class="s-sub-inputs">
-				<div class="">Input here</div>
+				<div *ngIf="selectedAnnotation">
+					<form>
+						<div *ngFor="let input of (selectedAnnotationTextInput ); let i = index">
+							<label class="s-sub-inputs__label" for="">{{input.label}}</label>
+							<input class="s-sub-inputs__input" type="text" [value]="input.text" name="input.text" (blur)="updateSelAnnoTextInput($event, input.$key)">
+						</div>
+					</form>
+				</div>
+
 			</div>
 		</div>
 
@@ -85,18 +93,17 @@
 		<div class="s-video_wrapper">
 			<div class="s-video">
 				<vrtvideo-player 
-					[clip]="(clipRef | async)"
+					[clip]="clip"
 					[selectedAnnotation]="selectedAnnotation">
 				</vrtvideo-player>
 
 				<range-slider *ngIf="selectedAnnotation"
 					[selectedAnnotation]="selectedAnnotation" 
-					[clip]="(clipRef | async)" (changeAnno)="updateAnnotation($event)">
+					[clip]="clip" (changeAnno)="updateAnnotation($event)">
 				</range-slider>
 			</div>
 		</div>
 
 	</div>
 	
-	<!--<small class="">{{ projectRef | async | json }}</small><br>-->
 </div>
