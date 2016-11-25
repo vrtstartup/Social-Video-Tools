@@ -5,8 +5,6 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
 import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/upload.service';
-import { ListPipe } from '../../../common/pipes/list.pipe';
-import { SortByPropPipe } from '../../../common/pipes/sortByProp.pipe';
 import { Project } from './models/project.model';
 
 // TODO remove | only for test purposes
@@ -32,7 +30,6 @@ export class SubtitlesComponent implements OnInit {
   projects: any[];
   projectRef: FirebaseObjectObservable<any[]>;
   project: any;
-  projectData: any;
   selectedAnnotation: any;
   templatesRef: FirebaseObjectObservable<any[]>;
   templates: any[];
@@ -93,7 +90,6 @@ export class SubtitlesComponent implements OnInit {
         this.projectRef.subscribe((s: any) => {
           // new project model
           this.project = new Project(s);
-          this.projectData = this.project.data;
         });
 
         // attach project id to user 
@@ -106,7 +102,7 @@ export class SubtitlesComponent implements OnInit {
   }
 
   updateProject() {
-    this.projectRef.update(this.projectData);
+    this.projectRef.update(this.project.data);
   }
 
   /* upload ------- */
@@ -125,56 +121,22 @@ export class SubtitlesComponent implements OnInit {
   }
 
   updateSource($event) {
-    this.uploadSource($event, this.projectData['$key']);
-    // TODO optionally highlight out-of-range annotations
+    this.uploadSource($event, this.project.key);
   }
 
   /* annotations -- */
   addAnnotation() {
-    // create annotation object if none
-    if (!this.projectData['annotations']) {
-      this.projectData['annotations'] = {};
-    }
-
-    let strtTm = 0;
-    let spanTm = 4;
-
-    // if min one annotation
-    if (Object.keys(this.projectData['annotations']).length > 0) {
-      // object to array => sort => get one with highest end-value
-      let annoArray = new ListPipe().transform(this.projectData['annotations']);
-      let annoSorted = new SortByPropPipe().transform(annoArray, 'end');
-      let annoLastEndtime = annoSorted[annoSorted.length -1 ]['end'] 
-      
-      strtTm = annoLastEndtime;
-      const leftTm = this.projectData['clip']['movieLength'] - strtTm;
-
-      if (leftTm <= spanTm) {
-        strtTm = this.projectData['clip']['movieLength'] - spanTm;
-      }
-    }
-
-    let endTm = strtTm + spanTm;
-    let newId = this.makeid();
-    let newAnno = {
-      key: newId,
-      start: strtTm,
-      end: endTm,
-      data: this.templates['subtitle'],
-    };
-
-    this.updateSelectedAnno(newId, newAnno);
+    let newAnno = this.project.addAnnotation( this.templates['subtitle']);
+    this.updateSelectedAnno(newAnno.key, newAnno);
   }
 
   setSelectedAnno(key) {
-    this.selectedAnnotation = this.projectData['annotations'][`${key}`];
+    this.selectedAnnotation = this.project.setSelectedAnno(key);
   }
 
   updateSelectedAnno(key, obj) {
-    // update project | if key doesn't exists, its created this way
-    this.projectData['annotations'][`${key}`] = obj;
-    // update selectedAnnotation
-    this.setSelectedAnno(key)
+    this.project.updateSelectedAnno(key, obj);
+    this.setSelectedAnno(key);
     this.updateProject();
   }
 
@@ -183,44 +145,28 @@ export class SubtitlesComponent implements OnInit {
     if (this.selectedAnnotation.key === key) {
       this.selectedAnnotation = false;
     }
-    delete this.projectData['annotations'][`${key}`];
+    delete this.project.data['annotations'][`${key}`];
     this.updateProject();
   }
 
   updateSelectedAnnoTemplate(template) {
     // only update if you select a different template for the annotation
     if (template.name != this.selectedAnnotation.data.name) {
-      this.projectData['annotations'][`${this.selectedAnnotation.key}`]['data'] = template;
+      this.project.data['annotations'][`${this.selectedAnnotation.key}`]['data'] = template;
       this.setSelectedAnno(this.selectedAnnotation.key);
       this.updateProject();
     }
   }
-
-
-
-
+  
+  // TODO
   updateSelAnnoTextInput(event: any) {
     let value = event.target.value;
-    // this.updateProject();
   }
-
-
-
-
 
   /* render ------- */
   addToRenderQueue() {
     this.http.post('api/render', { projectId: this.project.key })
       .subscribe((data) => { });
-  }
-
-  /* helper functions -- */
-  getLastObject(obj) {
-    return obj[Object.keys(obj)[Object.keys(obj).length - 1]];
-  }
-
-  makeid() {
-    return `-ANNO${Math.random().toString(22).substr(2, 15).toUpperCase()}`;
   }
 
 }
