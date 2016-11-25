@@ -28,12 +28,7 @@ export class VrtVideoPlayer implements OnChanges {
         // on setSelectedAnnotation & on rangeslider on('end')
         console.log('event in child: video-player')
 
-        if (this.clip && (!this.sources.length || this.sources[0]['lowResUrl'] != this.clip['lowResUrl'] )) {
-            if(this.sources.length){
-                console.log('change source');
-                console.log(this.sources[0]['lowResUrl'], this.clip['lowResUrl']);
-            }
-            
+        if (this.clip['lowResUrl'] && (!this.sources.length || this.sources[0]['lowResUrl'] != this.clip['lowResUrl'] )) {            
             // this.clip.lowResUrl = this.clip.lowResUrl + Math.floor((Math.random() * 10) + 1)
             this.sources = [this.clip];
         }
