@@ -112,11 +112,11 @@ export class SubtitlesComponent implements OnInit {
     // upload video
     this.uploadService.makeFileRequest('api/upload/source', source, key)
       .subscribe(
-      data => { this.userMessage = '' },
-      err => {
-        console.log('error: makeFileRequest:', err);
-        this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
-      }
+        data => { this.userMessage = '' },
+        err => {
+          console.log('error: makeFileRequest:', err);
+          this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
+        }
       );
   }
 

@@ -10,7 +10,9 @@ export default {
         },
         aeTemplate: './testTemplate.aep',
         imageUrl: 'http://placehold.it/250x250',
-        type: 'subtitle'
+        type: 'subtitle',
+        templateCss: '<style>.wrapper{ background: rgba(0,0,0,0.25); color:yellow; }</style>',
+        templateHtml: '<div class="wrapper" id="overlayKetnet"><div>subtitle</div></div>',
     },
     overlayKetnet: { 
         name: 'overlayKetnet',
@@ -36,6 +38,8 @@ export default {
             layer01: { visible: 'false'}, 
             layer02: { visible: 'false'}
         },
+        templateCss: '<style>.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
+        templateHtml: '<div class="wrapper" id="overlayKetnet"><div id="textInpt01">textInpt01</div><div id="textInpt02">textInpt02</div></div>',
     },
     overlayStubru: { 
         name: 'overlayStubru',
@@ -60,7 +64,9 @@ export default {
         layer: {            
             layer01: { visible: 'false'}, 
             layer02: { visible: 'false'}
-        },        
+        },
+        templateCss: '<style>.wrapper{ background: rgba(0,0,0,0.25); color:pink; }</style>',
+        templateHtml: '<div class="wrapper" id="overlayStubru"><div id="textInpt01">textInpt01</div><div id="textInpt02">textInpt02</div></div>',        
     },    
     bumper: {
         name: 'bumper', 

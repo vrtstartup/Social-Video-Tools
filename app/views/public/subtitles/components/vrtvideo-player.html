@@ -5,12 +5,14 @@
 
         <vg-player style="height: calc(100% - 100px);">
 
-            <div *ngIf="annotations" style="position:absolute; z-index:100; bottom:0; width:100%; text-align:center; color:white;margin-bottom:1.5rem;">
+            <div *ngIf="annotations" style="position:absolute; bottom:0; z-index:100; width:100%;">
                 <div *ngFor="let annotation of (annotations | list)">
-                    <div *ngIf="currentTime && (currentTime >= annotation.start && currentTime < annotation.end)">
-                        <div *ngFor="let text of (annotation.data.text | keys)">
-                            <small> {{text.value.text}}</small>
-                        </div>
+                    <div *ngIf="currentTime && (currentTime >= annotation.start && currentTime <= annotation.end)" 
+                        [ngInitDir]="parseHtml( annotation.data.templateHtml, annotation.data.templateCss, annotation.data.key)"
+                        style="position:absolute; z-index:100; width:100%; bottom:1.3rem; text-align:center; color:white;">
+
+                        <div [id]="annotation.data.key" ></div>
+
                     </div>
                 </div>
             </div>

@@ -1,6 +1,8 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { VgAPI, VgFullscreenAPI } from 'videogular2/core';
 
+import * as $ from 'jquery';
+
 @Component({
     selector: 'vrtvideo-player',
     templateUrl: './vrtvideo-player.html'
@@ -28,15 +30,15 @@ export class VrtVideoPlayer implements OnChanges {
         // on setSelectedAnnotation & on rangeslider on('end')
         console.log('event in child: video-player')
 
-        if (this.clip['lowResUrl'] && (!this.sources.length || this.sources[0]['lowResUrl'] != this.clip['lowResUrl'] )) {            
+        if (this.clip['lowResUrl'] && (!this.sources.length || this.sources[0]['lowResUrl'] != this.clip['lowResUrl'])) {
             // this.clip.lowResUrl = this.clip.lowResUrl + Math.floor((Math.random() * 10) + 1)
             this.sources = [this.clip];
         }
 
         if (this.selectedAnnotation) {
-            
+
             // Give the timeout enough time to avoid the race conflict.
-            setTimeout(() => { 
+            setTimeout(() => {
                 let seekTime = parseFloat(this.selectedAnnotation.start);
                 this.api.seekTime(seekTime);
                 this.api.play();
@@ -45,15 +47,22 @@ export class VrtVideoPlayer implements OnChanges {
             // loop function
             this.api.subscriptions.timeUpdate
                 .subscribe(() => {
-                    
+
                     this.currentTime = this.api.currentTime;
-                    
+
                     if (this.api.currentTime >= parseFloat(this.selectedAnnotation.end)) {
                         this.api.seekTime(parseFloat(this.selectedAnnotation.start));
                         this.api.play();
                     }
                 })
-
         }
+
+    }
+
+    parseHtml(html, css, annoKey) {
+        //let templateHtml = css + html;
+        // TODO inject
+        let templateHtml = css + html;
+        $(`#${annoKey}`).replaceWith(templateHtml);
     }
 }
