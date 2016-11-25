@@ -24,42 +24,43 @@
 		</div>
 
 		<!--progressbar downscaling-->
-		<div class="s-progress" *ngIf="project?.status?.downScaleProgress > 0 && project?.status?.downScaleProgress < 100">
+		<div class="s-progress" *ngIf="projectData?.status?.downScaleProgress > 0 && projectData?.status?.downScaleProgress < 100">
 			<div class="s-progress__label">downscaling</div>
-			<div class="s-progress__bg" *ngIf="project?.status.downScaleProgress">
-				<div class="s-progress__bar" [style.width]="project?.status?.downScaleProgress + '%'"></div>
+			<div class="s-progress__bg" *ngIf="projectData?.status.downScaleProgress">
+				<div class="s-progress__bar" [style.width]="projectData?.status?.downScaleProgress + '%'"></div>
 			</div>
 		</div>
 	</div>
 
 	<div class="s-submenu" *ngIf="project">
 		<!--once downscaled show controls-->
-		<div *ngIf="project?.status?.downscaled">
+		<div *ngIf="projectData?.status?.downscaled">
 			<button type="button" class="btn btn-secondary" (click)="addAnnotation()">Add Annotation(U)</button>
 			<label class="btn btn-secondary btn-upload">
 				<input type="file" name="video" (change)="updateSource($event)">Update Source
 			</label>
-			<button type="button" class="btn btn-secondary" (click)="addToRenderQueue(projectKey)">Render Movie(R)</button>
+			<button type="button" class="btn btn-secondary" (click)="addToRenderQueue()">Render Movie(R)</button>
 		</div>
 	</div>
 
-	<div class="s-sub-controls" *ngIf="project?.status?.downscaled">
+	<div class="s-sub-controls" *ngIf="projectData?.status?.downscaled">
 		
-		<!--subs-->
+		<!--annotations-->
 		<div class="s-sub__wrapper">
-			<!--subtitles column-->
+			<!--annotations column-->
 			<div class="s-sub-items">
-				<div *ngFor="let annotation of annotations ; 
-					let i = index; let last = last; trackBy:annotation?.$key" 
-       				[class.highlight]="selectedAnnotation.$key === annotation.$key"
-					(click)="setSelectedAnnotation(annotation)"
-					class="s-sub-item">
-					<div class="s-sub-item__info">
-						<small>({{i}}) {{annotation.start | json}}-{{annotation.end | json}} </small><br>
-						<small>{{annotation.data.name}}</small>
-					</div>
-					<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation)">
-						<span>x</span>
+				<div *ngIf="projectData.annotations">
+					<div *ngFor="let annotation of projectData.annotations | list | sortByProp:'end' " 
+						(click)="setSelectedAnno(annotation.key)"
+						[class.highlight]="selectedAnnotation.key === annotation.key"
+						class="s-sub-item">
+						<div class="s-sub-item__info">
+							<small>{{annotation.start | json}}-{{annotation.end | json}} </small><br>
+							<small>{{annotation.data.name}}</small>
+						</div>
+						<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation.key)">
+							<span>x</span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -67,7 +68,7 @@
 			<!--template column-->
 			<div class="s-sub-templates" *ngIf="selectedAnnotation">
 				<div *ngFor="let template of (templates | list)"
-					(click)="updateAnnotationTemplate(template)"
+					(click)="updateSelectedAnnoTemplate(template)"
 					[class.highlight]="template.name === selectedAnnotation.data.name"
 					class="s-sub-template">
 						<img class="s-sub-template__thumb" [src]="template.imageUrl">
@@ -79,27 +80,28 @@
 			<div class="s-sub-inputs">
 				<div *ngIf="selectedAnnotation">
 					<form>
-						<div *ngFor="let input of (selectedAnnotationTextInput ); let i = index">
-							<label class="s-sub-inputs__label" for="">{{input.label}}</label>
-							<input class="s-sub-inputs__input" type="text" [value]="input.text" name="input.text" (blur)="updateSelAnnoTextInput($event, input.$key)">
+						<div *ngFor="let input of (selectedAnnotation.data.text | keys)">
+							<label class="s-sub-inputs__label" for="">{{input.value.label}}</label>
+							<input class="s-sub-inputs__input" type="text" [(ngModel)]="input.value.text" (blur)="updateSelAnnoTextInput($event, selectedAnnotation.key)" [ngModelOptions]="{standalone: true}">
 						</div>
 					</form>
 				</div>
-
 			</div>
 		</div>
 
 		<!--video-->
 		<div class="s-video_wrapper">
+
 			<div class="s-video">
 				<vrtvideo-player 
-					[clip]="clip"
+					[clip]="projectData.clip"
+					[annotations]="projectData.annotations"
 					[selectedAnnotation]="selectedAnnotation">
 				</vrtvideo-player>
 
 				<range-slider *ngIf="selectedAnnotation"
 					[selectedAnnotation]="selectedAnnotation" 
-					[clip]="clip" (changeAnno)="updateAnnotation($event)">
+					[clip]="projectData.clip" (changeAnno)="updateSelectedAnno( selectedAnnotation.key, $event)">
 				</range-slider>
 			</div>
 		</div>
