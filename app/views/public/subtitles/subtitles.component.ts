@@ -210,7 +210,7 @@ export class SubtitlesComponent implements OnInit {
 
   /* render ------- */
   addToRenderQueue() {
-    this.http.post('api/render', { projectId: this.projectData['$key'] })
+    this.http.post('api/render', { projectId: this.project.key })
       .subscribe((data) => { });
   }
 
