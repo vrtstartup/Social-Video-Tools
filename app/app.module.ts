@@ -25,8 +25,8 @@ import { AuthComponent } from './views/public/auth/authentication.component';
 import { MenuComponent } from './views/public/partials/menu.component';
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 
-import { listPipe } from './common/pipes/list.pipe';
-import { SortTimePipe } from './common/pipes/sortTime.pipe';
+import { ListPipe } from './common/pipes/list.pipe';
+import { SortByPropPipe } from './common/pipes/sortByProp.pipe';
 import { KeysPipe } from './common/pipes/keys.pipe';
 
 
@@ -40,8 +40,8 @@ import { KeysPipe } from './common/pipes/keys.pipe';
         MenuComponent,
         RangeSliderComponent,
         LoginForm,
-        listPipe,
-        SortTimePipe,
+        ListPipe,
+        SortByPropPipe,
         KeysPipe
     ],
     imports: [

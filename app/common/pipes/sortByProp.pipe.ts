@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({ name: "sortTime" })
-export class SortTimePipe implements PipeTransform {
+@Pipe({ name: "sortByProp" })
+export class SortByPropPipe implements PipeTransform {
 
     transform(array: Array<string>, args: string): Array<string> {
 
