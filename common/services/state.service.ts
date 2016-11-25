@@ -1,6 +1,8 @@
 import { Projects } from '../../common/services/projects.service';
 import { Project } from '../../common/classes/project';
 import { Email } from '../../common/services/email.service';
+import { staticUrl } from '../../common/services/resolver.service';
+
 
 export class State {
   private fireBase; 
@@ -23,21 +25,25 @@ export class State {
   public updateState(project: Project, type:string, value:any) {
     return new Promise((resolve, reject) => {
         this.projectService.setProjectProperty(project.data.id, `status/${type}`, value) // update project status 
-          .then( data => this.handleSateChange(project, type)) // handle state specific stuff
+          .then( data => this.handleSateChange(project, type, value)) // handle state specific stuff
           .then(resolve);
     });
   }
 
-  private handleSateChange(project: Project, type:string){ 
+  private handleSateChange(project: Project, type:string, value: any){ 
     return new Promise((resolve, reject) => {
       switch (type) {
         case 'uploaded':
         break;
 
         case 'downscaled':
+          const lowResUrl = staticUrl('lowres', project.data.id) + `?${Date.now()}`;
+
           // additional hooks for the downscaled event go here
           this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress')
             .then(status => resolve(project), this.errorHandler);
+
+          if(value) this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl);
         break;
 
         case 'subtitles':

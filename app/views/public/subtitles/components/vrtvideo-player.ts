@@ -29,7 +29,6 @@ export class VrtVideoPlayer implements OnChanges {
         console.log('event in child: video-player')
 
         if (this.clip) {
-            this.clip.lowResUrl = this.clip.lowResUrl + Math.floor((Math.random() * 10) + 1)
             this.sources = [this.clip];
         }
 

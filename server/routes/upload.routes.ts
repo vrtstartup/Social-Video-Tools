@@ -57,8 +57,6 @@ router.post('/source', uploadLowres, (req: any, res) => {
   const fileMeta = req.files.video[0];
   const fireBase = req.app.get('fireBase');
 
-  const lowResUrl = resolve.staticUrl('lowres', projectId);
-
   // update project 
   const arrProms = [];
 
@@ -67,9 +65,6 @@ router.post('/source', uploadLowres, (req: any, res) => {
       'baseDir': projectId,
       'source': fileMeta.filename,
     },
-    clip: {
-      'lowResUrl': lowResUrl + '?' + Date.now(),
-    }
   }));
 
   arrProms.push(projects.getProjectById(projectId));
@@ -88,7 +83,6 @@ router.post('/source', uploadLowres, (req: any, res) => {
     success: true,
     file: fileMeta,
     projectId: projectId,
-    lowResUrl: lowResUrl,
   });
 
 });
