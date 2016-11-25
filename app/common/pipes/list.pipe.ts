@@ -1,7 +1,7 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({name: 'list'})
-export class listPipe implements PipeTransform {
+export class ListPipe implements PipeTransform {
     transform(input: any, args?: any[]): any[] {
         // create instance vars to store keys and final output
         let keyArr: any[] = Object.keys(input),

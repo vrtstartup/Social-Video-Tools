@@ -1,13 +1,14 @@
-import { Component, Input, OnInit, AfterViewInit, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { VgAPI, VgFullscreenAPI } from 'videogular2/core';
 
 @Component({
     selector: 'vrtvideo-player',
     templateUrl: './vrtvideo-player.html'
 })
-export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
+export class VrtVideoPlayer implements OnChanges {
     @Input() clip;
     @Input() selectedAnnotation;
+    @Input() annotations;
 
     sources: Array<Object>;
     controls: boolean = false;
@@ -15,16 +16,12 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
     preload: string = 'auto';
     api: VgAPI;
     fsAPI: VgFullscreenAPI;
+    currentTime: any;
 
     constructor(api: VgAPI) {
         this.fsAPI = VgFullscreenAPI;
         this.api = api;
         this.sources = [];
-    }
-
-    ngOnInit() {
-    }
-    ngAfterViewInit() {
     }
 
     ngOnChanges() {
@@ -35,26 +32,28 @@ export class VrtVideoPlayer implements OnInit, AfterViewInit, OnChanges {
             this.clip.lowResUrl = this.clip.lowResUrl + Math.floor((Math.random() * 10) + 1)
             this.sources = [this.clip];
         }
-        
+
         if (this.selectedAnnotation) {
             
-            let seekTime = parseFloat(this.selectedAnnotation.start);
-            this.api.seekTime(seekTime);
-            this.api.play();
-            
+            // Give the timeout enough time to avoid the race conflict.
+            setTimeout(() => { 
+                let seekTime = parseFloat(this.selectedAnnotation.start);
+                this.api.seekTime(seekTime);
+                this.api.play();
+            }, 150)
+
             // loop function
             this.api.subscriptions.timeUpdate
                 .subscribe(() => {
-                    if( this.api.currentTime >= parseFloat(this.selectedAnnotation.end)) {
-                        this.api.seekTime(parseFloat(this.selectedAnnotation.start))
-                        this.api.play()
+                    
+                    this.currentTime = this.api.currentTime;
+                    
+                    if (this.api.currentTime >= parseFloat(this.selectedAnnotation.end)) {
+                        this.api.seekTime(parseFloat(this.selectedAnnotation.start));
+                        this.api.play();
                     }
                 })
+
         }
-
-    }
-
-    onPlayerReady() {
-        // console.log("player ready");
     }
 }
