@@ -22,6 +22,7 @@ import { LoginForm } from './views/public/auth/components/login/login-form';
 // import { VrtAppsComponent } from './views/public/vrtapps.component';
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 import { AuthComponent } from './views/public/auth/authentication.component';
+import { DownloadComponent } from './views/public/download/download.component';
 import { MenuComponent } from './views/public/partials/menu.component';
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 
@@ -37,6 +38,7 @@ import { KeysPipe } from './common/pipes/keys.pipe';
         // VrtAppsComponent,
         SubtitlesComponent,
         AuthComponent,
+        DownloadComponent,
         MenuComponent,
         RangeSliderComponent,
         LoginForm,
