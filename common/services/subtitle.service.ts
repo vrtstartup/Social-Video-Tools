@@ -36,7 +36,7 @@ export class Subtitle {
         const sub = {
           start: String(subs[key]['start'] *= 1000),
           end: String(subs[key]['end'] *= 1000),
-          text: data['text']
+          text: data['text']['textInpt01']['text']
         }
 
         captions.add(sub);
