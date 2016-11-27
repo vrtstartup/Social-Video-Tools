@@ -2,17 +2,14 @@
     <div class="videoplayer-container__player">
         
         <!--annotation preview-->
-
         <vg-player style="height: calc(100% - 100px);">
-
             <div *ngIf="annotations" style="position:absolute; bottom:0; z-index:100; width:100%;">
                 <div *ngFor="let annotation of (annotations | list)">
+
                     <div *ngIf="currentTime && (currentTime >= annotation.start && currentTime <= annotation.end)" 
-                        [ngInitDir]="parseHtml( annotation.data.templateHtml, annotation.data.templateCss, annotation.data.key)"
+                        [ngInitDir]="parseHtml(annotation)"
                         style="position:absolute; z-index:100; width:100%; bottom:1.3rem; text-align:center; color:white;">
-
-                        <div [id]="annotation.data.key" ></div>
-
+                        <div [id]="annotation.key"></div>
                     </div>
                 </div>
             </div>

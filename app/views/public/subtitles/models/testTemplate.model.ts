@@ -5,14 +5,15 @@ export default {
             textInpt01: {
                 label: 'Title',
                 text: 'Hier komt de subtitle',
-                layerId: 'layername'
+                layerId: 'textInpt01',
+                key: 'textInpt01',
             }, 
         },
         aeTemplate: './testTemplate.aep',
         imageUrl: 'http://placehold.it/250x250',
         type: 'subtitle',
-        templateCss: '<style>.wrapper{ background: rgba(0,0,0,0.25); color:yellow; }</style>',
-        templateHtml: '<div class="wrapper" id="overlayKetnet"><div>subtitle</div></div>',
+        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:yellow; }</style>',
+        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
     },
     overlayKetnet: { 
         name: 'overlayKetnet',
@@ -26,20 +27,30 @@ export default {
             textInpt01: {
                 label: 'overlayKetnet: Title',
                 text: 'overlayKetnet: Hier komt de title',
-                layerId: 'textInpt01'
+                layerId: 'textInpt01',
+                key: 'textInpt01',
             }, 
             textInpt02: {
                 label: 'overlayKetnet: Subtitle',
                 text: 'overlayKetnet: Hier komt de subtitle',
-                layerId: 'textInpt02'
+                layerId: 'textInpt02',
+                key: 'textInpt02',
             } 
         },
         layer: {            
-            layer01: { visible: 'false'}, 
-            layer02: { visible: 'false'}
+            layer01: { 
+                visible: 'false',
+                layerId: 'layer01',
+                key: 'layer01'
+            }, 
+            layer02: { 
+                visible: 'false',
+                layerId: 'layer02',
+                key: 'layer02'
+            }
         },
-        templateCss: '<style>.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
-        templateHtml: '<div class="wrapper" id="overlayKetnet"><div id="textInpt01">textInpt01</div><div id="textInpt02">textInpt02</div></div>',
+        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
+        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
     },
     overlayStubru: { 
         name: 'overlayStubru',
@@ -53,20 +64,30 @@ export default {
             textInpt01: {
                 label: 'overlayStubru: Title',
                 text: 'overlayStubru: Hier komt de title',
-                layerId: 'textInpt01'
+                layerId: 'textInpt01',
+                key: 'textInpt01',
             }, 
             textInpt02: {
                 label: 'overlayStubru: Subtitle',
                 text: 'overlayStubru: Hier komt de subtitle',
-                layerId: 'textInpt02'
+                layerId: 'textInpt02',
+                key: 'textInpt02',
             } 
         },
         layer: {            
-            layer01: { visible: 'false'}, 
-            layer02: { visible: 'false'}
+            layer01: { 
+                visible: 'false',
+                layerId: 'layer01',
+                key: 'layer01'
+            }, 
+            layer02: { 
+                visible: 'false',
+                layerId: 'layer02',
+                key: 'layer02'
+            }
         },
         templateCss: '<style>.wrapper{ background: rgba(0,0,0,0.25); color:pink; }</style>',
-        templateHtml: '<div class="wrapper" id="overlayStubru"><div id="textInpt01">textInpt01</div><div id="textInpt02">textInpt02</div></div>',        
+        templateHtml: '<div id="overlayStubru" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',        
     },    
     bumper: {
         name: 'bumper', 

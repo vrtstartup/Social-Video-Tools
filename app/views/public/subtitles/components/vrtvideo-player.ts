@@ -59,10 +59,32 @@ export class VrtVideoPlayer implements OnChanges {
 
     }
 
-    parseHtml(html, css, annoKey) {
-        //let templateHtml = css + html;
-        // TODO inject
-        let templateHtml = css + html;
-        $(`#${annoKey}`).replaceWith(templateHtml);
+    parseHtml(annotation) {
+        
+        // value in template e.g '<div>%keyValue%</div>' will be replaced by 
+        // the textvalue of corresponding keyValue
+
+        // JSON.stringify(this.selectedAnnotation.data.text) !== JSON.stringify(annotation.data.text)
+        if (annotation.data.text) {
+            
+            let parsedHtml = annotation.data.templateHtml;
+
+            for(let i in annotation.data.text) {
+                let input = '';
+                input = annotation.data.text[i]['text'];
+                parsedHtml = parsedHtml.replace(`%${i}%`, input);
+            }
+            
+            let templateHtml = annotation.data.templateCss + parsedHtml;
+            
+            // inject it
+            $(`#${annotation.key}`).replaceWith(templateHtml);
+        }
+        
+        // for text: replace html string with text values
+        if(annotation.data.layer){
+
+        }
+
     }
 }
