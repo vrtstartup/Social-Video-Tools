@@ -34,6 +34,7 @@ import { ListPipe } from './common/pipes/list.pipe';
 import { SortByPropPipe } from './common/pipes/sortByProp.pipe';
 import { KeysPipe } from './common/pipes/keys.pipe';
 
+import { NgInitDir } from './common/directives/ngInit.directive'
 
 @NgModule({
     declarations: [
@@ -49,7 +50,8 @@ import { KeysPipe } from './common/pipes/keys.pipe';
         LoginForm,
         ListPipe,
         SortByPropPipe,
-        KeysPipe
+        KeysPipe,
+        NgInitDir
     ],
     imports: [
         BrowserModule, 

@@ -137,11 +137,11 @@ export class SubtitlesComponent implements OnInit, AfterViewChecked {
     // upload video
     this.uploadService.makeFileRequest('api/upload/source', source, key)
       .subscribe(
-      data => { this.userMessage = '' },
-      err => {
-        console.log('error: makeFileRequest:', err);
-        this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
-      }
+        data => { this.userMessage = '' },
+        err => {
+          console.log('error: makeFileRequest:', err);
+          this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
+        }
       );
   }
 
@@ -187,8 +187,15 @@ export class SubtitlesComponent implements OnInit, AfterViewChecked {
   hideOpenDialog() { this.showOpenDialog = false; }
 
   // TODO
-  updateSelAnnoTextInput(event: any) {
-    let value = event.target.value;
+  onBlur() {
+    this.updateProject();
+  }
+
+  onKey(input){
+    this.selectedAnnotation.data.text[input.key] = input;
+    this.setSelectedAnno(this.selectedAnnotation.key);
+    // update project => dont push yet to db
+    this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
   }
 
   /* render ------- */

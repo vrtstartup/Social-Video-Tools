@@ -81,10 +81,12 @@
 			<!--inputs column-->
 			<div class="s-sub-inputs">
 				<div *ngIf="selectedAnnotation">
-					<form>
-						<div *ngFor="let input of (selectedAnnotation.data.text | keys)">
-							<label class="s-sub-inputs__label" for="">{{input.value.label}}</label>
-							<input class="s-sub-inputs__input" type="text" [(ngModel)]="input.value.text" (blur)="updateSelAnnoTextInput($event, selectedAnnotation.key)" [ngModelOptions]="{standalone: true}">
+					<form  *ngIf="selectedAnnotation.data.text">
+						<div *ngFor="let input of (selectedAnnotation.data.text | list); let i = index">
+							<label class="s-sub-inputs__label" for="">{{i}}-{{input.label}}</label>
+							<input class="s-sub-inputs__input" type="text" [(ngModel)]="input.text" 
+								(keyup)="onKey(input)"
+								(blur)="onBlur()" [ngModelOptions]="{standalone: true}">
 						</div>
 					</form>
 				</div>
