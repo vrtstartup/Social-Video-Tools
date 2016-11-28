@@ -12,13 +12,14 @@ export default {
         aeTemplate: './testTemplate.aep',
         imageUrl: 'http://placehold.it/250x250',
         type: 'subtitle',
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:yellow; }</style>',
+        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:yellow; }</style>',
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
     },
     overlayKetnet: { 
         name: 'overlayKetnet',
         imageUrl: 'http://placehold.it/250x250',
         type: 'overlay',
+        duration: 5,
         bot: {
             "render-status": 'ready',
             aep: '/path/to/proper/aep/file.aep'
@@ -56,6 +57,7 @@ export default {
         name: 'overlayStubru',
         imageUrl: 'http://placehold.it/250x250',
         type: 'overlay',
+        duration: 7,
         bot: {
             "render-status": 'ready',
             aep: '/path/to/proper/aep/file.aep'
@@ -86,7 +88,7 @@ export default {
                 key: 'layer02'
             }
         },
-        templateCss: '<style>.wrapper{ background: rgba(0,0,0,0.25); color:pink; }</style>',
+        templateCss: '<style>.wrapper{ background: rgba(0,0,0,0); color:pink; }</style>',
         templateHtml: '<div id="overlayStubru" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',        
     },    
     bumper: {
