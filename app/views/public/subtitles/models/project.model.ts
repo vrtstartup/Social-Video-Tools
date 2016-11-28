@@ -5,16 +5,69 @@ export class Project {
 
     public data;
     public key; 
+    private possibleStatuses = [{
+        label: 'uploaded',
+        message: {
+          text: 'Project has been uploaded'
+        }
+    },
+    {
+      label: 'downScaleProgress',
+      message: {
+        text: 'source video is being processed...'
+      }
+    },
+    {
+        label: 'downscaled',
+        message: {
+          text: 'source video has been processed'
+        }
+    },
+    {
+      label: 'subtitles',
+      message: {
+        text: 'subtitle file has been generated'
+      }
+    },
+    {
+      label: 'stitchingProgress',
+      message: {
+        text: 'composition is being rendered...'
+      }
+    },
+    {
+      label: 'render',
+      message: {
+        text: 'rendering complete'
+      }
+    }];
+
+    public lastStatus: Object;
 
     constructor(project:any) {
         this.key = project['$key'];
         delete project['$key'];
         delete project['$exists'];
         this.data = project;
+
+        this.getLastStatus();
     }
     
     getAnnotations() {
         return this.data.annotations;
+    }
+
+    getFirstAnnotationKey(){
+      let returnVal;
+
+      if(this.data.hasOwnProperty('annotations')){ // there's annotations available
+        const arrKeys = Object.keys(this.data.annotations);
+        returnVal = arrKeys[0];
+      } else{
+        returnVal = null;
+      }
+
+      return returnVal;
     }
 
     addAnnotation(template){
@@ -55,13 +108,29 @@ export class Project {
         return newAnno
     }
 
-    setSelectedAnno(key) {
-        return this.data['annotations'][`${key}`];
+    getAnnotation(key) {
+        return this.data.hasOwnProperty('annotations') ? this.data['annotations'][`${key}`] : null;
     }
 
     updateSelectedAnno(key, obj){
         // update project | if key doesn't exists, its created this way
         this.data['annotations'][`${key}`] = obj;
+    }
+
+    getLastStatus(){
+        for(let i=0; i<this.possibleStatuses.length; i++){
+            const status = this.possibleStatuses[i];
+            if(this.checkStatus(status)){
+              if(status['label'] === 'stitchingProgress') status['message']['progress'] = this.data.status['stitchingProgress'];
+              if(status['label'] === 'downScaleProgress') status['message']['progress'] = this.data.status['downScaleProgress'];
+              this.lastStatus = status['message']
+            }
+
+        } 
+    }
+
+    private checkStatus(status: Object) { 
+        return (this.data.hasOwnProperty('status') && this.data.status[status['label']]) ? true : false;
     }
 
     private getLastObject(obj) {

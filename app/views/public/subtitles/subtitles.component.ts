@@ -1,5 +1,5 @@
-import { Component, OnInit, NgZone } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, AfterViewChecked, NgZone } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFire, FirebaseAuth, FirebaseAuthState, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/Rx';
@@ -16,7 +16,7 @@ import testTemplate from './models/testTemplate.model';
   templateUrl: 'subtitles.component.html',
 })
 
-export class SubtitlesComponent implements OnInit {
+export class SubtitlesComponent implements OnInit, AfterViewChecked {
 
   userId: string;
   userMessage: string = '';
@@ -34,16 +34,21 @@ export class SubtitlesComponent implements OnInit {
   templatesRef: FirebaseObjectObservable<any[]>;
   templates: any[];
   selectedTemplate: any;
+  selectedProjectId: string;
+
+  showOpenDialog: boolean;
 
   constructor(
     af: AngularFire,
     private zone: NgZone,
     private http: Http,
     private router: Router,
+    private route: ActivatedRoute,
     private uploadService: UploadService,
     public auth: FirebaseAuth) {
 
     this.af = af;
+
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
     this.templaterQueueRef = af.database.list('/templater-queue');
@@ -51,6 +56,9 @@ export class SubtitlesComponent implements OnInit {
     this.projectsRef.subscribe((s: any) => this.projects = s);
     this.templatesRef = af.database.object('/templates');
     this.templatesRef.subscribe((s: any) => this.templates = s);
+
+    // interface
+    this.showOpenDialog = false;
 
     // TODO remove | only for test purposes | 
     // should only be set once => when server restarts
@@ -65,7 +73,15 @@ export class SubtitlesComponent implements OnInit {
         this.zone.run(() => this.uploadProgress = data);
       }, err => console.log(err));
 
+    
     this.af.auth.subscribe(this.onAuthStatusChange.bind(this));
+
+    this.selectedProjectId =  this.route.snapshot.params['id'];
+    if(this.selectedProjectId) this.openProject(this.selectedProjectId);
+  }
+
+  ngAfterViewChecked(){
+    
   }
 
   /* auth --------- */
@@ -101,6 +117,15 @@ export class SubtitlesComponent implements OnInit {
       .catch(err => console.log(err, 'could not create|upload a new project'));
   }
 
+  openProject(id: string){
+    this.showOpenDialog = false;
+    this.projectRef = this.af.database.object(`/projects/${id}`);
+    this.projectRef.subscribe( s => {
+      this.project = new Project(s);
+      this.setSelectedAnno(this.project.getFirstAnnotationKey());
+    });
+  }
+
   updateProject() {
     this.projectRef.update(this.project.data);
   }
@@ -131,7 +156,7 @@ export class SubtitlesComponent implements OnInit {
   }
 
   setSelectedAnno(key) {
-    this.selectedAnnotation = this.project.setSelectedAnno(key);
+    this.selectedAnnotation = this.project.getAnnotation(key);
   }
 
   updateSelectedAnno(key, obj) {
@@ -158,6 +183,9 @@ export class SubtitlesComponent implements OnInit {
     }
   }
   
+  toggleOpenDialog() { this.showOpenDialog = !this.showOpenDialog; }
+  hideOpenDialog() { this.showOpenDialog = false; }
+
   // TODO
   updateSelAnnoTextInput(event: any) {
     let value = event.target.value;

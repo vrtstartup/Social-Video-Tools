@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { VgAPI, VgFullscreenAPI } from 'videogular2/core';
 
 @Component({
@@ -24,9 +24,10 @@ export class VrtVideoPlayer implements OnChanges {
         this.sources = [];
     }
 
-    ngOnChanges() {
+    ngOnChanges(changes: SimpleChanges) {
         // on setSelectedAnnotation & on rangeslider on('end')
-        console.log('event in child: video-player')
+        // console.log('event in child: video-player')
+        // console.log(changes);
 
         if (this.clip['lowResUrl'] && (!this.sources.length || this.sources[0]['lowResUrl'] != this.clip['lowResUrl'] )) {            
             // this.clip.lowResUrl = this.clip.lowResUrl + Math.floor((Math.random() * 10) + 1)

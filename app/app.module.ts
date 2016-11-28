@@ -12,19 +12,23 @@ import { VgBufferingModule } from "videogular2/buffering";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import{ routing } from './common/services/routing.service';
+import { ProjectService } from './common/services/project.service';
 import firebaseConfig from './config/firebase.config';
 import { AuthGuard } from './common/guards/auth';
 import { NoAuthGuard } from './common/guards/noAuth';
 
 import { AppComponent } from './app.component';
-import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
 import { LoginForm } from './views/public/auth/components/login/login-form';
 // import { VrtAppsComponent } from './views/public/vrtapps.component';
+
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
+import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
+import { OpenComponent } from './views/public/subtitles/components/open.component';
+import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { AuthComponent } from './views/public/auth/authentication.component';
 import { DownloadComponent } from './views/public/download/download.component';
 import { MenuComponent } from './views/public/partials/menu.component';
-import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
+
 
 import { ListPipe } from './common/pipes/list.pipe';
 import { SortByPropPipe } from './common/pipes/sortByProp.pipe';
@@ -37,6 +41,7 @@ import { KeysPipe } from './common/pipes/keys.pipe';
         VrtVideoPlayer,
         // VrtAppsComponent,
         SubtitlesComponent,
+        OpenComponent,
         AuthComponent,
         DownloadComponent,
         MenuComponent,
@@ -63,7 +68,7 @@ import { KeysPipe } from './common/pipes/keys.pipe';
         FormsModule,
         ReactiveFormsModule,
     ],
-    providers: [ExtBrowserXhr, AuthGuard, NoAuthGuard],
+    providers: [ExtBrowserXhr, AuthGuard, NoAuthGuard, ProjectService],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

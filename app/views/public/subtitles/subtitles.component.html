@@ -6,10 +6,12 @@
 			<label class="btn btn-secondary btn-upload">
 				<input type="file" name="video" (change)="createNewProject($event)">New
 			</label>
-			<button type="button" class="btn btn-secondary" (click)="''">Open</button>
+			<button type="button" class="btn btn-secondary" (click)="toggleOpenDialog()">Open</button>
 			<button (click)="logout()" class="btn btn-secondary">Sign Out</button>
 		</div>
 	</div>
+	
+	<open-dialog class="dialog" [class.closed]="!showOpenDialog" [openedProject]="project ? project:null" (selectionUpdated)="openProject($event)"></open-dialog>
 
 	<div class="s-status" *ngIf="project?.data">
 		<!--erro message upload|project -->
