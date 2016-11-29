@@ -163,7 +163,7 @@ export function stitch(project, job, messageHandler) {
             .on('start', command => logger.verbose(`Spawned ffmpeg with command: ${command}`))
             .on('progress', msg => {
                 // append some extra data to the progress message
-                msg.progress = Math.round((msg.frames / project.data.clip.frames) * 1000) / 10; // encoding progress
+                msg.progress = Math.min(Math.round((msg.frames / project.data.clip.frames) * 1000) / 10, 100); // encoding progress
                 messageHandler(msg, job, 'status/stitchingProgress')
             })
             .on('end', () => {
