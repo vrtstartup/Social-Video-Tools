@@ -24,6 +24,8 @@ import { LoginForm } from './views/public/auth/components/login/login-form';
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
 import { OpenComponent } from './views/public/subtitles/components/open.component';
+import { ProgressComponent } from './views/public/subtitles/components/progress.component';
+import { ProgressBarComponent } from './views/public/subtitles/components/progressbar.component';
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { AuthComponent } from './views/public/auth/authentication.component';
 import { DownloadComponent } from './views/public/download/download.component';
@@ -43,6 +45,8 @@ import { NgInitDir } from './common/directives/ngInit.directive'
         // VrtAppsComponent,
         SubtitlesComponent,
         OpenComponent,
+        ProgressComponent,
+        ProgressBarComponent,
         AuthComponent,
         DownloadComponent,
         MenuComponent,
