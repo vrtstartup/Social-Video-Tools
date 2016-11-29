@@ -17,51 +17,60 @@ export class VrtVideoPlayer implements OnChanges {
     autoplay: boolean = false;
     preload: string = 'auto';
     api: VgAPI;
+    apiLoaded: boolean;
     fsAPI: VgFullscreenAPI;
-    currentTime: any;
+    currentTime: number;
 
-    constructor(api: VgAPI) {
+    constructor() {
         this.fsAPI = VgFullscreenAPI;
-        this.api = api;
         this.sources = [];
+        this.currentTime = 1;
+        this.apiLoaded = false;
+    }
+
+    onPlayerReady(api:VgAPI) {
+        this.api = api;
+        this.apiLoaded = true;
+        this.setSeekTime();
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        // on setSelectedAnnotation & on rangeslider on('end')
-        // console.log('event in child: video-player')
-        // console.log(changes);
+        if(changes.hasOwnProperty('clip')) { // input 'clip' changed
+            const prev = changes['clip']['previousValue'];
+            const curr = changes['clip']['currentValue'];
 
-        if (this.clip['lowResUrl'] && (!this.sources.length || this.sources[0]['lowResUrl'] != this.clip['lowResUrl'])) {
-            // this.clip.lowResUrl = this.clip.lowResUrl + Math.floor((Math.random() * 10) + 1)
-            this.sources = [this.clip];
+            if(curr.hasOwnProperty('lowResUrl') && (!this.sources.length || curr['lowResUrl'] != this.sources[0]['lowResUrl'])){
+                this.sources = [this.clip];
+            }
         }
 
-        if (this.selectedAnnotation) {
+        if(changes.hasOwnProperty('selectedAnnotation') && changes['selectedAnnotation']['currentValue'] && this.apiLoaded) { // input 'selectedAnnotation' changed && VG api loaded?
+            const prev = changes['selectedAnnotation']['previousValue'];
+            const curr = changes['selectedAnnotation']['currentValue'];
 
-            // Give the timeout enough time to avoid the race conflict.
-            setTimeout(() => {
-                let seekTime = parseFloat(this.selectedAnnotation.start);
-                this.api.seekTime(seekTime);
-                this.api.play();
-            }, 150)
-
-            // loop function
-            this.api.subscriptions.timeUpdate
-                .subscribe(() => {
-
-                    this.currentTime = this.api.currentTime;
-
-                    if (this.api.currentTime >= parseFloat(this.selectedAnnotation.end)) {
-                        this.api.seekTime(parseFloat(this.selectedAnnotation.start));
-                        this.api.play();
-                    }
-                })
+            if(prev != null && curr !=null && prev['key'] != curr['key']) this.setSeekTime();
         }
+    }
 
+    setSeekTime(){
+        // position the seek time according to the selected annotation
+        //  subscribe to seek time to reset seek position whenever it goes out of the bounds defined by the scrub handles 
+        if(this.selectedAnnotation) {
+            let seekTime = Number(this.selectedAnnotation['start']);
+            this.api.seekTime(seekTime);
+
+            // loop between scrub handles
+            this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(() => {
+                this.currentTime = Number(this.api.currentTime);
+                if (this.api.currentTime >= parseFloat(this.selectedAnnotation.end)) {
+                    this.api.seekTime(parseFloat(this.selectedAnnotation.start));
+                    this.api.play();
+                }
+            });
+        }
     }
 
     parseHtml(annotation) {
-        
         // value in template e.g '<div>%keyValue%</div>' will be replaced by 
         // the textvalue of corresponding keyValue
 
@@ -86,6 +95,9 @@ export class VrtVideoPlayer implements OnChanges {
         if(annotation.data.layer){
 
         }
+    }
 
+    isEmptyObject(obj){ 
+        return (typeof obj === 'object') ? (Object.keys(obj).length === 0) : true;
     }
 }
