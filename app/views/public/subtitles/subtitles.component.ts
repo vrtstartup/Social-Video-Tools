@@ -2,7 +2,7 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFire, FirebaseAuth, FirebaseAuthState, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
-import 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/upload.service';
 import { Project } from './models/project.model';
