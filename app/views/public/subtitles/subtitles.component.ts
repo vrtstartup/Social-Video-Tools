@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFire, FirebaseAuth, FirebaseAuthState, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
@@ -16,7 +16,7 @@ import testTemplate from './models/testTemplate.model';
   templateUrl: 'subtitles.component.html',
 })
 
-export class SubtitlesComponent implements OnInit, AfterViewChecked {
+export class SubtitlesComponent implements OnInit {
 
   userId: string;
   userMessage: string = '';
@@ -80,10 +80,6 @@ export class SubtitlesComponent implements OnInit, AfterViewChecked {
     if(this.selectedProjectId) this.openProject(this.selectedProjectId);
   }
 
-  ngAfterViewChecked(){
-    
-  }
-
   /* auth --------- */
   logout(event) {
     this.auth.logout();
@@ -101,11 +97,14 @@ export class SubtitlesComponent implements OnInit, AfterViewChecked {
     // create new empty project
     this.projectsRef.push({ user: this.userId })
       .then((ref) => {
-      
         this.projectRef = this.af.database.object(ref.toString());
         this.projectRef.subscribe((s: any) => {
           // new project model
           this.project = new Project(s);
+
+          if( this.project.remapAnnotationsTime() ){
+            this.updateProject();
+          };
         });
 
         // attach project id to user 
@@ -177,7 +176,17 @@ export class SubtitlesComponent implements OnInit, AfterViewChecked {
   updateSelectedAnnoTemplate(template) {
     // only update if you select a different template for the annotation
     if (template.name != this.selectedAnnotation.data.name) {
-      this.project.data['annotations'][`${this.selectedAnnotation.key}`]['data'] = template;
+      // update selectedAnno with new template
+      this.selectedAnnotation.data = template;
+      if (template.duration) {
+        // if duration exceeds movieLength
+        if (this.selectedAnnotation.start + template.duration > this.project.data.clip.movieLength) {
+          this.selectedAnnotation.start = this.project.data.clip.movieLength - template.duration;
+        }
+        this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
+      }
+
+      this.updateSelectedAnno(this.selectedAnnotation.key, this.selectedAnnotation);
       this.setSelectedAnno(this.selectedAnnotation.key);
       this.updateProject();
     }
