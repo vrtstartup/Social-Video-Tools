@@ -1,4 +1,5 @@
 # list of to-do's 
+  * confirmation email on registration to verify account
   * testing (deploy, templater bot, different formats and dimensions, automate testing)
   * cancel a job and do cleanup (remove from ffmpeg queue manage statuses)
   * cancel a job mid-render
@@ -29,3 +30,4 @@
   * styling front
   * rolselection and templates
   * documentatie
+  * bring in existing apps
