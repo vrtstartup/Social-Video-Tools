@@ -36,7 +36,7 @@ function handleQueue(jobs) {
 
   // does parsing return data? (e.g. not null etc)
   if (jobs) {
-    logger.verbose("processing queue...");
+    // logger.verbose("processing queue...");
 
     const jobs = [
       jobService.getFirst('ffmpeg-queue', 'render'),
