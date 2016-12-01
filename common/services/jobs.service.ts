@@ -15,7 +15,7 @@ export class Jobs {
     return this.fireBase.database.ref(`${queue}`).child(key).remove();
   }
 
-  getFirst(property:string) {
+  getFirst(property:string, operation: string) {
     // #todo implement logic for picking the proper job
     // get the first job from the queue stack
     const refProperty = this.fireBase.database.ref(property);
@@ -31,7 +31,7 @@ export class Jobs {
             const key = arrKeys[i];
             const job = jobs[key];
 
-            if(job.status === 'open'){
+            if(job.status === 'open' && job.operation === operation){
               job.id = key;
               resolve(job);
               break;
@@ -39,7 +39,7 @@ export class Jobs {
           }
         }
 
-        reject('No more jobs'); // no more available jobs
+        resolve(false); // no more available jobs
       });
     });
   }
