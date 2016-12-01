@@ -125,8 +125,7 @@ function handleSubtitles(project) {
   return new Promise((resolve, reject) => {
     if(project.hasAnnotations('subtitle')){
       logger.verbose('project has subtitles, preparing...');
-      subtitle.makeSrt(project)
-        .then(makeAss)
+      subtitle.makeAss(project)
         .then(resolve)
         .catch(errorHandler);
     } else{
