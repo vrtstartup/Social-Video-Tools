@@ -10,6 +10,7 @@ router.post('/', (req, res) => {
   // services
   const projectService = req.app.get('projects');
   const jobService = req.app.get('jobs');
+  const state = req.app.get('state');
 
   // params
   const projectId = req.body.projectId;
@@ -18,7 +19,8 @@ router.post('/', (req, res) => {
     .then( project => {
       const queue = project.hasOverlays() ? 'templater-queue' : 'ffmpeg-queue';
       const operation = project.hasOverlays() ? 'render-assets' : 'render';
-      jobService.queue(queue, projectId, operation);
+      state.updateState(project, 'render', false)
+        .then(data => jobService.queue(queue, projectId, operation));
     }).then(data => res.json({status: 'success'}));
 });
 

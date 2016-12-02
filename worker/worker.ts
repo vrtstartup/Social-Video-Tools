@@ -18,7 +18,8 @@ const stateService = new State(fireBase, logger);
 const jobService = new Jobs(fireBase, logger);
 const subtitle = new Subtitle(fireBase); //inject database
 
-let busyProcessing = false; // busy / idle state
+let busyProcessingLowres = false;
+let busyProcessingStitch = false;
 
 // attach listener to queue
 jobService.listenQueue(handleQueue);
@@ -27,25 +28,48 @@ function handleQueue(jobs) {
    /*
     * This function:
     *   - gets the first job from the queue
-    *   - sets job status to InProgress\
+    *   - sets job status to in progress
     *   - gets the related project data
     *   - processes the job
     *   - resolves the job
     */
 
   // does parsing return data? (e.g. not null etc)
-  if (jobs && !busyProcessing) {
-    logger.verbose("processing queue...");
+  if (jobs) {
+    // logger.verbose("processing queue...");
 
-    const job = jobService.getFirst('ffmpeg-queue')
-      .then((job:any) => {
-        busyProcessing = true;
+    const jobs = [
+      jobService.getFirst('ffmpeg-queue', 'render'),
+      jobService.getFirst('ffmpeg-queue', 'lowres'),
+    ];
+
+    Promise.all(jobs).then( data => {
+      const stitchingJob = data[0];
+      const lowresJob = data[1];
+
+      if(stitchingJob && !busyProcessingStitch) {
+        busyProcessingStitch = true;
+        const job = stitchingJob;
+
         jobService.setInProgress(job); // update job state
-        projectService.getProjectByJob(job)
-          .then( project => handleJob(job, project), errorHandler)
-          .then( project => jobService.resolve('ffmpeg-queue', job.id), errorHandler)
-          .then(done, errorHandler)
-      }, (warning) => logger.warn(warning))
+          projectService.getProjectByJob(job)
+            .then( project => handleJob(job, project), errorHandler)
+            .then( project => jobService.resolve('ffmpeg-queue', job['id']), errorHandler)
+            .then( fbData => done(job), errorHandler)
+      }
+
+      if(lowresJob && !busyProcessingLowres) {
+        busyProcessingLowres = true;
+        const job = lowresJob;
+
+        jobService.setInProgress(job); // update job state
+          projectService.getProjectByJob(job)
+            .then( project => handleJob(job, project), errorHandler)
+            .then( project => jobService.resolve('ffmpeg-queue', job['id']), errorHandler)
+            .then( fbData => done(job), errorHandler)
+      }
+    }, logger.info('no job found'))
+    .catch(errorHandler);
   }
 }
 
@@ -67,7 +91,7 @@ function handleJob(job, project) {
       case 'render':
         logger.verbose('processing render operation...');
         processRenderJob(project, job)
-          .then((project:Project) => stateService.updateState(project, 'render', 'done'))
+          .then((project:Project) => stateService.updateState(project, 'render', true))
           .then(resolve, reject);
         break;
 
@@ -125,8 +149,7 @@ function handleSubtitles(project) {
   return new Promise((resolve, reject) => {
     if(project.hasAnnotations('subtitle')){
       logger.verbose('project has subtitles, preparing...');
-      subtitle.makeSrt(project)
-        .then(makeAss)
+      subtitle.makeAss(project)
         .then(resolve)
         .catch(errorHandler);
     } else{
@@ -136,10 +159,11 @@ function handleSubtitles(project) {
   });
 }
 
-function done() {
+function done(job) {
   // go to idle state
   logger.verbose("Done, new job possible");
-  busyProcessing = false;
+  if(job['operation'] === 'render') busyProcessingStitch = false;
+  if(job['operation'] === 'lowres') busyProcessingLowres = false;
 
   jobService.checkQueue(handleQueue);
 }

@@ -9,6 +9,7 @@ import { Project } from './models/project.model';
 
 // TODO remove | only for test purposes
 import testTemplate from './models/testTemplate.model';
+import testStyles from './models/testStyles.model';
 
 @Component({
   providers: [UploadService],
@@ -32,6 +33,7 @@ export class SubtitlesComponent implements OnInit {
   project: any;
   selectedAnnotation: any;
   templatesRef: FirebaseObjectObservable<any[]>;
+  stylesRef: FirebaseObjectObservable<any[]>;
   templates: any[];
   selectedTemplate: any;
   selectedProjectId: string;
@@ -57,12 +59,15 @@ export class SubtitlesComponent implements OnInit {
     this.templatesRef = af.database.object('/templates');
     this.templatesRef.subscribe((s: any) => this.templates = s);
 
+    this.stylesRef = af.database.object('/styles');
+
     // interface
     this.showOpenDialog = false;
 
     // TODO remove | only for test purposes | 
     // should only be set once => when server restarts
     this.templatesRef.set(testTemplate);
+    this.stylesRef.set(testStyles);
   }
 
   ngOnInit() {

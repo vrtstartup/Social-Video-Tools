@@ -1,6 +1,7 @@
 export default {
     subtitle: {
         name: 'subtitle',
+        style: 'subtitle',
         text: {
             textInpt01: {
                 label: 'Title',

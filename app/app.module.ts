@@ -16,6 +16,7 @@ import { ProjectService } from './common/services/project.service';
 import firebaseConfig from './config/firebase.config';
 import { AuthGuard } from './common/guards/auth';
 import { NoAuthGuard } from './common/guards/noAuth';
+import { AdminGuard } from './common/guards/admin';
 
 import { AppComponent } from './app.component';
 import { LoginForm } from './views/public/auth/components/login/login-form';
@@ -24,9 +25,12 @@ import { LoginForm } from './views/public/auth/components/login/login-form';
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
 import { OpenComponent } from './views/public/subtitles/components/open.component';
+import { ProgressComponent } from './views/public/subtitles/components/progress.component';
+import { ProgressBarComponent } from './views/public/subtitles/components/progressbar.component';
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { AuthComponent } from './views/public/auth/authentication.component';
 import { DownloadComponent } from './views/public/download/download.component';
+import { AdminComponent } from './views/public/admin/admin.component';
 import { MenuComponent } from './views/public/partials/menu.component';
 
 
@@ -43,8 +47,11 @@ import { NgInitDir } from './common/directives/ngInit.directive'
         // VrtAppsComponent,
         SubtitlesComponent,
         OpenComponent,
+        ProgressComponent,
+        ProgressBarComponent,
         AuthComponent,
         DownloadComponent,
+        AdminComponent,
         MenuComponent,
         RangeSliderComponent,
         LoginForm,
@@ -70,7 +77,7 @@ import { NgInitDir } from './common/directives/ngInit.directive'
         FormsModule,
         ReactiveFormsModule,
     ],
-    providers: [ExtBrowserXhr, AuthGuard, NoAuthGuard, ProjectService],
+    providers: [ExtBrowserXhr, AuthGuard, NoAuthGuard, AdminGuard, ProjectService],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

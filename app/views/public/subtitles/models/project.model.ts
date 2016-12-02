@@ -178,6 +178,10 @@ export class Project {
         }
     }
 
+    isRendering(){
+        return (this.data.hasOwnProperty('status') && this.data.status.hasOwnProperty('stitchingProgress') && this.data.status.hasOwnProperty('stitchingProgress') !== null)
+    }
+
     private checkStatus(status: Object) { 
         return (this.data.hasOwnProperty('status') && this.data.status[status['label']]) ? true : false;
 

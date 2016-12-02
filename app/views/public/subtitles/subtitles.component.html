@@ -13,28 +13,14 @@
 	
 	<open-dialog class="dialog" [class.closed]="!showOpenDialog" [openedProject]="project ? project:null" (selectionUpdated)="openProject($event)"></open-dialog>
 
-	<div class="s-status" *ngIf="project?.data">
-		<!--erro message upload|project -->
-		<div class="s-status-error" *ngIf="userMessage">{{userMessage}}</div>
-
-		<!--progressbar upload-->
-		<div class="s-progress" *ngIf="uploadProgress > 0 && uploadProgress < 100">
-			<div class="s-progress__label">uploading</div>
-			<div class="s-progress__bg" *ngIf="uploadProgress">
-				<div class="s-progress__bar" [style.width]="uploadProgress + '%'"></div>
-			</div>
-		</div>
-
-		<!--progressbar downscaling-->
-		<div class="s-progress" *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100">
-			<div class="s-progress__label">downscaling</div>
-			<div class="s-progress__bg" *ngIf="project.data?.status.downScaleProgress">
-				<div class="s-progress__bar" [style.width]="project.data?.status?.downScaleProgress + '%'"></div>
-			</div>
-		</div>
+	<div *ngIf="project?.data">
+		<progress-bar *ngIf="uploadProgress > 0 && uploadProgress < 100" [task]="'uploading'" [progress]="uploadProgress"></progress-bar>
+		<progress-bar *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100" [task]="'downscaling'" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
 	</div>
 
-	<div class="s-submenu" *ngIf="project">
+	<progress-dialog *ngIf="project && project.isRendering()" [project]="project"></progress-dialog>
+
+	<div class="s-submenu" *ngIf="project && !project.isRendering()">
 		<!--once downscaled show controls-->
 		<div *ngIf="project?.data?.status?.downscaled">
 			<button type="button" class="btn btn-secondary" (click)="addAnnotation()">Add Annotation(U)</button>
@@ -45,7 +31,7 @@
 		</div>
 	</div>
 
-	<div class="s-sub-controls" *ngIf="project?.data?.status?.downscaled">
+	<div class="s-sub-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
 		
 		<!--annotations-->
 		<div class="s-sub__wrapper">
