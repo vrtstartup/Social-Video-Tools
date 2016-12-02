@@ -102,9 +102,10 @@ export class SubtitlesComponent implements OnInit {
           // new project model
           this.project = new Project(s);
 
-          if( this.project.remapAnnotationsTime() ){
+          if (this.project.remapAnnotationsTime() ){
             this.updateProject();
           };
+          
         });
 
         // attach project id to user 
@@ -150,6 +151,12 @@ export class SubtitlesComponent implements OnInit {
 
   /* annotations -- */
   addAnnotation() {
+    // add bumper
+    // if ( !this.project.hasBumper ){
+    //   this.project.addAnnotation( this.templates['bumper'] );
+    //   //this.updateProject();
+    // }
+
     let newAnno = this.project.addAnnotation( this.templates['subtitle']);
     this.updateSelectedAnno(newAnno.key, newAnno);
   }
