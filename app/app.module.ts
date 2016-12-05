@@ -30,8 +30,11 @@ import { ProgressBarComponent } from './views/public/subtitles/components/progre
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { AuthComponent } from './views/public/auth/authentication.component';
 import { DownloadComponent } from './views/public/download/download.component';
-import { AdminComponent } from './views/public/admin/admin.component';
+import { DashboardComponent } from './views/public/admin/dashboard.component';
+import { UsersComponent } from './views/public/admin/users.component';
+import { ProjectsComponent } from './views/public/admin/projects.component';
 import { MenuComponent } from './views/public/partials/menu.component';
+import { AdminMenuComponent } from './views/public/partials/adminMenu.component';
 
 
 import { ListPipe } from './common/pipes/list.pipe';
@@ -51,7 +54,10 @@ import { NgInitDir } from './common/directives/ngInit.directive'
         ProgressBarComponent,
         AuthComponent,
         DownloadComponent,
-        AdminComponent,
+        DashboardComponent,
+        UsersComponent,
+        ProjectsComponent,
+        AdminMenuComponent,
         MenuComponent,
         RangeSliderComponent,
         LoginForm,
