@@ -6,16 +6,14 @@ import * as resolver from '../../common/services/resolver.service';
 
 
 export class State {
-  private fireBase; 
   private projectService; 
   private jobService;
   private emailService;
   private logger;
 
-  constructor(fireBase:any, logger?: any) { 
-    this.fireBase = fireBase;
-    this.projectService = new Projects(this.fireBase, logger);
-    this.jobService = new Jobs(this.fireBase, logger);
+  constructor(logger?: any) { 
+    this.projectService = new Projects(logger);
+    this.jobService = new Jobs(logger);
     this.emailService = new Email(logger);
     this.logger = logger ? logger : null;
   }

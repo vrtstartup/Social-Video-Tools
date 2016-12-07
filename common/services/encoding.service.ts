@@ -1,4 +1,3 @@
-// #todo: rename to encoding.service
 import {spawn, spawnSync, execFile} from 'child_process';
 import * as resolver from '../../common/services/resolver.service';
 import { config } from '../../common/config';
@@ -8,7 +7,6 @@ const path = require('path');
 
 const logger = config.logger;
 
-// #todo order of parameters should be the same for each function...
 export function ffprobe (project) {
   logger.verbose('Starting FFprobe'); 
   const baseDir = project.data.files.baseDir;

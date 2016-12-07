@@ -1,15 +1,15 @@
+import { db } from './firebase.service';
+
 export class Templates {
-  private fireBase;
   private logger;
 
-  constructor(fireBase:any, logger: any) { 
-    this.fireBase = fireBase;
+  constructor(logger: any) { 
     this.logger = logger;
   }
 
   getAll() {
     return new Promise((resolve, reject) => {
-      this.fireBase.database.ref('templates').once('value')
+      db.ref('templates').once('value')
         .then(snapshot => resolve(snapshot.val()), err => this.logger.error(err));
     });
   }

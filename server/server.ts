@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { FireBase } from '../common/services/firebase.service';
+import { db } from '../common/services/firebase.service';
 import { Projects } from '../common/services/projects.service';
 import { Jobs } from '../common/services/jobs.service';
 import { Templates } from '../common/services/templates.service';
@@ -17,11 +17,10 @@ const bodyParser = require('body-parser');
 
 // init firebase
 // const db = FireBase.database();
-const fireBase = new FireBase();
-const projects = new Projects(fireBase, logger);
-const state = new State(fireBase, logger);
-const jobs = new Jobs(fireBase, logger);
-const templates = new Templates(fireBase, logger);
+const projects = new Projects(logger);
+const state = new State(logger);
+const jobs = new Jobs(logger);
+const templates = new Templates(logger);
 
 // init server
 const server = express();

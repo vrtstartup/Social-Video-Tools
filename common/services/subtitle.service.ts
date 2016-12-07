@@ -6,15 +6,12 @@ import { logger } from '../../common/config/winston';
 import { Styles } from '../../common/services/styles.service';
 
 export class Subtitle {
-
-  private fireBase;
   private logger;
   private styleService;
 
-  constructor(fireBase:any) { 
-    this.fireBase = fireBase;
+  constructor() { 
     this.logger = logger;
-    this.styleService = new Styles(this.fireBase, this.logger);
+    this.styleService = new Styles(this.logger);
   }
 
   makeAss(project){

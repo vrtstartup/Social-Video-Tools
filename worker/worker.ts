@@ -2,7 +2,7 @@ require('ts-node/register');
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { FireBase } from '../common/services/firebase.service';
+import { db } from '../common/services/firebase.service';
 import { Jobs } from '../common/services/jobs.service';
 import { Projects } from '../common/services/projects.service';
 import { Project } from '../common/classes/project';
@@ -12,12 +12,10 @@ import { ffprobe, scaleDown, stitch } from '../common/services/encoding.service'
 import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 
-// services and dependencies
-const fireBase = new FireBase();
-const projectService = new Projects(fireBase, logger);
-const stateService = new State(fireBase, logger);
-const jobService = new Jobs(fireBase, logger);
-const subtitle = new Subtitle(fireBase); //inject database
+const projectService = new Projects(logger);
+const stateService = new State(logger);
+const jobService = new Jobs(logger);
+const subtitle = new Subtitle();
 
 let busyProcessingLowres = false;
 let busyProcessingStitch = false;
