@@ -12,7 +12,7 @@ const logger = config.logger;
 export function ffprobe (project) {
   logger.verbose('Starting FFprobe'); 
   const baseDir = project.data.files.baseDir;
-  const input = resolver.getProjectFilePath('source', baseDir);
+  const input = resolver.storageUrl('source', baseDir);
 
   return new Promise((resolve, reject) => {
       const args = [
@@ -66,7 +66,7 @@ export function ffprobe (project) {
 export function scaleDown(project, messageHandler, job) {
     const baseDir = project.data.files.baseDir;
     const lowresFileName = resolver.getFileNameByType('lowres', baseDir);
-    const input = resolver.getProjectFilePath('source', baseDir);
+    const input = resolver.storageUrl('source', baseDir); //#todo input stream instead of HTTP
     const output = resolver.destinationFile('lowres', baseDir, lowresFileName);
     const scaleFilter = `scale='min(${config.encoding.videoMaxWidth.toString()}\\,iw):-2'`;
 
@@ -92,27 +92,6 @@ export function scaleDown(project, messageHandler, job) {
     });
 };
 
-export function makeAss(project) {
-    return new Promise((resolve, reject) => {
-        const baseDir = project.data.files.baseDir; 
-        const srtFile = resolver.getProjectFilePath('srt', baseDir);
-        const assFile = resolver.getProjectFilePath('ass', baseDir);
-
-        let command = new FfmpegCommand(srtFile, {logger:logger})
-            .output(assFile)
-            .on('error', (err) => { 
-                logger.error(err);
-                reject(err);
-            })
-            .on('start', (commandLine) => {logger.debug('Spawned Ffmpeg with command: ' + commandLine)})
-            .on('end', () => {
-                logger.verbose('done burning subs'); 
-                resolve(project);
-            })
-            .run();
-    });
-}
-
 export function stitch(project, job, messageHandler) {
     // project data
     const clipData = project.data.clip;
@@ -129,7 +108,7 @@ export function stitch(project, job, messageHandler) {
 
     // project files
     const assFile = resolver.getProjectFilePath('ass', baseDir);
-    const sourceFile = resolver.getProjectFilePath('source', baseDir);
+    const sourceFile = resolver.storageUrl('source', baseDir); //#todo input stream instead of HTTP
     const renderFile = resolver.getProjectFilePath('render', baseDir);
     const outroFile = outro.filePath;
 

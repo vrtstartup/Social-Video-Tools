@@ -5,47 +5,56 @@ export const fileConfig = {
   sharedDirectory: resolve('data', 'shared'),
   files: {
     source: {
-      directory: 'source',
+      directory: './',
       name: 'source_file',
       extension: 'mp4',
+      mime: 'video/mp4',
     },
     lowres: {
-      directory: 'build_artefacts',
+      directory: './',
       name: 'scaled_down',
       extension: 'mp4',
+      mime: 'video/mp4',
     },
     srt: {
-      directory: 'build_artefacts',
+      directory: './',
       name: 'subtitles',
       extension: 'srt',
+      mime: 'text/plain',
     },
     ass: {
-      directory: 'build_artefacts',
+      directory: './',
       name: 'subtitles',
       extension: 'ass',
+      mime: 'text/plain',
     },
     render: {
-      directory: 'out',
+      directory: './',
       name: 'render',
       extension: 'mp4',
+      mime: 'video/mp4',
     },
     subtitledSource: {
-      directory: 'build_artefacts',
+      directory: './',
       name: 'sourceSubtitled',
       extension: 'mp4',
+      mime: 'video/mp4',
     },
     overlay: {
       directory: 'overlays',
       extension: 'mov',
+      mime: 'video/quicktime',
     },
     outro: {
       directory: 'bumpers',
       extension: 'mov',
+      mime: 'video/quicktime',
       shared: true
     },
     logo: {
       directory: 'logo',
       extension: 'mov',
+      mime: 'video/quicktime',
       shared: true,
     }
   }

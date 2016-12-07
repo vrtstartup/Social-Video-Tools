@@ -2,73 +2,19 @@ const subtitle = require('subtitle');
 
 import * as fs from 'fs';
 import * as resolve from '../../common/services/resolver.service';
-import { State } from '../../common/services/state.service';
 import { logger } from '../../common/config/winston';
 import { Styles } from '../../common/services/styles.service';
 
 export class Subtitle {
 
   private fireBase;
-  private state: State;
   private logger;
   private styleService;
 
   constructor(fireBase:any) { 
     this.fireBase = fireBase;
     this.logger = logger;
-    this.state = new State(this.fireBase, this.logger);
     this.styleService = new Styles(this.fireBase, this.logger);
-  }
-
-
-  /*
-  * given arbitrary project data, iterate over 'titles' property and 
-  * add contents to a generated .srt file
-  */
-  makeSrt(project) {
-    const subs = project.getAnnotations('subtitle');
-    let arrKeys: any[] = Object.keys(subs);
-    const file = resolve.getProjectFilePath('srt', project.data.files.baseDir);
-    const counter = 1;
-    const captions = new subtitle();
-
-    if(project.hasAnnotations('subtitle')){
-      arrKeys.forEach((key: any) => {
-        const data = subs[key]['data'];
-
-        const sub = {
-          start: String(subs[key]['start'] *= 1000),
-          end: String(subs[key]['end'] *= 1000),
-          text: data['text']['textInpt01']['text']
-        }
-
-        captions.add(sub);
-      });
-    }
-    
-    // Return a promise 
-    return new Promise((resolve, reject) => {
-      // wite to file 
-      fs.open(file, 'w+', (err, fd) => {
-        if (err) {
-          if (err.code === "EEXIST") {
-            logger.warn('.srt file already exists');
-            reject(err);
-            return;
-          } else {
-            throw err;
-          }
-        }
-
-        const stream = fs.createWriteStream(file);
-        stream.write(captions.stringify(), 'utf-8', () => {
-          stream.close();
-          this.state.updateState(project, 'subtitles', true)
-            .then(resolve)
-        });
-        stream.on('error', (err) => reject(err));
-      });
-    })
   }
 
   makeAss(project){
@@ -97,7 +43,7 @@ export class Subtitle {
 
           // initiate write stream
           const stream = fs.createWriteStream(file);
-
+          
           // write script info
           stream.write('[Script Info]\n', 'utf-8');
           stream.write('Title: Nieuwshub subtitles\n');
@@ -127,7 +73,7 @@ export class Subtitle {
           });
 
           stream.write('\n', 'utf8', () => stream.end());
-
+          
           stream.on('error', (err) => reject(err));
           stream.on('close', (data) => resolve(project));
         });

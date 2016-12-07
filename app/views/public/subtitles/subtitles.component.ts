@@ -138,16 +138,29 @@ export class SubtitlesComponent implements OnInit {
   /* upload ------- */
   uploadSource($event, key) {
     // file-ref to upload
-    let source = $event.target.files[0];
+    let sourceFile = $event.target.files[0];
     // upload video
-    this.uploadService.makeFileRequest('api/upload/source', source, key)
-      .subscribe(
-        data => { this.userMessage = '' },
-        err => {
-          console.log('error: makeFileRequest:', err);
-          this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
-        }
-      );
+    this.uploadService.getSignedRequest(sourceFile, key)
+      .then((data: Object) => {
+        this.uploadService.uploadFile(data['file'], data['response']['signedRequest'])
+          .subscribe(
+            data => {
+              // done uploading to s3
+              this.userMessage ='';
+
+              // update state 
+              this.http.post('api/state/update', { 
+                projectId: this.project.key,
+                state: 'uploaded',
+                value: true
+              }).subscribe((data) => { });
+            },
+            err => {
+              console.log('error: makeFileRequest:', err);
+              this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
+            }
+          );
+      });
   }
 
   updateSource($event) {
@@ -221,7 +234,7 @@ export class SubtitlesComponent implements OnInit {
 
   /* render ------- */
   addToRenderQueue() {
-    this.http.post('api/render', { projectId: this.project.key })
+    this.http.post('api/render/stitch', { projectId: this.project.key })
       .subscribe((data) => { });
   }
 

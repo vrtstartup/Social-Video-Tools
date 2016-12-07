@@ -7,7 +7,8 @@ import { Jobs } from '../common/services/jobs.service';
 import { Projects } from '../common/services/projects.service';
 import { Project } from '../common/classes/project';
 import { State } from '../common/services/state.service';
-import { ffprobe, scaleDown, stitch, makeAss } from '../common/services/encoding.service';
+import * as storage from '../common/services/storage.service';
+import { ffprobe, scaleDown, stitch } from '../common/services/encoding.service';
 import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 
@@ -120,6 +121,7 @@ function processLowResJob(project, job) {
           clip: project['data']['clip']
         }))
         .then(project => scaleDown(project, progressHandler, job))
+        .then(project => storage.uploadFile(project, 'lowres'))
         .then(resolve)
         .catch(err => jobService.kill(job.id, err));
     });
@@ -137,7 +139,9 @@ function processRenderJob(project,job) {
 
     return new Promise((resolve, reject) => {
         handleSubtitles(project)
+          .then(project => storage.uploadFile(project, 'ass'))
           .then(project => stitch(project, job, progressHandler))
+          .then(project => storage.uploadFile(project, 'render'))
           .then(resolve)
           .catch(err => jobService.kill(job.id, err));
     });

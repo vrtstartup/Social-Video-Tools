@@ -31,6 +31,7 @@ const uploadRoutes = require('./routes/upload.routes');
 const fileRoutes = require('./routes/file.routes');
 const templaterRoutes = require('./routes/templater.routes');
 const renderRoutes = require('./routes/render.routes');
+const stateRoutes = require('./routes/state.routes');
 
 server.set('projects', projects);
 server.set('state', state);
@@ -62,6 +63,7 @@ server.use('/api/upload', uploadRoutes);
 server.use('/api/file', fileRoutes);
 server.use('/api/templater', templaterRoutes);
 server.use('/api/render', renderRoutes);
+server.use('/api/state', stateRoutes);
 
 server.use('*', express.static(pathToClient));
 
