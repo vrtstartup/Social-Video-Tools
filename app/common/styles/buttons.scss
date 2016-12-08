@@ -1,0 +1,21 @@
+.s-btn {
+    background: $s-link;
+    border: 0;
+    color: white;
+    border-radius: .25rem;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.25;
+    padding: .5rem 1rem;
+    text-align: center;
+    user-select: none;
+    vertical-align: middle;
+    white-space: nowrap;
+    &--outline { 
+        background: none;
+        border: 2px solid lighten($s-primary, 10%);
+        color: $s-link;
+    }
+}
