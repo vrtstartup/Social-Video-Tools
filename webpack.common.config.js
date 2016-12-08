@@ -70,9 +70,10 @@ module.exports = function () {
                 minimize: true,
                 debug: false
             }),
-            new CopyWebpackPlugin([{ 
-                from: 'node_modules/videogular2/fonts', to: 'fonts' 
-            }]),
+            new CopyWebpackPlugin([
+                { from: 'node_modules/videogular2/fonts', to: 'fonts' },
+                { from: './app/assets/', to: 'assets' },
+            ]),
             new webpack.DefinePlugin({
                 'ENV': JSON.stringify( config.env ),
             }),
