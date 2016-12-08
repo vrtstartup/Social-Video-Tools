@@ -1,21 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
-import { User } from '../../views/public/subtitles/models/user.model';
-import { AngularFire, FirebaseListObservable} from 'angularfire2';
+import { AngularFire } from 'angularfire2'; // FirebaseAuth acts as our authentication service
 
 @Injectable()
-export class UserService{
-    /*
-    * map the AngularFire /projects stream to a new stream, which wraps the raw data
-    * in Project()-class objects.
-    */
-    public users$: Observable<any>;
+export class UserService {
 
-    constructor(private af:AngularFire) {
-      this.users$ = af.database.list('/users').map(UserData => {
-        const arrUsers: Array<User> = [];
-        UserData.forEach(UserData => arrUsers.push(new User(UserData)));
-        return arrUsers;
-      });
+    public user$: Observable<any>;
+
+    constructor(private af: AngularFire) {
+        console.log('userService init')        
+        this.user$ = this.af.auth.flatMap(auth => {
+            if(auth){
+                return this.af.database.object(`/users/${auth['uid']}`).map(userData => {
+                    userData.userID = auth.uid;
+                    userData.email = auth.auth.email;
+
+                    return userData;
+                });
+            }  
+        });
     }
+
 }

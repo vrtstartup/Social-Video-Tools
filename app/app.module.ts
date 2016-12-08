@@ -13,14 +13,16 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import{ routing } from './common/services/routing.service';
 import { ProjectService } from './common/services/project.service';
+import { UserService } from './common/services/user.service';
+
 import firebaseConfig from './config/firebase.config';
-import { AuthGuard } from './common/guards/auth';
-import { NoAuthGuard } from './common/guards/noAuth';
-import { AdminGuard } from './common/guards/admin';
+//import { AuthGuard } from './common/guards/auth';
+//import { NoAuthGuard } from './common/guards/noAuth';
+//import { AdminGuard } from './common/guards/admin';
+import { RoleGuard } from './common/guards/role.guard';
 
 import { AppComponent } from './app.component';
 import { LoginForm } from './views/public/auth/components/login/login-form';
-// import { VrtAppsComponent } from './views/public/vrtapps.component';
 
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
@@ -32,22 +34,25 @@ import { AuthComponent } from './views/public/auth/authentication.component';
 import { DownloadComponent } from './views/public/download/download.component';
 import { DashboardComponent } from './views/public/admin/dashboard.component';
 import { UsersComponent } from './views/public/admin/users.component';
-import { ProjectsComponent } from './views/public/admin/projects.component';
+//import { ProjectsComponent } from './views/public/admin/projects.component';
+import { ProjectsComponent } from './views/public/subtitles/components/projects.component';
 import { MenuComponent } from './views/public/partials/menu.component';
 import { AdminMenuComponent } from './views/public/partials/adminMenu.component';
 
+// currently only used for mdicon
+import { MaterialModule } from '@angular/material';
+import 'hammerjs';
 
 import { ListPipe } from './common/pipes/list.pipe';
 import { SortByPropPipe } from './common/pipes/sortByProp.pipe';
 import { KeysPipe } from './common/pipes/keys.pipe';
 
-import { NgInitDir } from './common/directives/ngInit.directive'
+import { NgInitDir } from './common/directives/ngInit.directive';
 
 @NgModule({
     declarations: [
         AppComponent,
         VrtVideoPlayer,
-        // VrtAppsComponent,
         SubtitlesComponent,
         OpenComponent,
         ProgressComponent,
@@ -64,9 +69,10 @@ import { NgInitDir } from './common/directives/ngInit.directive'
         ListPipe,
         SortByPropPipe,
         KeysPipe,
-        NgInitDir
+        NgInitDir,
     ],
     imports: [
+        [MaterialModule.forRoot()],
         BrowserModule, 
         FormsModule,
         ReactiveFormsModule,
@@ -83,7 +89,7 @@ import { NgInitDir } from './common/directives/ngInit.directive'
         FormsModule,
         ReactiveFormsModule,
     ],
-    providers: [ExtBrowserXhr, AuthGuard, NoAuthGuard, AdminGuard, ProjectService],
+    providers: [ExtBrowserXhr, ProjectService, UserService, RoleGuard],
     bootstrap: [AppComponent],
 })
 export class AppModule {}
