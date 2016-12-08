@@ -6,12 +6,10 @@ import { logger } from '../../common/config/winston';
 import { Styles } from '../../common/services/styles.service';
 
 export class Subtitle {
-  private logger;
   private styleService;
 
   constructor() { 
-    this.logger = logger;
-    this.styleService = new Styles(this.logger);
+    this.styleService = new Styles();
   }
 
   makeAss(project){

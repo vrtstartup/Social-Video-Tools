@@ -1,17 +1,16 @@
 import { db } from '../../common/services/firebase.service';
+import { logger } from '../config/winston';
 
 export class Jobs {
-  private logger;
   public refFfmpegQueue: any;
 
-  constructor(logger: any) { 
-    this.logger = logger;
+  constructor() { 
     this.refFfmpegQueue = db.ref('ffmpeg-queue');
   }
 
   resolveJob(queue:string, key: string) {
     // get reference 
-    this.logger.verbose('successfully processed job...');
+    logger.verbose('successfully processed job...');
     return db.ref(`${queue}`).child(key).remove();
   }
 
@@ -58,12 +57,12 @@ export class Jobs {
 
   resolve(queue:string, key: string) {
     // get reference 
-    this.logger.verbose('successfully processed job...');
+    logger.verbose('successfully processed job...');
     return db.ref(`${queue}`).child(key).remove();
   }
 
   kill(key, err) {
-    this.logger.error(err);
+    logger.error(err);
     // make sure that faulty, error-throwing jobs dont get stuck in an execution loop
     return db.ref("ffmpeg-queue").child(key).update({
       status: 'error',
@@ -83,7 +82,7 @@ export class Jobs {
       const jobs = snapshot.val();
       handler(jobs);
     }, (errorObject) => {
-      this.logger.error(`The read failed: ${errorObject.code}`);
+      logger.error(`The read failed: ${errorObject.code}`);
     });
   }
 
@@ -94,7 +93,7 @@ export class Jobs {
 
       handler(jobs);
     }, (errorObject) => {
-      this.logger.error(`The read failed: ${errorObject.code}`);
+      logger.error(`The read failed: ${errorObject.code}`);
     });
   }
 

@@ -3,19 +3,17 @@ import { Jobs } from '../../common/services/jobs.service';
 import { Project } from '../../common/classes/project';
 import { Email } from '../../common/services/email.service';
 import * as resolver from '../../common/services/resolver.service';
-
+import { logger } from '../config/winston';
 
 export class State {
   private projectService; 
   private jobService;
   private emailService;
-  private logger;
 
-  constructor(logger?: any) { 
-    this.projectService = new Projects(logger);
-    this.jobService = new Jobs(logger);
-    this.emailService = new Email(logger);
-    this.logger = logger ? logger : null;
+  constructor() { 
+    this.projectService = new Projects();
+    this.jobService = new Jobs();
+    this.emailService = new Email();
   }
 
   /*
@@ -89,12 +87,12 @@ export class State {
         break;
         
         default:
-          this.logger.warn('handling unknown status change!');
+          logger.warn('handling unknown status change!');
           break;
         
       }
     });
   }
 
-  private errorHandler(err) { this.logger.error(err) };
+  private errorHandler(err) { logger.error(err) };
 }

@@ -12,9 +12,9 @@ import { ffprobe, scaleDown, stitch } from '../common/services/encoding.service'
 import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 
-const projectService = new Projects(logger);
-const stateService = new State(logger);
-const jobService = new Jobs(logger);
+const projectService = new Projects();
+const stateService = new State();
+const jobService = new Jobs();
 const subtitle = new Subtitle();
 
 let busyProcessingLowres = false;

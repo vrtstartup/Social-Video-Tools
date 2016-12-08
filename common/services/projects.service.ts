@@ -1,12 +1,9 @@
 import { Project } from '../../common/classes/project';
 import { db } from '../../common/services/firebase.service';
+import { logger } from '../config/winston';
 
 export class Projects {
-  private logger;
-
-  constructor(logger?: any) { 
-    this.logger = logger ? logger : null;
-  }
+  constructor() {}
 
   getProjectByJob(job:any) {
     const refProject = db.ref(`projects/${job.id}`);
@@ -18,8 +15,8 @@ export class Projects {
         // for conveniece sake, append the project ID to the return object
         const projectData = snapshot.val();
         projectData.id=snapshot.key;
-        return new Project(projectData, this.logger);
-      }, err => this.logger.error(err) )
+        return new Project(projectData, logger);
+      }, err => logger.error(err) )
   }
 
   getProjectById(id:string) {
@@ -30,7 +27,7 @@ export class Projects {
       .then( snapshot => {
         const projectData = snapshot.val();
         projectData.id=snapshot.key;
-        resolve(new Project(projectData, this.logger));
+        resolve(new Project(projectData, logger));
       }).catch(reject);
     });
   }

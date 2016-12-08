@@ -17,10 +17,10 @@ const bodyParser = require('body-parser');
 
 // init firebase
 // const db = FireBase.database();
-const projects = new Projects(logger);
-const state = new State(logger);
-const jobs = new Jobs(logger);
-const templates = new Templates(logger);
+const projects = new Projects();
+const state = new State();
+const jobs = new Jobs();
+const templates = new Templates();
 
 // init server
 const server = express();
