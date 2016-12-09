@@ -25,7 +25,11 @@ export class LoginForm implements OnInit {
     });
   }
 
-  ngOnInit() { }
+  ngOnInit() { 
+    // #todo remove this, workaround broken register
+    const credentialsA = { email: 'matthias.devriendt@vrt.be', password: 'test123' };
+    this.register(credentialsA);
+  }
 
   login(event) {
     event.preventDefault();
