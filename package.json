@@ -12,8 +12,7 @@
     "uploader:dev": "node uploader --ext js,ts",
     "clean": "rm -rf dist",
     "build-dev": "npm run clean && webpack --config webpack.dev.js",
-    "build-prod": "npm run clean && webpack --config webpack.prod.js",
-    "postinstall": "npm run build:dev"
+    "build-prod": "npm run clean && webpack --config webpack.prod.js"
   },
   "keywords": [
     "angular2",
