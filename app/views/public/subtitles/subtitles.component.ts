@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
@@ -18,7 +18,7 @@ import testStyles from '../../../common/models/testStyles.model';
   templateUrl: 'subtitles.component.html',
 })
 
-export class SubtitlesComponent implements OnInit {
+export class SubtitlesComponent implements OnInit, OnDestroy {
 
   userId: string;
   userMessage: string = '';
@@ -40,6 +40,7 @@ export class SubtitlesComponent implements OnInit {
   selectedProjectId: string;
 
   showOpenDialog: boolean;
+  userSubscribtion: any;
 
   constructor(
     af: AngularFire,
@@ -70,12 +71,12 @@ export class SubtitlesComponent implements OnInit {
     this.templatesRef.set(testTemplate);
     this.stylesRef.set(testStyles);
   }
-  
+
   ngOnInit() {
-    this.userService.user$.subscribe( 
+    this.userSubscribtion = this.userService.user$.subscribe( 
       data => this.userId = data.userID ,
       err => console.log('authserviceErr', err)
-     ).unsubscribe();
+     );
     
     // subscribe to service observable
     this.uploadService.progress$
@@ -86,6 +87,10 @@ export class SubtitlesComponent implements OnInit {
 
     this.selectedProjectId =  this.route.snapshot.params['id'];
     if(this.selectedProjectId) this.openProject(this.selectedProjectId);
+  }
+
+  ngOnDestroy(){
+    this.userSubscribtion.unsubscribe();
   }
 
   /* project ------ */
