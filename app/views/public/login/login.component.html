@@ -1,0 +1,69 @@
+<div class="s-login">
+    <div class="s-login-background" style="background: #ccc url('https://goo.gl/bcZhpy') 50% / cover;"></div>
+
+    <div class="s-login__signin">    
+        <a *ngIf="!registerFlag" class="s-btn s-btn--outline" (click)="onClickRegister()">Sign In</a>
+        <a *ngIf="registerFlag" class="s-btn s-btn--outline" (click)="onClickRegister()">Login</a>
+    </div>
+
+    <div class="s-login__wrapper">
+
+        <!--Authenticate-->
+        <div class="s-login__form" *ngIf="!registerFlag">
+            <form class="s-form" [formGroup]="loginForm" (submit)="login($event)" autocomplete="off" novalidate>
+                
+                <div class="s-form__row s-info">{{errorMessage | json}}</div>
+
+                <div class="s-form__row">
+                    <input formControlName="email" type="email" placeholder="Your email">
+                    <p class="s-form__error" *ngIf="loginForm.controls.email.errors && loginForm.controls.email.touched">
+                        Oops, Please provide a valid email address!
+                    </p>
+                </div>
+
+                <div class="s-form__row">
+                    <input formControlName="password" type="password" placeholder="Your password">
+                    <p class="s-form__error" *ngIf="loginForm.controls.password.errors && loginForm.controls.password.touched">
+                        Min 6 characters!
+                    </p>
+                </div>
+
+                <div class="s-form__row">
+                    <button class="s-btn s-btn--large s-btn--display-block s-formfield" type="submit">Log in</button>
+                </div>
+                <div class="s-form__row">
+                    <small class="s-link">Forgot password?</small>
+                </div>
+            </form>
+        </div>
+
+        <!--Register-->
+        <div class="s-login__form" *ngIf="registerFlag">
+
+            <div class="s-info">{{errorMessage | json}}</div>
+            <form [formGroup]="registerForm" (submit)="register($event)" autocomplete="nope" novalidate>
+                <div class="s-form__row">
+                    <input formControlName="email" type="email" placeholder="Your email">
+                    <p class="s-form__error" *ngIf="registerForm.controls.email.errors && loginForm.controls.email.touched">
+                        Oops, PleaseProvide a valid email address!
+                    </p>
+                </div>
+
+                <div class="s-form__row">
+                <input formControlName="password" type="password" placeholder="Your password">
+                    <p class="s-form__error" *ngIf="registerForm.controls.password.errors && loginForm.controls.password.touched">
+                        Min 6 characters!
+                    </p>
+                </div>
+                <div class="s-form__row">
+                    <button class="s-btn s-btn--large s-btn--display-block" type="submit">Register</button>
+                </div>
+            </form>
+        </div>
+
+    </div> 
+
+    <div class="s-login__credit">
+        <small><a class="s-link" href="https://github.com/vrtstartup/Social-Video-Tools" target="_blank">Like it?</a></small>
+    </div>   
+</div>

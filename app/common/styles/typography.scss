@@ -7,3 +7,15 @@
 a {
     //
 }
+.s-link {
+    color: $s-link;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover { 
+        color: darken($s-link, 10%);
+    }
+    &__underline {
+        cursor: pointer;
+        text-decoration: none;
+    }
+}

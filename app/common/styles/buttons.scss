@@ -1,4 +1,6 @@
 .s-btn {
+    @include s-transition(all .15s ease);
+
     background: $s-link;
     border: 0;
     color: white;
@@ -13,9 +15,24 @@
     user-select: none;
     vertical-align: middle;
     white-space: nowrap;
+    transform: translateY(0px);
+    &:hover {
+        background: darken($s-link, 6%);
+        box-shadow: 0 6px 6px -4px rgba($s-primary, .5), 0 6px 16px 0 rgba(150, 150, 150, .15);
+        //color: $p-color-white;
+        transform: translateY(-1px);
+    }
     &--outline { 
         background: none;
         border: 2px solid lighten($s-primary, 10%);
         color: $s-link;
     }
+    &--display-block {
+        width: 100%;
+    }
+    &--large {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+    
 }

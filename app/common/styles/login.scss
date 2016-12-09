@@ -1,0 +1,53 @@
+.s-login {
+    @include s-gradient-vertical( lighten($s-primary, 0%), darken($s-primary,10%));
+
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+}
+.s-login-background {
+    height: 100vh; 
+    left: 0; 
+    opacity: .4; 
+    top: 0; 
+    position: absolute; 
+    width: 100%; 
+    z-index: 0; 
+}
+.s-login__signin {
+    flex: 0 1 auto;
+    padding: 1rem;
+    text-align: right;
+    z-index: 1;
+}
+.s-login__wrapper {
+    align-items: center;
+    flex: 1 1 auto;
+    justify-content: center;
+    display: flex;
+    z-index: 1;
+}
+.s-login__form {
+    max-width: 420px;
+    flex-basis: 100%;
+    padding: 1rem;
+}
+.s-login__credit {
+    background: rgba(0,0,0,.1);
+    flex: 0 1 auto;
+    padding: 1rem;
+    text-align: right;
+    z-index: 1;
+}
+.s-form {
+    display: flex;
+    flex-direction: column;
+}
+.s-form__row {
+    flex: 1 1 100%;
+}
+.s-form__error {
+    color: $s-gray;
+    margin-top: 0;
+}

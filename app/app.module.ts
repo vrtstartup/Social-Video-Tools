@@ -19,7 +19,7 @@ import firebaseConfig from './config/firebase.config';
 import { RoleGuard } from './common/guards/role.guard';
 
 import { AppComponent } from './app.component';
-import { LoginForm } from './views/public/auth/components/login/login-form';
+import { LoginComponent } from './views/public/login/login.component';
 
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
@@ -27,7 +27,6 @@ import { OpenComponent } from './views/public/subtitles/components/open.componen
 import { ProgressComponent } from './views/public/subtitles/components/progress.component';
 import { ProgressBarComponent } from './views/public/subtitles/components/progressbar.component';
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
-import { AuthComponent } from './views/public/auth/authentication.component';
 import { DownloadComponent } from './views/public/download/download.component';
 import { DashboardComponent } from './views/admin/dashboard.component';
 import { UsersComponent } from './views/admin/users.component';
@@ -54,7 +53,6 @@ import { NgInitDir } from './common/directives/ngInit.directive';
         OpenComponent,
         ProgressComponent,
         ProgressBarComponent,
-        AuthComponent,
         DownloadComponent,
         DashboardComponent,
         UsersComponent,
@@ -63,7 +61,7 @@ import { NgInitDir } from './common/directives/ngInit.directive';
         AdminMenuComponent,
         MenuComponent,
         RangeSliderComponent,
-        LoginForm,
+        LoginComponent,
         ListPipe,
         SortByPropPipe,
         KeysPipe,
