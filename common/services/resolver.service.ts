@@ -14,12 +14,12 @@ export function destinationDirectory(fileType:string, baseDirectory:string) {
   return resolve(workingDir, baseDirectory, subDir);
 }
 
-export function destinationFile(fileType:string, baseDirectory:string, fileName:string) {
+export function destinationFile(fileType:string, projectId:string, fileName:string) {
   //  return a fully resolved path to a project file
   const workingDir = config.filesystem.workingDirectory;
-  const subDir = config.filesystem.files[fileType].directory;
+  // const subDir = config.filesystem.files[fileType].directory;
 
-  return resolve(workingDir, baseDirectory, subDir, fileName);
+  return resolve(workingDir, `${projectId}${fileName}`);
 }
 
 export function isSharedFile(type: string){ 
@@ -48,11 +48,11 @@ export function getSharedFilePath(type: string, fileName: string) {
 export function getProjectFilePath(type: string, projectName: string, fileName?: any){
   const fileConfig = getFileConfigByType(type);
   const workingDir = config.filesystem.workingDirectory;
-  const subDir = fileConfig['directory'];
+  // const subDir = fileConfig['directory'];
   const fName = fileName ? fileName : fileConfig['name']; // if fileName is not explicitly set, it's a unique file whose name has been set in the config 
   const ext = fileConfig['extension'];
 
-  return resolve(workingDir, projectName, subDir, `${fName}.${ext}`);
+  return resolve(workingDir, `${projectName}${fName}.${ext}`);
 }
 
 export function getProjectFileKey(type: string, projectId: string, fileName?: any): string{

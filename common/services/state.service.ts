@@ -33,21 +33,31 @@ export class State {
     return new Promise((resolve, reject) => {
       switch (type) {
         case 'uploaded':
-          const proms = [];
+          // const proms = [];
 
-          proms.push(resolver.makeProjectDirectories(project.data.id));
-          proms.push(this.projectService.updateProject(project, {
+          // proms.push(resolver.makeProjectDirectories(project.data.id));
+          // proms.push(this.projectService.updateProject(project, {
+          //   files: {
+          //     'baseDir': project.data.id
+          //   }
+          // }));
+
+
+          this.projectService.updateProject(project, {
             files: {
               'baseDir': project.data.id
             }
-          }));
-
-          Promise.all(proms).then(arrData => {
-            const project = arrData[1];
-
+          }).then(project => {
             this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres')
                .then(this.updateState(project, 'downscaled', false))
           });
+
+          // Promise.all(proms).then(arrData => {
+          //   const project = arrData[1];
+
+          //   this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres')
+          //      .then(this.updateState(project, 'downscaled', false))
+          // });
         break;
 
         case 'downscaled':

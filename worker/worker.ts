@@ -11,6 +11,7 @@ import * as storage from '../common/services/storage.service';
 import { ffprobe, scaleDown, stitch } from '../common/services/encoding.service';
 import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
+import { config } from '../common/config';
 
 const projectService = new Projects();
 const stateService = new State();
@@ -19,6 +20,13 @@ const subtitle = new Subtitle();
 
 let busyProcessingLowres = false;
 let busyProcessingStitch = false;
+
+// create temp dat dir if it doesnt exist
+const dataDir = config.filesystem.workingDirectory;
+
+if (!fs.existsSync(dataDir)){
+    fs.mkdirSync(dataDir);
+}
 
 // attach listener to queue
 jobService.listenQueue(handleQueue);
@@ -35,7 +43,7 @@ function handleQueue(jobs) {
 
   // does parsing return data? (e.g. not null etc)
   if (jobs) {
-    // logger.verbose("processing queue...");
+    // logger.verbose("processing queue...");ls app
 
     const jobs = [
       jobService.getFirst('ffmpeg-queue', 'render'),

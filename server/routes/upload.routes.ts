@@ -14,7 +14,7 @@ const storageOverlays = multer.diskStorage({
     const baseDir = req.body.projectId;
 
     // #todo this is out of place
-    resolve.makeProjectDirectories(baseDir);
+    // resolve.makeProjectDirectories(baseDir);
 
     const dest = resolve.destinationDirectory('overlay', baseDir );
     cb(null, dest);

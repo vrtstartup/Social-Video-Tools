@@ -24,7 +24,6 @@ Start worker:
 npm run worker
 ```
 
-
 Start app [you need to run server and worker]
 ```
 npm run dev-server
