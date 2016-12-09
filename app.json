@@ -1,0 +1,78 @@
+{
+  "name": "Social-Video-Tools",
+  "description": "Rapidly subtitle videos for social media",
+  "scripts": {
+  },
+  "env": {
+    "AWS_ACCESS_KEY_ID": {
+      "required": true
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "required": true
+    },
+    "DATA_FOLDER": {
+      "required": true
+    },
+    "FIREBASE_AUTH_PROVIDER_X509_CERT_URL": {
+      "required": true
+    },
+    "FIREBASE_AUTH_URI": {
+      "required": true
+    },
+    "FIREBASE_CLIENT_EMAIL": {
+      "required": true
+    },
+    "FIREBASE_CLIENT_ID": {
+      "required": true
+    },
+    "FIREBASE_CLIENT_X509_CERT_URL": {
+      "required": true
+    },
+    "FIREBASE_DATABASEURL": {
+      "required": true
+    },
+    "FIREBASE_PRIVATE_KEY": {
+      "required": true
+    },
+    "FIREBASE_PRIVATE_KEY_ID": {
+      "required": true
+    },
+    "FIREBASE_PROJECT_ID": {
+      "required": true
+    },
+    "FIREBASE_TOKEN_URI": {
+      "required": true
+    },
+    "FIREBASE_TYPE": {
+      "required": true
+    },
+    "NODE_ENV": {
+      "required": true
+    },
+    "PORT": {
+      "required": true
+    },
+    "POSTMARK_SECRET": {
+      "required": true
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1
+    },
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [
+    "papertrail"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/vrtstartup/heroku-buildpack-ffmpeg"
+    }
+  ]
+}
