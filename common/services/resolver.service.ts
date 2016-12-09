@@ -55,7 +55,15 @@ export function getProjectFilePath(type: string, projectName: string, fileName?:
   return resolve(workingDir, projectName, subDir, `${fName}.${ext}`);
 }
 
-export function getFileNameByType(fileType:string, fileId:string) {
+export function getProjectFileKey(type: string, projectId: string, fileName?: any): string{
+  const fileConfig = getFileConfigByType(type);
+  const fName = fileName ? fileName : fileConfig['name']; // if fileName is not explicitly set (overlay), it's a unique file whose name has been set in the config 
+  const ext = fileConfig['extension'];
+
+  return `${projectId}/${fName}.${ext}`;
+}
+
+export function getFileNameByType(fileType:string, fileId?:string) {
   // return an unresovled project file's name, including extension as configured
   const file =  config.filesystem.files[fileType];
   let fileName = file.hasOwnProperty('name') ? file.name : fileId;
@@ -65,12 +73,12 @@ export function getFileNameByType(fileType:string, fileId:string) {
   return fileName;
 }
 
-export function staticUrl(fileType:string, baseDirectory:string) {
-  // return a public url to file in the static folder
+export function storageUrl(fileType:string, baseDirectory:string){
+  // return public url to file in s3 bucket
   const file =  config.filesystem.files[fileType]; //config
-  const fileName = this.getFileNameByType(fileType, baseDirectory);
+  const fileName = this.getFileNameByType(fileType);
 
-  return `${fServer.protocol}://${fServer.domain}:${fServer.port}/video/${baseDirectory}/${file.directory}/${fileName}`;
+  return `https://s3.eu-central-1.amazonaws.com/social-video-tools/${baseDirectory}/${fileName}`;
 }
 
 export function makeProjectDirectories(baseDirectory:string) {

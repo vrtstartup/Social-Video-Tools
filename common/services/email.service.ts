@@ -2,11 +2,7 @@ import { config } from '../../common/config';
 const postmark = require('postmark');
 
 export class Email {
-  private logger;
-
-  constructor(logger?: any) { 
-    this.logger = logger ? logger : null;
-  }
+  constructor() {}
 
   notify(targetAddress:string, type:string, projectId: string) {
     const client = new postmark.Client(config.mail.postmark.secret);

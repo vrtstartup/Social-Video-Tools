@@ -1,0 +1,45 @@
+machine:
+  node:
+    version: 6.6.0
+general:
+  artifacts:
+    - "release-notes.md"
+    - "dist"
+dependencies:
+  override:
+    - npm install
+  cache_directories:
+    - node_modules
+deployment:
+  production:
+    branch: master
+    commands:
+      - npm run build-prod
+      - git config user.name ${CIRCLE_USERNAME}
+      - git config user.email matthiasdv@circleci.com
+      - git add -A
+      - git commit -m 'Created Build'
+      - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
+      - git push -f git@heroku.com:euricom-staging.git ${CIRCLE_BRANCH}:master
+
+  development:
+    branch: dev
+    commands:
+      - npm run build-dev
+      - git config user.name ${CIRCLE_USERNAME}
+      - git config user.email matthiasdv@circleci.com
+      - git add -A
+      - git commit -m 'Created Build'
+      - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
+      - git push -f git@heroku.com:euricom-dev.git ${CIRCLE_BRANCH}:master
+
+  release:
+    branch: /release\/.*/
+    commands:
+      - npm run build-prod
+      - git config user.name ${CIRCLE_USERNAME}
+      - git config user.email matthiasdv@circleci.com
+      - git add -A
+      - git commit -m 'Created Build'
+      - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
+      - git push -f git@heroku.com:euricom-staging.git ${CIRCLE_BRANCH}:master

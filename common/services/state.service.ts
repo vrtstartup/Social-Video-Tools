@@ -1,20 +1,19 @@
 import { Projects } from '../../common/services/projects.service';
+import { Jobs } from '../../common/services/jobs.service';
 import { Project } from '../../common/classes/project';
 import { Email } from '../../common/services/email.service';
-import { staticUrl } from '../../common/services/resolver.service';
-
+import * as resolver from '../../common/services/resolver.service';
+import { logger } from '../config/winston';
 
 export class State {
-  private fireBase; 
   private projectService; 
+  private jobService;
   private emailService;
-  private logger;
 
-  constructor(fireBase:any, logger?: any) { 
-    this.fireBase = fireBase;
-    this.projectService = new Projects(this.fireBase, logger);
-    this.emailService = new Email(logger);
-    this.logger = logger ? logger : null;
+  constructor() { 
+    this.projectService = new Projects();
+    this.jobService = new Jobs();
+    this.emailService = new Email();
   }
 
   /*
@@ -34,10 +33,26 @@ export class State {
     return new Promise((resolve, reject) => {
       switch (type) {
         case 'uploaded':
+          const proms = [];
+
+          proms.push(resolver.makeProjectDirectories(project.data.id));
+          proms.push(this.projectService.updateProject(project, {
+            files: {
+              'baseDir': project.data.id
+            }
+          }));
+
+          Promise.all(proms).then(arrData => {
+            const project = arrData[1];
+
+            this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres')
+               .then(this.updateState(project, 'downscaled', false))
+          });
         break;
 
         case 'downscaled':
-          const lowResUrl = staticUrl('lowres', project.data.id) + `?${Date.now()}`;
+          // salt link to trigger angular change detection
+          const lowResUrl = resolver.storageUrl('lowres', project.data.id) + `?${Date.now()}${Math.floor(Math.random() * 1000000000)}`;
 
           // additional hooks for the downscaled event go here
           this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress')
@@ -55,8 +70,11 @@ export class State {
         break; 
 
         case 'render':
+        const renderUrl = resolver.storageUrl('render', project.data.id);
+
           // send email 
           this.projectService.removeProjectProperty(project.data.id, 'status/stitchingProgress')
+            .then( status => this.projectService.setProjectProperty(project.data.id, 'clip/renderUrl', renderUrl))
             .then( status => this.projectService.getEmailByProject(project))
             .then( address =>  this.emailService.notify(address, type, project.data.id))
             .then( info => resolve(project))
@@ -69,12 +87,12 @@ export class State {
         break;
         
         default:
-          this.logger.warn('handling unknown status change!');
+          logger.warn('handling unknown status change!');
           break;
         
       }
     });
   }
 
-  private errorHandler(err) { this.logger.error(err) };
+  private errorHandler(err) { logger.error(err) };
 }

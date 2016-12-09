@@ -2,21 +2,20 @@ require('ts-node/register');
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { FireBase } from '../common/services/firebase.service';
+import { db } from '../common/services/firebase.service';
 import { Jobs } from '../common/services/jobs.service';
 import { Projects } from '../common/services/projects.service';
 import { Project } from '../common/classes/project';
 import { State } from '../common/services/state.service';
-import { ffprobe, scaleDown, stitch, makeAss } from '../common/services/encoding.service';
+import * as storage from '../common/services/storage.service';
+import { ffprobe, scaleDown, stitch } from '../common/services/encoding.service';
 import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 
-// services and dependencies
-const fireBase = new FireBase();
-const projectService = new Projects(fireBase, logger);
-const stateService = new State(fireBase, logger);
-const jobService = new Jobs(fireBase, logger);
-const subtitle = new Subtitle(fireBase); //inject database
+const projectService = new Projects();
+const stateService = new State();
+const jobService = new Jobs();
+const subtitle = new Subtitle();
 
 let busyProcessingLowres = false;
 let busyProcessingStitch = false;
@@ -120,6 +119,7 @@ function processLowResJob(project, job) {
           clip: project['data']['clip']
         }))
         .then(project => scaleDown(project, progressHandler, job))
+        .then(project => storage.uploadFile(project, 'lowres'))
         .then(resolve)
         .catch(err => jobService.kill(job.id, err));
     });
@@ -137,7 +137,9 @@ function processRenderJob(project,job) {
 
     return new Promise((resolve, reject) => {
         handleSubtitles(project)
+          .then(project => storage.uploadFile(project, 'ass'))
           .then(project => stitch(project, job, progressHandler))
+          .then(project => storage.uploadFile(project, 'render'))
           .then(resolve)
           .catch(err => jobService.kill(job.id, err));
     });

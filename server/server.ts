@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { FireBase } from '../common/services/firebase.service';
+import { db } from '../common/services/firebase.service';
 import { Projects } from '../common/services/projects.service';
 import { Jobs } from '../common/services/jobs.service';
 import { Templates } from '../common/services/templates.service';
@@ -17,11 +17,10 @@ const bodyParser = require('body-parser');
 
 // init firebase
 // const db = FireBase.database();
-const fireBase = new FireBase();
-const projects = new Projects(fireBase, logger);
-const state = new State(fireBase, logger);
-const jobs = new Jobs(fireBase, logger);
-const templates = new Templates(fireBase, logger);
+const projects = new Projects();
+const state = new State();
+const jobs = new Jobs();
+const templates = new Templates();
 
 // init server
 const server = express();
@@ -31,6 +30,7 @@ const uploadRoutes = require('./routes/upload.routes');
 const fileRoutes = require('./routes/file.routes');
 const templaterRoutes = require('./routes/templater.routes');
 const renderRoutes = require('./routes/render.routes');
+const stateRoutes = require('./routes/state.routes');
 
 server.set('projects', projects);
 server.set('state', state);
@@ -62,6 +62,7 @@ server.use('/api/upload', uploadRoutes);
 server.use('/api/file', fileRoutes);
 server.use('/api/templater', templaterRoutes);
 server.use('/api/render', renderRoutes);
+server.use('/api/state', stateRoutes);
 
 server.use('*', express.static(pathToClient));
 
