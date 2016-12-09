@@ -1,7 +1,7 @@
 import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { User } from '../subtitles/models/user.model';
-import { UsersService } from '../../../common/services/users.service';
+import { User } from '../../common/models/user.model';
+import { UsersService } from '../../common/services/users.service';
 
 @Component({
   providers: [UsersService],

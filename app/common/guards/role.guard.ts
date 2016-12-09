@@ -19,11 +19,11 @@ export class RoleGuard implements CanActivate {
     const allowedRoles = route.data['roles'];
 
     return this.userService.user$.map( userData => {
-      if(this.validateRole(userData, allowedRoles)) {
+      if(userData && this.validateRole(userData, allowedRoles)) {
         return true;
       } 
 
-      console.log(`user not authenticated (as ${allowedRoles})`)
+      console.log(`incorrect userRole: (${allowedRoles})`)
       this.router.navigate(['/auth']);
       return false;
       

@@ -1,9 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Project } from '../models/project.model';
-
-// import { Router } from '@angular/router';
-// import { ProjectService } from '../../../../common/services/project.service';
-
+import { Project } from '../../../../common/models/project.model';
 
 @Component({
   selector: 'progress-dialog',

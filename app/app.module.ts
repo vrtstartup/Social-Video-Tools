@@ -16,9 +16,6 @@ import { ProjectService } from './common/services/project.service';
 import { UserService } from './common/services/user.service';
 
 import firebaseConfig from './config/firebase.config';
-//import { AuthGuard } from './common/guards/auth';
-//import { NoAuthGuard } from './common/guards/noAuth';
-//import { AdminGuard } from './common/guards/admin';
 import { RoleGuard } from './common/guards/role.guard';
 
 import { AppComponent } from './app.component';
@@ -32,11 +29,11 @@ import { ProgressBarComponent } from './views/public/subtitles/components/progre
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { AuthComponent } from './views/public/auth/authentication.component';
 import { DownloadComponent } from './views/public/download/download.component';
-import { DashboardComponent } from './views/public/admin/dashboard.component';
-import { UsersComponent } from './views/public/admin/users.component';
-//import { ProjectsComponent } from './views/public/admin/projects.component';
+import { DashboardComponent } from './views/admin/dashboard.component';
+import { UsersComponent } from './views/admin/users.component';
 import { ProjectsComponent } from './views/public/subtitles/components/projects.component';
-import { MenuComponent } from './views/public/partials/menu.component';
+import { ProjectListComponent } from './views/common/project-list.component';
+import { MenuComponent } from './views/common/menu.component';
 import { AdminMenuComponent } from './views/public/partials/adminMenu.component';
 
 // currently only used for mdicon
@@ -62,6 +59,7 @@ import { NgInitDir } from './common/directives/ngInit.directive';
         DashboardComponent,
         UsersComponent,
         ProjectsComponent,
+        ProjectListComponent,
         AdminMenuComponent,
         MenuComponent,
         RangeSliderComponent,

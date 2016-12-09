@@ -18,7 +18,7 @@ export class AuthComponent implements OnInit {
 
   ngOnInit() {
       // subscribe to auth event
-      this.auth.subscribe(this.loginStatusChange.bind(this));
+      // this.auth.subscribe(this.loginStatusChange.bind(this));
     }
 
     loginStatusChange(status) { 

@@ -1,5 +1,5 @@
-import { ListPipe } from '../../../../common/pipes/list.pipe';
-import { SortByPropPipe } from '../../../../common/pipes/sortByProp.pipe';
+import { ListPipe } from '../pipes/list.pipe';
+import { SortByPropPipe } from '../pipes/sortByProp.pipe';
 import possibleStatuses from './statusMessage.model';
 
 export class Project {

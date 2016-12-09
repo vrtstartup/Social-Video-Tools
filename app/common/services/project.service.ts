@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
-import { Project } from '../../views/public/subtitles/models/project.model';
+import { Project } from '../models/project.model';
 import { AngularFire, FirebaseListObservable} from 'angularfire2';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProjectService } from '../../../../common/services/project.service';
-import { Project } from '../models/project.model';
+import { Project } from '../../../../common/models/project.model';
 
 @Component({
   selector: 'open-dialog',

@@ -1,15 +1,16 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AngularFire, FirebaseAuth, FirebaseAuthState, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
+import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/upload.service';
-import { Project } from './models/project.model';
+import { Project } from '../../../common/models/project.model';
+import { UserService } from '../../../common/services/user.service';
 
 // TODO remove | only for test purposes
-import testTemplate from './models/testTemplate.model';
-import testStyles from './models/testStyles.model';
+import testTemplate from '../../../common/models/testTemplate.model';
+import testStyles from '../../../common/models/testStyles.model';
 
 @Component({
   providers: [UploadService],
@@ -47,7 +48,7 @@ export class SubtitlesComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private uploadService: UploadService,
-    public auth: FirebaseAuth) {
+    public userService: UserService) {
 
     this.af = af;
 
@@ -69,8 +70,13 @@ export class SubtitlesComponent implements OnInit {
     this.templatesRef.set(testTemplate);
     this.stylesRef.set(testStyles);
   }
-
+  
   ngOnInit() {
+    this.userService.user$.subscribe( 
+      data => this.userId = data.userID ,
+      err => console.log('authserviceErr', err)
+     ).unsubscribe();
+    
     // subscribe to service observable
     this.uploadService.progress$
       .subscribe(data => {
@@ -78,21 +84,8 @@ export class SubtitlesComponent implements OnInit {
         this.zone.run(() => this.uploadProgress = data);
       }, err => console.log(err));
 
-    
-    this.af.auth.subscribe(this.onAuthStatusChange.bind(this));
-
     this.selectedProjectId =  this.route.snapshot.params['id'];
     if(this.selectedProjectId) this.openProject(this.selectedProjectId);
-  }
-
-  /* auth --------- */
-  logout(event) {
-    this.auth.logout();
-    this.router.navigate(['auth']);
-  }
-
-  onAuthStatusChange(state: FirebaseAuthState) {
-    if (state !== null) this.userId = state.uid;
   }
 
   /* project ------ */
@@ -156,12 +149,6 @@ export class SubtitlesComponent implements OnInit {
 
   /* annotations -- */
   addAnnotation() {
-    // add bumper
-    // if ( !this.project.hasBumper ){
-    //   this.project.addAnnotation( this.templates['bumper'] );
-    //   //this.updateProject();
-    // }
-
     let newAnno = this.project.addAnnotation( this.templates['subtitle']);
     this.updateSelectedAnno(newAnno.key, newAnno);
   }
