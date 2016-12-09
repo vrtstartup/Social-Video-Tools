@@ -29,6 +29,8 @@ export function ffprobe (project) {
               logger.error(stderr);
           }
 
+          logger.debug(stdout);
+
           const outputObj = JSON.parse(stdout);
           const hasVideoStream = outputObj.streams.some(stream =>
               stream.codec_type === 'video' &&
