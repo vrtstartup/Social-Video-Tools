@@ -19,13 +19,16 @@
     &:hover {
         background: darken($s-link, 6%);
         box-shadow: 0 6px 6px -4px rgba($s-primary, .5), 0 6px 16px 0 rgba(150, 150, 150, .15);
-        //color: $p-color-white;
+        color: white;
         transform: translateY(-1px);
     }
     &--outline { 
         background: none;
         border: 2px solid lighten($s-primary, 10%);
         color: $s-link;
+        &:hover {
+            border: 2px solid darken($s-link, 6%);
+        }
     }
     &--display-block {
         width: 100%;

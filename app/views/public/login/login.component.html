@@ -1,18 +1,19 @@
 <div class="s-login">
-    <div class="s-login-background" style="background: #ccc url('https://goo.gl/bcZhpy') 50% / cover;"></div>
+    <div class="s-login-background s-scaleSlow" style="background: #ccc url('https://goo.gl/bcZhpy') 50% / cover;"></div>
 
     <div class="s-login__signin">    
-        <a *ngIf="!registerFlag" class="s-btn s-btn--outline" (click)="onClickRegister()">Sign In</a>
-        <a *ngIf="registerFlag" class="s-btn s-btn--outline" (click)="onClickRegister()">Login</a>
+        <a *ngIf="activeFormGroup === 'loginForm'" class="s-btn s-btn--outline" (click)="onSetActiveFromGroup('registerForm')">Sign In</a>
+        <a *ngIf="activeFormGroup === 'registerForm' || activeFormGroup === 'requestPassForm'" class="s-btn s-btn--outline" (click)="onSetActiveFromGroup('loginForm')">Login</a>
     </div>
 
     <div class="s-login__wrapper">
 
+
         <!--Authenticate-->
-        <div class="s-login__form" *ngIf="!registerFlag">
+        <div class="s-login__form s-slideIn" *ngIf="activeFormGroup === 'loginForm'">
             <form class="s-form" [formGroup]="loginForm" (submit)="login($event)" autocomplete="off" novalidate>
                 
-                <div class="s-form__row s-info">{{errorMessage | json}}</div>
+                <div class="s-form__row s-info">{{ errorMessage }}</div>
 
                 <div class="s-form__row">
                     <input formControlName="email" type="email" placeholder="Your email">
@@ -32,15 +33,16 @@
                     <button class="s-btn s-btn--large s-btn--display-block s-formfield" type="submit">Log in</button>
                 </div>
                 <div class="s-form__row">
-                    <small class="s-link">Forgot password?</small>
+                    <small class="s-link" (click)="onSetActiveFromGroup('requestPassForm')">Forgot password?</small>
                 </div>
             </form>
         </div>
 
         <!--Register-->
-        <div class="s-login__form" *ngIf="registerFlag">
+        <div class="s-login__form s-slideIn"  *ngIf="activeFormGroup === 'registerForm'">
 
-            <div class="s-info">{{errorMessage | json}}</div>
+            <div class="s-form__row s-info">{{ errorMessage }}</div>
+
             <form [formGroup]="registerForm" (submit)="register($event)" autocomplete="nope" novalidate>
                 <div class="s-form__row">
                     <input formControlName="email" type="email" placeholder="Your email">
@@ -57,6 +59,24 @@
                 </div>
                 <div class="s-form__row">
                     <button class="s-btn s-btn--large s-btn--display-block" type="submit">Register</button>
+                </div>
+            </form>
+        </div>
+
+        <!--RequestPass-->
+        <div class="s-login__form s-slideIn" *ngIf="activeFormGroup === 'requestPassForm'">
+
+            <div class="s-form__row s-info">{{ errorMessage }}</div>
+
+            <form [formGroup]="requestPassForm" (submit)="requestPasswordResetEmail($event)" autocomplete="nope" novalidate>
+                <div class="s-form__row">
+                    <input formControlName="email" type="email" placeholder="Your email">
+                    <p class="s-form__error" *ngIf="requestPassForm.controls.email.errors && requestPassForm.controls.email.touched">
+                        Oops, PleaseProvide a valid email address!
+                    </p>
+                </div>
+                <div class="s-form__row">
+                    <button class="s-btn s-btn--large s-btn--display-block" type="submit">Request new password?</button>
                 </div>
             </form>
         </div>

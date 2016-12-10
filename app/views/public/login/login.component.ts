@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AngularFire, FirebaseAuth, FirebaseAuthState } from 'angularfire2';
+import { AngularFire, FirebaseApp, FirebaseAuth, FirebaseAuthState } from 'angularfire2';
 
 @Component({
   selector: 'login',
@@ -11,17 +11,22 @@ import { AngularFire, FirebaseAuth, FirebaseAuthState } from 'angularfire2';
 export class LoginComponent implements OnInit {
 
   private af;
+  public activeFormGroup: string = 'loginForm';
+  public fbAuth: any;
   private errorMessage: string;
   private loginForm: FormGroup;
   private registerForm: FormGroup;
+  private requestPassForm: FormGroup;
   private registerFlag: Boolean = false;
 
   constructor(
     af: AngularFire,
     public auth: FirebaseAuth,
     private fb: FormBuilder,
-    private router: Router) {
+    private router: Router,
+    @Inject(FirebaseApp) firebaseApp: any) {
     this.af = af;
+    this.fbAuth = firebaseApp.auth();
   }
 
   ngOnInit() { 
@@ -34,13 +39,20 @@ export class LoginComponent implements OnInit {
     this.registerForm = this.fb.group({
       email: ['', [ Validators.required, this.validateEmail]],
       password: ['', [Validators.required, Validators.minLength(6)]]
-    }); 
-
-    this.loginForm.valueChanges.subscribe(value => {
-      console.log(this.loginForm)
-      console.log(this.loginForm.controls);
     });
 
+    this.requestPassForm = this.fb.group({
+      email: ['', [ Validators.required, this.validateEmail]],
+    });
+      
+    // optinally subscribe on changes
+    this.loginForm.valueChanges.subscribe(value => {});
+  }
+
+  onSetActiveFromGroup(formGroupName) {
+    // toggles visibility of different forms
+    this.errorMessage = '';
+    this.activeFormGroup = formGroupName;
   }
 
   validateEmail(fromControl: FormControl) {
@@ -51,40 +63,51 @@ export class LoginComponent implements OnInit {
 
   login(event) {
     event.preventDefault();
-    const form = this.loginForm.value;
-    const credentials = { email: form.email, password: form.password};
+    if(this.loginForm.valid) {
+      this.errorMessage = '';
+      const credentials = { email: this.loginForm.value.email, password: this.loginForm.value.password};
 
-    this.auth.login(credentials)
-      .then(user => this.router.navigate(['subtitles']))
-      .catch(err => this.errorHandler(err))
-  }
-
-  onClickRegister() {
-    this.registerFlag = !this.registerFlag;
+      this.auth.login(credentials)
+        .then(user => this.router.navigate(['subtitles']))
+        .catch(err => this.errorHandler(err))
+    }
   }
 
   register(event) {
     event.preventDefault();
-    const form = this.registerForm.value;
-    const credentials = { email: form.email, password: form.password};
+    if(this.registerForm.valid) {
+      this.errorMessage = '';
+      const credentials = { email: this.registerForm.value.email, password: this.registerForm.value.password};
 
-    this.auth.createUser(credentials)
-      .then(user => {
-        this.af.database.object(`/users/${user.uid}/role`).set('user'); // set user role
-        this.af.database.object(`/users/${user.uid}/email`).set(user.auth.email); //set user email
-        this.router.navigate(['subtitles'])
-      })
-      .catch(err => this.errorHandler(err));
+      this.auth.createUser(credentials)
+        .then(user => {
+          this.af.database.object(`/users/${user.uid}/role`).set('user'); // set user role
+          this.af.database.object(`/users/${user.uid}/email`).set(user.auth.email); //set user email
+          this.router.navigate(['subtitles'])
+        })
+        .catch(err => this.errorHandler(err));
+    }
+  }
+
+  requestPasswordResetEmail(event){
+    event.preventDefault();
+    if(this.requestPassForm.valid) {
+      this.errorMessage = '';
+      this.fbAuth.sendPasswordResetEmail(this.requestPassForm.value.email)
+        .then( resp => {
+          this.errorMessage = 'Sent successfully';
+          setTimeout(() => {this.onSetActiveFromGroup('loginForm')}, 2000);
+        })
+        .catch( err => this.errorHandler(err))
+    }
   }
 
   errorHandler(err) {
     if (err.code === 'auth/user-not-found') {
-      this.errorMessage = err.message;
+      this.errorMessage = 'Oops: We couldn\'t find that email address';
     } else if (err.code === 'auth/email-already-in-use') {
-      console.log(err.message)
-      this.errorMessage = 'You must provide a correct email and password';
+      this.errorMessage = 'This email is already in use';
     } else {
-      console.log(err.message);
       this.errorMessage = 'authentication failed wrong';
     }
   }
