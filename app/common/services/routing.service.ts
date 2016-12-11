@@ -2,7 +2,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { RoleGuard } from '../../common/guards/role.guard';
 
 import { SubtitlesComponent } from '../../views/public/subtitles/subtitles.component';
-import { ProjectsComponent } from '../../views/public/subtitles/components/projects.component';
+import { ProjectsComponent } from '../../views/public/projects/projects.component';
 import { LoginComponent } from '../../views/public/login/login.component';
 import { DownloadComponent } from '../../views/public/download/download.component';
 import { AdminComponent } from '../../views/admin/admin.component';
@@ -20,9 +20,11 @@ const appRoutes: Routes = [
     { path: 'download/:id', component: DownloadComponent, canActivate: [RoleGuard], data: { roles: AllowedRoles['user']}},
     { path: 'admin',
         component: AdminComponent,
+        canActivate: [RoleGuard], 
+        data: { roles: AllowedRoles['admin']},
         children: [
-            { path: '', component: DashboardComponent, canActivate: [RoleGuard], data: { roles: AllowedRoles['admin']}},
-            { path: 'users', component: UsersComponent, canActivate: [RoleGuard], data: { roles: AllowedRoles['admin']}},
+            { path: '', component: DashboardComponent },
+            { path: 'users', component: UsersComponent },
         ],
     },
     { path: '**', redirectTo: '/login', pathMatch: 'full' },

@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit {
       const credentials = { email: this.loginForm.value.email, password: this.loginForm.value.password};
 
       this.auth.login(credentials)
-        .then(user => this.router.navigate(['subtitles']))
+        .then(user => this.router.navigate(['projects']))
         .catch(err => this.errorHandler(err))
     }
   }
@@ -83,7 +83,7 @@ export class LoginComponent implements OnInit {
         .then(user => {
           this.af.database.object(`/users/${user.uid}/role`).set('user'); // set user role
           this.af.database.object(`/users/${user.uid}/email`).set(user.auth.email); //set user email
-          this.router.navigate(['subtitles'])
+          this.router.navigate(['projects'])
         })
         .catch(err => this.errorHandler(err));
     }

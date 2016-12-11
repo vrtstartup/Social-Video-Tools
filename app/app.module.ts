@@ -30,7 +30,7 @@ import { DownloadComponent } from './views/public/download/download.component';
 import { AdminComponent } from './views/admin/admin.component';
 import { DashboardComponent } from './views/admin/dashboard.component';
 import { UsersComponent } from './views/admin/users.component';
-import { ProjectsComponent } from './views/public/subtitles/components/projects.component';
+import { ProjectsComponent } from './views/public/projects/projects.component';
 import { ProjectListComponent } from './views/common/project-list.component';
 import { MenuComponent } from './views/common/menu.component';
 
