@@ -23,17 +23,16 @@ import { LoginComponent } from './views/public/login/login.component';
 
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
-import { OpenComponent } from './views/public/subtitles/components/open.component';
 import { ProgressComponent } from './views/public/subtitles/components/progress.component';
 import { ProgressBarComponent } from './views/public/subtitles/components/progressbar.component';
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { DownloadComponent } from './views/public/download/download.component';
+import { AdminComponent } from './views/admin/admin.component';
 import { DashboardComponent } from './views/admin/dashboard.component';
 import { UsersComponent } from './views/admin/users.component';
 import { ProjectsComponent } from './views/public/subtitles/components/projects.component';
 import { ProjectListComponent } from './views/common/project-list.component';
 import { MenuComponent } from './views/common/menu.component';
-import { AdminMenuComponent } from './views/public/partials/adminMenu.component';
 
 // currently only used for mdicon
 import { MaterialModule } from '@angular/material';
@@ -50,15 +49,14 @@ import { NgInitDir } from './common/directives/ngInit.directive';
         AppComponent,
         VrtVideoPlayer,
         SubtitlesComponent,
-        OpenComponent,
         ProgressComponent,
         ProgressBarComponent,
         DownloadComponent,
+        AdminComponent,
         DashboardComponent,
         UsersComponent,
         ProjectsComponent,
         ProjectListComponent,
-        AdminMenuComponent,
         MenuComponent,
         RangeSliderComponent,
         LoginComponent,

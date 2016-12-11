@@ -10,8 +10,6 @@
 			<button type="button" class="s-btn s-btn--outline" (click)="logout()">Sign Out</button>
 		</div>
 	</div>
-	
-	<open-dialog class="dialog" [class.closed]="!showOpenDialog" [openedProject]="project ? project:null" (selectionUpdated)="openProject($event)"></open-dialog>
 
 	<div *ngIf="project?.data">
 		<progress-bar *ngIf="uploadProgress > 0 && uploadProgress < 100" [task]="'uploading'" [progress]="uploadProgress"></progress-bar>
