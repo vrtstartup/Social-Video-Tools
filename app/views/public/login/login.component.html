@@ -1,5 +1,7 @@
 <div class="s-login">
-    <div class="s-login-background s-scaleSlow" style="background: #ccc url('https://goo.gl/bcZhpy') 50% / cover;"></div>
+    <div class="s-login-background__wrapper" style="overflow:hidden;">
+        <div class="s-login-background s-scaleSlow" style="background: #ccc url('https://goo.gl/bcZhpy') 50% / cover;"></div>
+    </div>
 
     <div class="s-login__signin">    
         <a *ngIf="activeFormGroup === 'loginForm'" class="s-btn s-btn--outline" (click)="onSetActiveFromGroup('registerForm')">Sign In</a>

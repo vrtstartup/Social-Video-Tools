@@ -11,14 +11,18 @@
         font-size: 1.6rem;
     }
 }
-.s-login-background {
+.s-login-background__wrapper {
     height: 100vh; 
+    width: 100%; 
     left: 0; 
     opacity: .4; 
     top: 0; 
     position: absolute; 
-    width: 100%; 
     z-index: 0; 
+}
+.s-login-background {
+    width: 100vw;
+    height: 100%;
 }
 .s-login__signin {
     flex: 0 1 auto;
