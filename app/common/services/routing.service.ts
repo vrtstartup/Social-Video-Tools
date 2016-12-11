@@ -1,7 +1,7 @@
 import { Routes, RouterModule } from '@angular/router';
 import { RoleGuard } from '../../common/guards/role.guard';
 
-import { SubtitlesComponent } from '../../views/public/subtitles/subtitles.component';
+import { ProjectComponent } from '../../views/public/project/project.component';
 import { ProjectsComponent } from '../../views/public/projects/projects.component';
 import { LoginComponent } from '../../views/public/login/login.component';
 import { DownloadComponent } from '../../views/public/download/download.component';
@@ -15,8 +15,8 @@ const appRoutes: Routes = [
     { path: 'projects', component: ProjectsComponent, canActivate: [RoleGuard], data: { roles: AllowedRoles['user']}},
     { path: '', redirectTo: '/projects', pathMatch: 'full' },
     { path: 'login', component: LoginComponent },
-    { path: 'subtitles', component: SubtitlesComponent, canActivate: [RoleGuard], data: { roles: AllowedRoles['user']}},
-    { path: 'subtitles/:id', component: SubtitlesComponent, canActivate: [RoleGuard], data: { roles: AllowedRoles['user']}},
+    { path: 'project', component: ProjectComponent, canActivate: [RoleGuard], data: { roles: AllowedRoles['user']}},
+    { path: 'project/:id', component: ProjectComponent, canActivate: [RoleGuard], data: { roles: AllowedRoles['user']}},
     { path: 'download/:id', component: DownloadComponent, canActivate: [RoleGuard], data: { roles: AllowedRoles['user']}},
     { path: 'admin',
         component: AdminComponent,

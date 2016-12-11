@@ -21,11 +21,11 @@ import { RoleGuard } from './common/guards/role.guard';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './views/public/login/login.component';
 
-import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
-import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
-import { ProgressComponent } from './views/public/subtitles/components/progress.component';
+import { ProjectComponent } from './views/public/project/project.component';
+import { VrtVideoPlayer } from "./views/public/project/components/vrtvideo-player";
+import { ProgressComponent } from './views/public/project/components/progress.component';
 import { ProgressBarComponent } from './views/common/progressbar.component';
-import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
+import { RangeSliderComponent } from './views/public/project/components/range-slider.component';
 import { DownloadComponent } from './views/public/download/download.component';
 import { AdminComponent } from './views/admin/admin.component';
 import { DashboardComponent } from './views/admin/dashboard.component';
@@ -48,7 +48,7 @@ import { NgInitDir } from './common/directives/ngInit.directive';
     declarations: [
         AppComponent,
         VrtVideoPlayer,
-        SubtitlesComponent,
+        ProjectComponent,
         ProgressComponent,
         ProgressBarComponent,
         DownloadComponent,

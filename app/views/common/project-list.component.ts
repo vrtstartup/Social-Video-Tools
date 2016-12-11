@@ -26,6 +26,6 @@ export class ProjectListComponent implements OnInit {
 
   open(projectId: string){ 
     //this.selectionUpdated.emit(projectId);
-    this.router.navigateByUrl(`/subtitles/${projectId}`);
+    this.router.navigateByUrl(`/project/${projectId}`);
   }
 }

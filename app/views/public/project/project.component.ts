@@ -3,10 +3,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
-import './subtitles.component.scss';
 import { UploadService } from '../../../common/services/upload.service';
 import { Project } from '../../../common/models/project.model';
 import { UserService } from '../../../common/services/user.service';
+
+import './project.component.scss';
 
 // TODO remove | only for test purposes
 import testTemplate from '../../../common/models/testTemplate.model';
@@ -14,11 +15,11 @@ import testStyles from '../../../common/models/testStyles.model';
 
 @Component({
   providers: [UploadService],
-  selector: 'subtitles-component',
-  templateUrl: 'subtitles.component.html',
+  selector: 'project-component',
+  templateUrl: 'project.component.html',
 })
 
-export class SubtitlesComponent implements OnInit, OnDestroy {
+export class ProjectComponent implements OnInit, OnDestroy {
 
   userId: string;
   userMessage: string = '';
