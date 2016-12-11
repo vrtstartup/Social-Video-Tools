@@ -24,7 +24,7 @@ import { LoginComponent } from './views/public/login/login.component';
 import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
 import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
 import { ProgressComponent } from './views/public/subtitles/components/progress.component';
-import { ProgressBarComponent } from './views/public/subtitles/components/progressbar.component';
+import { ProgressBarComponent } from './views/common/progressbar.component';
 import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
 import { DownloadComponent } from './views/public/download/download.component';
 import { AdminComponent } from './views/admin/admin.component';
