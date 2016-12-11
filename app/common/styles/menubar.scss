@@ -52,6 +52,7 @@ menu-bar {
         position: absolute;
         top: 1rem;
         right: 0;
+        z-index: 101;
         li:hover {
             color: $s-link;
             cursor: pointer;

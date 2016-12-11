@@ -7,12 +7,15 @@
 @import './helpers.scss';
 @import './typography.scss';
 @import './forms.scss';
+@import './buttons.scss';
 
+// views
+@import './projects.scss';
+@import './login.scss';
+// components
 @import './videogular.scss';
 @import './nouislider.scss';
 @import './rangeslider.scss'; // overrides nouislider
 @import './download.scss';
-@import './login.scss';
-// components
-@import './buttons.scss';
+@import './projectlist.scss';
 @import './menubar.scss';

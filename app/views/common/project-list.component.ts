@@ -15,13 +15,12 @@ export class ProjectListComponent implements OnInit {
   constructor(
       private projectService: ProjectService, 
       private router: Router) {
-        projectService.projects$.subscribe(this.doThings.bind(this))
   }
 
-  ngOnInit(){}
-
-  doThings(projects:Array<Project>){
-    this.projects = projects;
+  ngOnInit(){
+      this.projectService.projects$.subscribe( projects => {
+        this.projects = projects;
+      })
   }
 
   open(projectId: string){ 
