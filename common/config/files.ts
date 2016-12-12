@@ -1,7 +1,7 @@
 import { resolve } from 'path';
 
 export const fileConfig = {
-  workingDirectory: process.env.DATA_FOLDER,
+  workingDirectory: process.env.DATA_FOLDER || resolve('data'),
   sharedDirectory: resolve('/app/data', 'shared'),
   files: {
     source: {
