@@ -1,6 +1,9 @@
 <div class="s-menu-bar__left">
-    <div class="s-menu-bar__item">
-        <md-icon routerLink='/projects' class="s-projects-link" routerLinkActive="s-active" svgSrc="assets/icons/icon-arrow-left.svg"></md-icon>
+    <div class="s-menu-bar__item" *ngIf="router.url != '/projects'">
+        <md-icon routerLink='/projects' class="s-projects-link" svgSrc="assets/icons/icon-projects.svg"></md-icon>
+    </div>
+    <div *ngIf="router.url.substring(0,6) === '/admin'">
+        admin features here
     </div>
 </div>
 <div class="s-menu-bar__right">
