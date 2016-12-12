@@ -3,11 +3,20 @@
 <div class="socialvideotool">
 	<div class="s-menu-project">
 		<div>
-			<label class="btn-upload s-btn">
-				<input type="file" name="video" (change)="createNewProject($event)">New
-			</label>
-			<button type="button" class="s-btn" (click)="toggleOpenDialog()">Open</button>
-			<button type="button" class="s-btn s-btn--outline" (click)="logout()">Sign Out</button>
+			<div *ngIf="!project?.data?.status?.downscaled">
+				<label class="s-btn btn-upload">
+					<input type="file" name="video" (change)="uploadSource($event)">uploadSource
+				</label>
+			</div>
+			<div *ngIf="project?.data?.status?.downscaled">
+				<div class="s-btn">brand selector ></div>
+				<label class="s-btn s-btn--outline btn-upload">
+					<input type="file" name="video" (change)="updateSource($event)">Update Source
+				</label>
+				<button class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
+				<button class="s-btn" type="button" (click)="addToRenderQueue()">Render Movie</button>
+			</div>
+
 		</div>
 	</div>
 
@@ -21,11 +30,7 @@
 	<div class="s-submenu" *ngIf="project && !project.isRendering()">
 		<!--once downscaled show controls-->
 		<div *ngIf="project?.data?.status?.downscaled">
-			<button type="button" class="btn btn-secondary" (click)="addAnnotation()">Add Annotation(U)</button>
-			<label class="btn btn-secondary btn-upload">
-				<input type="file" name="video" (change)="updateSource($event)">Update Source
-			</label>
-			<button type="button" class="btn btn-secondary" (click)="addToRenderQueue()">Render Movie(R)</button>
+			<button type="button" class="s-btn" (click)="addAnnotation()">Add Annotation(U)</button>
 		</div>
 	</div>
 

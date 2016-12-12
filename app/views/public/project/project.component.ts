@@ -38,9 +38,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
   stylesRef: FirebaseObjectObservable<any[]>;
   templates: any[];
   selectedTemplate: any;
-  selectedProjectId: string;
+  projectId: string;
 
-  showOpenDialog: boolean;
+  //showOpenDialog: boolean;
   userSubscribtion: any;
 
   constructor(
@@ -65,7 +65,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.stylesRef = af.database.object('/styles');
 
     // interface
-    this.showOpenDialog = false;
+    //this.showOpenDialog = false;
 
     // TODO remove | only for test purposes | 
     // should only be set once => when server restarts
@@ -86,8 +86,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
         this.zone.run(() => this.uploadProgress = data);
       }, err => console.log(err));
 
-    this.selectedProjectId =  this.route.snapshot.params['id'];
-    if(this.selectedProjectId) this.openProject(this.selectedProjectId);
+    this.projectId =  this.route.snapshot.params['id'];
+    if(this.projectId) {
+      this.openProject(this.projectId);
+    }
   }
 
   ngOnDestroy(){
@@ -95,34 +97,34 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   /* project ------ */
-  createNewProject($event) {
-    // reset some values
-    this.selectedAnnotation = false;
-    // create new empty project
-    this.projectsRef.push({ user: this.userId })
-      .then((ref) => {
-        this.projectRef = this.af.database.object(ref.toString());
-        this.projectRef.subscribe((s: any) => {
-          // new project model
-          this.project = new Project(s);
+  // createNewProject($event) {
+  //   // reset some values
+  //   this.selectedAnnotation = false;
+  //   // create new empty project
+  //   this.projectsRef.push({ user: this.userId })
+  //     .then((ref) => {
+  //       this.projectRef = this.af.database.object(ref.toString());
+  //       this.projectRef.subscribe((s: any) => {
+  //         // new project model
+  //         this.project = new Project(s);
 
-          if (this.project.remapAnnotationsTime() ){
-            this.updateProject();
-          };
+  //         if (this.project.remapAnnotationsTime() ){
+  //           this.updateProject();
+  //         };
           
-        });
+  //       });
 
-        // attach project id to user 
-        this.af.database.object(`/users/${this.userId}/projects/${ref.key}`).set(true);
+  //       // attach project id to user 
+  //       this.af.database.object(`/users/${this.userId}/projects/${ref.key}`).set(true);
 
-        // upload
-        this.uploadSource($event, ref.key);
-      })
-      .catch(err => console.log(err, 'could not create|upload a new project'));
-  }
+  //       // upload
+  //       this.uploadSource($event, ref.key);
+  //     })
+  //     .catch(err => console.log(err, 'could not create|upload a new project'));
+  // }
 
   openProject(id: string){
-    this.showOpenDialog = false;
+    //this.showOpenDialog = false;
     this.projectRef = this.af.database.object(`/projects/${id}`);
     this.projectRef.subscribe( s => {
       this.project = new Project(s);
@@ -135,21 +137,20 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   /* upload ------- */
-  uploadSource($event, key) {
+  uploadSource($event) {
     // file-ref to upload
     let sourceFile = $event.target.files[0];
     // upload video
-    this.uploadService.getSignedRequest(sourceFile, key)
+    this.uploadService.getSignedRequest(sourceFile, this.projectId)
       .then((data: Object) => {
         this.uploadService.uploadFile(data['file'], data['response']['signedRequest'])
           .subscribe(
             data => {
               // done uploading to s3
               this.userMessage ='';
-
               // update state 
               this.http.post('api/state/update', { 
-                projectId: this.project.key,
+                projectId: this.projectId,
                 state: 'uploaded',
                 value: true
               }).subscribe((data) => { });
@@ -163,7 +164,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   updateSource($event) {
-    this.uploadSource($event, this.project.key);
+    this.uploadSource($event);
   }
 
   /* annotations -- */
@@ -210,8 +211,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
     }
   }
   
-  toggleOpenDialog() { this.showOpenDialog = !this.showOpenDialog; }
-  hideOpenDialog() { this.showOpenDialog = false; }
+  //toggleOpenDialog() { this.showOpenDialog = !this.showOpenDialog; }
+  //hideOpenDialog() { this.showOpenDialog = false; }
 
   // TODO
   onBlur() {
@@ -227,7 +228,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   /* render ------- */
   addToRenderQueue() {
-    this.http.post('api/render/stitch', { projectId: this.project.key })
+    this.http.post('api/render/stitch', { projectId: this.projectId })
       .subscribe((data) => { });
   }
 
