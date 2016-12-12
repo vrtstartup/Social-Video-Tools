@@ -29,12 +29,18 @@
         &:hover {
             border-bottom: 2px solid $s-link;
         }
+        &:hover md-icon { 
+            fill: $s-link;
+        }
     }
     &__previewbtn {
         position: absolute;
         left: 50%;
         top: 50%;
         transform: translate(-50%,-50%);
+        md-icon {
+            fill: white;
+        }
     }
     &__info {
         color: hsl(0,0,50%);

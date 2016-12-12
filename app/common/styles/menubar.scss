@@ -5,10 +5,7 @@ menu-bar {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: .5rem 1rem; 
-    .s-projects-link.s-active {
-        display: none;
-    }
+    padding: .5rem 1rem;
     .s-menu-bar__item { 
         cursor: pointer;
         display: flex;
