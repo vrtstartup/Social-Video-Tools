@@ -27,8 +27,10 @@ if(!env && !(env==='development' || env==='production')){
 } else {
     // when no env var is available, check wether or not URI contains the string 'dev'
     // exportConfig = (window.location.hostname.indexOf('dev') > -1) ? firebaseConfig.development : firebaseConfig.production;
+    console.log(process.env);
+    console.log(process.env.CIRCLE_BRANCH);
     exportConfig = (process.env.CIRCLE_BRANCH === 'develop') ? firebaseConfig.development : firebaseConfig.production;
-// }
+}
 
 module.exports = {
     firebaseApp: exportConfig,
