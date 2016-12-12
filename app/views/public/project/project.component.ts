@@ -16,7 +16,7 @@ import testStyles from '../../../common/models/testStyles.model';
 @Component({
   providers: [UploadService],
   selector: 'project-component',
-  templateUrl: 'project.component.html',
+  templateUrl: './project.component.html',
 })
 
 export class ProjectComponent implements OnInit, OnDestroy {
