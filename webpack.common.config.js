@@ -5,7 +5,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const config = require('./app/config/front.config');
+const frontConfig = require('./app/config/front.config'); 
 
 module.exports = function () {
     return {
@@ -75,7 +75,7 @@ module.exports = function () {
                 { from: './app/assets/', to: 'assets' },
             ]),
             new webpack.DefinePlugin({
-                'ENV': JSON.stringify( config.env ),
+                'FIREBASE_CONFIG': JSON.stringify(frontConfig['firebaseApp']),
             }),
         ],
 

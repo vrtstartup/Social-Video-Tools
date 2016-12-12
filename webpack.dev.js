@@ -7,7 +7,7 @@ const webpack = require('webpack');
 const webpackCommonConfig = require('./webpack.common.config.js');
 const webpackMerge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const config = require('./app/config/front.config');
+const frontConfig = require('./app/config/front.config');
 
 module.exports = function () {
     return webpackMerge(webpackCommonConfig(), {
@@ -22,7 +22,7 @@ module.exports = function () {
             contentBase: './',
             historyApiFallback: true,
             proxy: {
-                "**": "http://localhost:" + config.port
+                "**": "http://localhost:" + frontConfig.port
             }
         }
     });

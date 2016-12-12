@@ -41,8 +41,6 @@ export function signUrl(fileType:string, fileExtension: string, projectId: strin
   */
   const fileKey = resolver.getProjectFileKey(fileType, projectId);
 
-  console.log('got fileKey: ', fileKey);
-
   const s3Params = {
     Bucket: 'social-video-tools',
     Key: fileKey,

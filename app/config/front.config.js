@@ -1,15 +1,35 @@
-const env = process.env.NODE_ENV || 'development';
-
-// Service message for console in case of unknown environment
-if (env !== 'development' && env !== 'production' && env !== 'staging') {
-    console.log('Use: NODE_ENV=[development | production]');
-    console.log('Quitting...');
-    process.exit();
+// define configuration for both environments
+const firebaseConfig = {
+    development: {
+        apiKey: "AIzaSyAOsjXWW-1EBeHJX5hHz7dhDRuGYsrchNU",
+        authDomain: "socialvideotool-dev.firebaseapp.com",
+        databaseURL: "https://socialvideotool-dev.firebaseio.com",
+        storageBucket: "socialvideotool-dev.appspot.com",
+        messagingSenderId: "82496228852"
+    },
+    production: {
+        apiKey: "AIzaSyD3BnxjYmXHrP7zUPn8PxXQ1H-SbEzZwsY",
+        authDomain: "socialvideotool.firebaseapp.com",
+        databaseURL: "https://socialvideotool.firebaseio.com",
+        storageBucket: "socialvideotool.appspot.com",
+        messagingSenderId: "796211105673"
+    }
 }
 
-const config = {
-    env: process.env.NODE_ENV || 'development',
-    port: process.env.PORT || '3000',
+let exportConfig = {};
+const env = process.env.NODE_ENV;
+const port = process.env.PORT || '3000'
+
+// check if the env var NODE_ENV has been set. 
+// This will be false on the CircleCI build server, but properly on a developers machine running Webpack
+if(env && (env==='development' || env==='production')){ 
+    exportConfig = firebaseConfig[env];
+} else {
+    // when no env var is available, check wether or not URI contains the string 'dev'
+    exportConfig = (window.location.hostname.indexOf('dev') > -1) ? firebaseConfig.development : firebaseConfig.production;
 }
 
-module.exports = config;
+module.exports = {
+    firebaseApp: exportConfig,
+    port: port
+};
