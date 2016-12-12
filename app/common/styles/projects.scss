@@ -1,0 +1,12 @@
+.s-projects-menu {
+    background: $s-primary;
+    border-bottom: 1px solid lighten($s-primary, 10%);
+    color: white;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+}
+.s-projects-container {
+    background: hsl(0,0,95%);
+}

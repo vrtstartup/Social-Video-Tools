@@ -19,22 +19,20 @@ import { UserService } from './common/services/user.service';
 import { RoleGuard } from './common/guards/role.guard';
 
 import { AppComponent } from './app.component';
-import { LoginForm } from './views/public/auth/components/login/login-form';
+import { LoginComponent } from './views/public/login/login.component';
 
-import { SubtitlesComponent } from './views/public/subtitles/subtitles.component';
-import { VrtVideoPlayer } from "./views/public/subtitles/components/vrtvideo-player";
-import { OpenComponent } from './views/public/subtitles/components/open.component';
-import { ProgressComponent } from './views/public/subtitles/components/progress.component';
-import { ProgressBarComponent } from './views/public/subtitles/components/progressbar.component';
-import { RangeSliderComponent } from './views/public/subtitles/components/range-slider.component';
-import { AuthComponent } from './views/public/auth/authentication.component';
+import { ProjectComponent } from './views/public/project/project.component';
+import { VrtVideoPlayer } from "./views/public/project/components/vrtvideo-player";
+import { ProgressComponent } from './views/public/project/components/progress.component';
+import { ProgressBarComponent } from './views/common/progressbar.component';
+import { RangeSliderComponent } from './views/public/project/components/range-slider.component';
 import { DownloadComponent } from './views/public/download/download.component';
+import { AdminComponent } from './views/admin/admin.component';
 import { DashboardComponent } from './views/admin/dashboard.component';
 import { UsersComponent } from './views/admin/users.component';
-import { ProjectsComponent } from './views/public/subtitles/components/projects.component';
+import { ProjectsComponent } from './views/public/projects/projects.component';
 import { ProjectListComponent } from './views/common/project-list.component';
 import { MenuComponent } from './views/common/menu.component';
-import { AdminMenuComponent } from './views/public/partials/adminMenu.component';
 
 // currently only used for mdicon
 import { MaterialModule } from '@angular/material';
@@ -58,20 +56,18 @@ const firebaseAuthConfig = {
     declarations: [
         AppComponent,
         VrtVideoPlayer,
-        SubtitlesComponent,
-        OpenComponent,
+        ProjectComponent,
         ProgressComponent,
         ProgressBarComponent,
-        AuthComponent,
         DownloadComponent,
+        AdminComponent,
         DashboardComponent,
         UsersComponent,
         ProjectsComponent,
         ProjectListComponent,
-        AdminMenuComponent,
         MenuComponent,
         RangeSliderComponent,
-        LoginForm,
+        LoginComponent,
         ListPipe,
         SortByPropPipe,
         KeysPipe,

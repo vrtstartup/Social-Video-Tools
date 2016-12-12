@@ -1,7 +1,0 @@
-<div class="open-project container-fluid">
-  <div class="project row" *ngFor="let project of projects">
-    <div class="col-md-12" [class.highlight]="openedProject && project.key === openedProject.key" (click)="open(project.key)">
-      <p>{{project.key}}: <span class="right" *ngIf="project.lastStatus">{{project.lastStatus.text}} <span *ngIf="project.lastStatus.progress">{{project.lastStatus.progress}}%</span></span></p>
-    </div>
-  </div>
-</div>
