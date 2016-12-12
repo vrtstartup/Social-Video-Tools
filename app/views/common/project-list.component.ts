@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProjectService } from '../../common/services/project.service';
 import { Project } from '../../common/models/project.model';
@@ -9,7 +9,7 @@ import { Project } from '../../common/models/project.model';
 })
 
 export class ProjectListComponent implements OnInit {
-
+  @Input() role: number;
   private projects: Array<Project>;
 
   constructor(
@@ -25,6 +25,6 @@ export class ProjectListComponent implements OnInit {
 
   open(projectId: string){ 
     //this.selectionUpdated.emit(projectId);
-    this.router.navigateByUrl(`/project/${projectId}`);
+    this.router.navigateByUrl(`/projects/${projectId}`);
   }
 }
