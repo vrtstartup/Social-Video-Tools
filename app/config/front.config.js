@@ -22,12 +22,13 @@ const port = process.env.PORT || '3000'
 
 // check if the env var NODE_ENV has been set. 
 // This will be false on the CircleCI build server, but properly on a developers machine running Webpack
-if(env && (env==='development' || env==='production')){ 
+if(!env && !(env==='development' || env==='production')){ 
     exportConfig = firebaseConfig[env];
 } else {
     // when no env var is available, check wether or not URI contains the string 'dev'
-    exportConfig = (window.location.hostname.indexOf('dev') > -1) ? firebaseConfig.development : firebaseConfig.production;
-}
+    // exportConfig = (window.location.hostname.indexOf('dev') > -1) ? firebaseConfig.development : firebaseConfig.production;
+    exportConfig = (process.env.CIRCLE_BRANCH === 'develop') ? firebaseConfig.development : firebaseConfig.production;
+// }
 
 module.exports = {
     firebaseApp: exportConfig,
