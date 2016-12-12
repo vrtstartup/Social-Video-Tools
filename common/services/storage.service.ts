@@ -13,13 +13,11 @@ const  s3 = new aws.S3({signatureVersion: 'v4'});
 export function uploadFile(project, fileType: string){
   // get file 
   const filePath = resolver.getProjectFilePath(fileType, project['data']['id']);
-  console.log(filePath); 
+  logger.info(`Uploading files for ${project.data.id}`);
   
   return new Promise((resolve, reject) => {
     fs.readFile(filePath,(err, fileBuffer) => {
       if(err) logger.error(`could not read ${fileType} file.`);
-
-      logger.debug(fileBuffer);
       
       s3.putObject({
         ACL: 'public-read',
@@ -30,7 +28,7 @@ export function uploadFile(project, fileType: string){
       }, (err, resp) => {
         if(err) logger.error(err);
 
-        logger.info(resp);
+        logger.info(`Upload done.`);
         resolve(project);
       })
     })
