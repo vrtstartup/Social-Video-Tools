@@ -1,7 +1,44 @@
-<div class="open-project container-fluid">
-  <div class="project row" *ngFor="let project of projects">
-    <div class="col-md-12" [class.highlight]="openedProject && project.key === openedProject.key" (click)="open(project.key)">
-      <p>{{project.key}}: <span class="right" *ngIf="project.lastStatus">{{project.lastStatus.text}} <span *ngIf="project.lastStatus.progress">{{project.lastStatus.progress}}%</span></span></p>
+<div class="s-project-list">
+
+  <div class="s-project-item" *ngFor="let project of projects">
+    <!--image-->
+    <div class="s-project-item__image">
+      <img src="http://placehold.it/160x90" alt="">
+      <div class="s-project-item__previewbtn">
+        play
+      </div>
     </div>
+
+    <div class="s-project-item__info">
+      <!--meta-->
+      <div class="s-project-item__meta">
+        <span class="">15-06-2016</span> |
+        <span class="">joris compernol</span>
+      </div>
+      <!--status-->
+      <div class="s-project-item__status">
+        <span *ngIf="project.lastStatus">
+            {{project.lastStatus.text}} 
+              <span *ngIf="project.lastStatus.progress">
+                {{project.lastStatus.progress}}%
+              </span>
+        </span>
+        <div>Uploaded:<span>progress here</span></div>
+        <div>Downscaled:<span>progress here</span></div>
+        <div>Templater:<span>progress here</span></div>
+        <div>Stitching:<span>progress here</span></div>
+      </div>
+    </div>
+
+    <!--controls-->
+    <div class="s-project-item__controls">
+      <button class="s-btn" type="button">Download</button>
+      <button class="s-btn s-btn--secondary" type="button" (click)="open(project.key)">Edit</button>
+    </div>
+    <div class="s-project-item__morebtn" (click)="more = !false">
+      ...
+    </div>
+    <ul class="s-project-item__more" *ngIf="more">
+      <li>delete</li>
+    </ul>
   </div>
-</div>

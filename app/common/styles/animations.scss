@@ -1,0 +1,28 @@
+@mixin s-keyframes($animation-name) {
+    @keyframes #{$animation-name} {
+        @content;
+    }
+}
+@mixin s-animation($str) {
+    animation: #{$str};
+}
+
+// USE
+
+/* --- fadeIn ---- */
+@include s-keyframes(fadeIn) {
+    0% {  transform: translateY(6px); }
+    100% {  transform: translateY(0); }
+}
+.s-slideIn {
+    @include s-animation('fadeIn .6s 1');
+}
+
+/* --- scale ---- */
+@include s-keyframes(scaleSlow) {
+    0% {  transform: scale(1, 1); }
+    100% {  transform: scale(1.1, 1.1); }
+}
+.s-scaleSlow {
+    @include s-animation('scaleSlow 20s normal forwards ease-out');
+}

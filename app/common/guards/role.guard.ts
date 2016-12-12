@@ -24,7 +24,7 @@ export class RoleGuard implements CanActivate {
       } 
 
       console.log(`incorrect userRole: (${allowedRoles})`)
-      this.router.navigate(['/auth']);
+      this.router.navigate(['/login']);
       return false;
       
     }).first()
