@@ -7,14 +7,6 @@ const fs = require('fs');
 import { config } from '../config';
 const logger = config.logger;
 
-export class FireBase {
+firebase.initializeApp( config.firebase );
 
-  public database: any;
-
-  constructor() {
-    // this operation is synchronous
-    firebase.initializeApp( config.firebase );
-
-    this.database = firebase.database();
-  }
-}
+export const db = firebase.database();

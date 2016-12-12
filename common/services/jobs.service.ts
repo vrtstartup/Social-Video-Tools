@@ -1,24 +1,23 @@
+import { db } from '../../common/services/firebase.service';
+import { logger } from '../config/winston';
+
 export class Jobs {
-  private fireBase;
-  private logger;
   public refFfmpegQueue: any;
 
-  constructor(fireBase:any, logger: any) { 
-    this.fireBase = fireBase;
-    this.logger = logger;
-    this.refFfmpegQueue = this.fireBase.database.ref('ffmpeg-queue');
+  constructor() { 
+    this.refFfmpegQueue = db.ref('ffmpeg-queue');
   }
 
   resolveJob(queue:string, key: string) {
     // get reference 
-    this.logger.verbose('successfully processed job...');
-    return this.fireBase.database.ref(`${queue}`).child(key).remove();
+    logger.verbose('successfully processed job...');
+    return db.ref(`${queue}`).child(key).remove();
   }
 
-  getFirst(property:string) {
+  getFirst(property:string, operation: string) {
     // #todo implement logic for picking the proper job
     // get the first job from the queue stack
-    const refProperty = this.fireBase.database.ref(property);
+    const refProperty = db.ref(property);
 
     return new Promise((resolve, reject) => {
       refProperty.once('value', (snapshot) => {
@@ -31,7 +30,7 @@ export class Jobs {
             const key = arrKeys[i];
             const job = jobs[key];
 
-            if(job.status === 'open'){
+            if(job.status === 'open' && job.operation === operation){
               job.id = key;
               resolve(job);
               break;
@@ -39,7 +38,7 @@ export class Jobs {
           }
         }
 
-        reject('No more jobs'); // no more available jobs
+        resolve(false); // no more available jobs
       });
     });
   }
@@ -48,7 +47,7 @@ export class Jobs {
     // set a project up for processing in the firebase queue
 
     // has firebase been initialized? 
-    const refFfmpegQueue = this.fireBase.database.ref(`${queue}/${projectId}`);
+    const refFfmpegQueue = db.ref(`${queue}/${projectId}`);
 
     return refFfmpegQueue.update({
       "operation": operation,
@@ -58,14 +57,14 @@ export class Jobs {
 
   resolve(queue:string, key: string) {
     // get reference 
-    this.logger.verbose('successfully processed job...');
-    return this.fireBase.database.ref(`${queue}`).child(key).remove();
+    logger.verbose('successfully processed job...');
+    return db.ref(`${queue}`).child(key).remove();
   }
 
   kill(key, err) {
-    this.logger.error(err);
+    logger.error(err);
     // make sure that faulty, error-throwing jobs dont get stuck in an execution loop
-    return this.fireBase.database.ref("ffmpeg-queue").child(key).update({
+    return db.ref("ffmpeg-queue").child(key).update({
       status: 'error',
       error: {
         message: err.message ? err.message : 'none',
@@ -77,13 +76,13 @@ export class Jobs {
   }
 
   listenQueue(handler) {
-    this.refFfmpegQueue.on('value', (snapshot) => {
+    this.refFfmpegQueue.on('child_added', (snapshot) => {
       // this runs whenever a new job is created in the queue.
       // logger.verbose('got new queue data'); //#todo feedback
       const jobs = snapshot.val();
       handler(jobs);
     }, (errorObject) => {
-      this.logger.error(`The read failed: ${errorObject.code}`);
+      logger.error(`The read failed: ${errorObject.code}`);
     });
   }
 
@@ -94,7 +93,7 @@ export class Jobs {
 
       handler(jobs);
     }, (errorObject) => {
-      this.logger.error(`The read failed: ${errorObject.code}`);
+      logger.error(`The read failed: ${errorObject.code}`);
     });
   }
 
@@ -112,7 +111,7 @@ export class Jobs {
   updateFfmpegQueue(job:any, value: Object) {
     // Update the firebase entry property for a given project
     return new Promise((resolve, reject) => {
-      const ref = this.fireBase.database.ref(`ffmpeg-queue/${job.id}`);
+      const ref = db.ref(`ffmpeg-queue/${job.id}`);
       ref.update(value)
         .then(resolve(job), reject);
     });

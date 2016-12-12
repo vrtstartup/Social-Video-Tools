@@ -3,6 +3,9 @@ import { config } from '../../common/config';
 import * as fs from 'fs';
 const mkdirp = require('mkdirp');
 
+const fServer = config.routing.fileServer;
+
+
 export function destinationDirectory(fileType:string, baseDirectory:string) {
   // return a fully resolved path to a project file's directory
   const workingDir = config.filesystem.workingDirectory;
@@ -11,47 +14,71 @@ export function destinationDirectory(fileType:string, baseDirectory:string) {
   return resolve(workingDir, baseDirectory, subDir);
 }
 
-export function destinationFile(fileType:string, baseDirectory:string, fileName:string) {
+export function destinationFile(fileType:string, projectId:string, fileName:string) {
   //  return a fully resolved path to a project file
   const workingDir = config.filesystem.workingDirectory;
-  const subDir = config.filesystem.files[fileType].directory;
+  // const subDir = config.filesystem.files[fileType].directory;
 
-  return resolve(workingDir, baseDirectory, subDir, fileName);
+  return resolve(workingDir, `${projectId}${fileName}`);
 }
 
-export function getFilePathByType(fileType:string, baseDirectory){
-  // shoud be able to say "get me this project's source file"
-  const file =  config.filesystem.files[fileType];
+export function isSharedFile(type: string){ 
+  const fileConfig = getFileConfigByType(type);
+  return fileConfig.hasOwnProperty('shared') && fileConfig['shared'];
+}
+
+export function isUniqueFile(type: string) {
+  const fileConfig = getFileConfigByType(type);
+  return fileConfig.hasOwnProperty('name');
+}
+
+function getFileConfigByType(type: string): Object{ return config.filesystem.files[type] }
+
+export function getSharedFilePath(type: string, fileName: string) {
+  // get configuration 
+  const fileConfig = getFileConfigByType(type);
   const workingDir = config.filesystem.workingDirectory;
-  const subDir = file.directory;
-  const fileName = file.name;
+  const sharedDir = config.filesystem.sharedDirectory;
+  const subDir = fileConfig['directory'];
+  const ext = fileConfig['extension'];
 
-  // resolve proper path
-  const directory = resolve(workingDir, baseDirectory, subDir);
-  let filePath = resolve(directory, fileName);
-
-  if(file.extension) filePath = `${filePath}.${file.extension}`;
-
-  return filePath;
+  return resolve(workingDir, sharedDir, subDir, `${fileName}.${ext}`);
 }
 
-export function getFileNameByType(fileType:string, baseDirectory:string) {
+export function getProjectFilePath(type: string, projectName: string, fileName?: any){
+  const fileConfig = getFileConfigByType(type);
+  const workingDir = config.filesystem.workingDirectory;
+  // const subDir = fileConfig['directory'];
+  const fName = fileName ? fileName : fileConfig['name']; // if fileName is not explicitly set, it's a unique file whose name has been set in the config 
+  const ext = fileConfig['extension'];
+
+  return resolve(workingDir, `${projectName}${fName}.${ext}`);
+}
+
+export function getProjectFileKey(type: string, projectId: string, fileName?: any): string{
+  const fileConfig = getFileConfigByType(type);
+  const fName = fileName ? fileName : fileConfig['name']; // if fileName is not explicitly set (overlay), it's a unique file whose name has been set in the config 
+  const ext = fileConfig['extension'];
+
+  return `${projectId}/${fName}.${ext}`;
+}
+
+export function getFileNameByType(fileType:string, fileId?:string) {
   // return an unresovled project file's name, including extension as configured
   const file =  config.filesystem.files[fileType];
-  let fileName = file.name;
+  let fileName = file.hasOwnProperty('name') ? file.name : fileId;
 
   if(file.extension) fileName = `${fileName}.${file.extension}`;
 
   return fileName;
 }
 
-export function staticUrl(fileType:string, baseDirectory:string) {
-  // return a public url to file in the static folder
+export function storageUrl(fileType:string, baseDirectory:string){
+  // return public url to file in s3 bucket
   const file =  config.filesystem.files[fileType]; //config
-  const fileName = this.getFileNameByType(fileType, baseDirectory);
+  const fileName = this.getFileNameByType(fileType);
 
-  // #todo how do I get the base URL here ? 
-  return `http://localhost:3000/video/${baseDirectory}/${file.directory}/${fileName}`;
+  return `https://s3.eu-central-1.amazonaws.com/social-video-tools/${baseDirectory}/${fileName}`;
 }
 
 export function makeProjectDirectories(baseDirectory:string) {

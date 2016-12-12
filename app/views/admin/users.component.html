@@ -1,0 +1,18 @@
+Users
+<section class="users container-fluid">
+  <div *ngFor="let user of users" class="user row">
+    <section class="credentials col-md-4">
+      <h2>{{user.key}}</h2>
+      <p>{{user.data.email}} {{user.data.role}}</p>
+      <p>Projects: {{user.countProjects()}}</p>
+    </section>
+    
+    <section class="buttons col-md-8">
+      <button class="right" (click)="echoUsers()">Reset Password</button>
+      <select class="right" [ngModel]="user.data.role" (ngModelChange)="echoUsers()">
+        <option *ngFor="let option of possibleRoles" [ngValue]="option">{{option}}</option>
+      </select>
+    </section>
+    
+  </div>
+</section>

@@ -12,7 +12,6 @@ You need to have [Node.js and npm]
 ```
 npm i
 ```
-
 ### NPM commands
 Start server [on port 3000]:
 ```

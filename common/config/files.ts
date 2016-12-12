@@ -1,43 +1,61 @@
 import { resolve } from 'path';
 
 export const fileConfig = {
-  workingDirectory: `${resolve('projects')}`,
+  workingDirectory: process.env.DATA_FOLDER || resolve('data'),
+  sharedDirectory: resolve('/app/data', 'shared'),
   files: {
     source: {
-      directory: 'source',
+      directory: './',
       name: 'source_file',
       extension: 'mp4',
-      unique: true
+      mime: 'video/mp4',
     },
     lowres: {
-      directory: 'build_artefacts',
+      directory: './',
       name: 'scaled_down',
       extension: 'mp4',
-      unique: true
+      mime: 'video/mp4',
     },
-    subtitle: {
-      directory: 'build_artefacts',
-      name: 'subtitle',
+    srt: {
+      directory: './',
+      name: 'subtitles',
       extension: 'srt',
-      unique: true
+      mime: 'text/plain',
+    },
+    ass: {
+      directory: './',
+      name: 'subtitles',
+      extension: 'ass',
+      mime: 'text/plain',
     },
     render: {
-      directory: 'out',
+      directory: './',
       name: 'render',
       extension: 'mp4',
-      unique: true
+      mime: 'video/mp4',
     },
     subtitledSource: {
-      directory: 'build_artefacts',
+      directory: './',
       name: 'sourceSubtitled',
       extension: 'mp4',
-      unique: true
+      mime: 'video/mp4',
     },
-    overlays: {
+    overlay: {
       directory: 'overlays',
-      name: '_overlay',
-      extension: 'mp4',
-      unique: false,
+      extension: 'mov',
+      mime: 'video/quicktime',
+    },
+    outro: {
+      directory: 'bumpers',
+      extension: 'mov',
+      mime: 'video/quicktime',
+      shared: true
+    },
+    logo: {
+      directory: 'logo',
+      extension: 'mov',
+      mime: 'video/quicktime',
+      shared: true,
     }
   }
 };

@@ -15,33 +15,10 @@ router.get('/queue', (req, res) => {
   // return data
   let data = [];
 
-  /*
-  * This funtion gets the first job object from the 'templater-queue' list. A job contains a projectId and a current status
-  * then, the related project data and available templates are fetched. Finally, the results from these three promises are
-  * fed into the parseTitles() function which in turn returns an array of objects which is parseable by the templater bot. 
-  * A job containes one project rather than an individual title because we want assets to be processed on a by-project basis, 
-  * i.e the templater bot shouldn't render assets for project B before *all* assets for project A have been rendered.
-  *
-  * However, the templater bot needs a way to update the status for a specific title. 
-  * 
-  * This async structure is quite hard to write properly without async/await, see: 
-  *
-  *   http://stackoverflow.com/a/28250697/1185774
-  */
-  let templates = templateService.getAll();
   let project = jobService.getFirst('templater-queue')
-    .then(job => projectService.getProjectByJob(job), err => errorHandler(err));
-
-
-  Promise.all([
-    templates,
-    project
-  ]).then((data) => {
-    const templates = data[0];
-    const project = data[1];
-
-    res.send(project.parseOverlays(templates));
-  }, err => errorHandler(err));
+    .then(job => projectService.getProjectByJob(job), reason => res.json([]))
+    .then( project => res.json(project.parseOverlays()))
+    .catch(errorHandler);
 
 });
 
@@ -60,11 +37,14 @@ router.post('/status', (req, res) => {
     const jobService = req.app.get('jobs');
 
     // update title 
-    projectService.setProjectProperty(projectId, `annotations/${overlayId}/render-status`, 'done')
+    projectService.setProjectProperty(projectId, `annotations/${overlayId}/data/bot/render-status`, 'done')
       .then(fbData => projectService.getProjectById(projectId))
       .then(project => {
         if (project.overlaysReady()) {
+          // all overlays have been rendered, progress to next state 
           jobService.resolveJob('templater-queue', projectId);
+          projectService.setProjectProperty(projectId, 'status/overlaysReady', true);
+          jobService.queue('ffmpeg-queue', projectId, 'render');
         }
       }, errorHandler) 
       .then(data => res.send({success: true, info: 'overlay status has been updated.'}), errorHandler);

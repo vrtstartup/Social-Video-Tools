@@ -1,0 +1,104 @@
+<menu-bar></menu-bar>
+
+<div class="socialvideotool">
+	<div class="s-menu-project">
+		<div>
+			<div *ngIf="!project?.data?.status?.downscaled">
+				<label class="s-btn btn-upload">
+					<input type="file" name="video" (change)="uploadSource($event)">uploadSource
+				</label>
+			</div>
+			<div *ngIf="project?.data?.status?.downscaled">
+				<div class="s-btn">brand selector ></div>
+				<label class="s-btn s-btn--outline btn-upload">
+					<input type="file" name="video" (change)="updateSource($event)">Update Source
+				</label>
+				<button class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
+				<button class="s-btn" type="button" (click)="addToRenderQueue()">Render Movie</button>
+			</div>
+
+		</div>
+	</div>
+
+	<div *ngIf="project?.data">
+		<progress-bar *ngIf="uploadProgress > 0 && uploadProgress < 100" [task]="'uploading'" [progress]="uploadProgress"></progress-bar>
+		<progress-bar *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100" [task]="'downscaling'" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
+	</div>
+
+	<progress-dialog *ngIf="project && project.isRendering()" [project]="project"></progress-dialog>
+
+	<div class="s-submenu" *ngIf="project && !project.isRendering()">
+		<!--once downscaled show controls-->
+		<div *ngIf="project?.data?.status?.downscaled">
+			<button type="button" class="s-btn" (click)="addAnnotation()">Add Annotation(U)</button>
+		</div>
+	</div>
+
+	<div class="s-sub-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
+		
+		<!--annotations-->
+		<div class="s-sub__wrapper">
+			<!--annotations column-->
+			<div class="s-sub-items">
+				<div *ngIf="project.data.annotations">
+					<div *ngFor="let annotation of project.data.annotations | list | sortByProp:'end' " 
+						(click)="setSelectedAnno(annotation.key)"
+						[class.highlight]="selectedAnnotation.key === annotation.key"
+						class="s-sub-item">
+						<div class="s-sub-item__info">
+							<small>{{annotation.start | json}}-{{annotation.end | json}} </small><br>
+							<small>{{annotation.data.name}}</small>
+						</div>
+						<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation.key)">
+							<span>x</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!--template column-->
+			<div class="s-sub-templates" *ngIf="selectedAnnotation">
+				<div *ngFor="let template of (templates | list)"
+					(click)="updateSelectedAnnoTemplate(template)"
+					[class.highlight]="template.name === selectedAnnotation.data.name"
+					class="s-sub-template">
+						<img class="s-sub-template__thumb" [src]="template.imageUrl">
+						<small class="s-sub-template__name">{{template.name}}</small>
+				</div><hr>
+			</div>
+
+			<!--inputs column-->
+			<div class="s-sub-inputs">
+				<div *ngIf="selectedAnnotation">
+					<form  *ngIf="selectedAnnotation.data.text">
+						<div *ngFor="let input of (selectedAnnotation.data.text | list); let i = index">
+							<label class="s-sub-inputs__label" for="">{{i}}-{{input.label}}</label>
+							<input class="s-sub-inputs__input" type="text" [(ngModel)]="input.text" 
+								(keyup)="onKey(input)"
+								(blur)="onBlur()" [ngModelOptions]="{standalone: true}">
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!--video-->
+		<div class="s-video_wrapper">
+
+			<div class="s-video">
+				<vrtvideo-player 
+					[clip]="project.data.clip"
+					[annotations]="project.data.annotations"
+					[selectedAnnotation]="selectedAnnotation">
+				</vrtvideo-player>
+
+				<range-slider *ngIf="selectedAnnotation"
+					[selectedAnnotation]="selectedAnnotation" 
+					[clip]="project.data.clip" (changeAnno)="updateSelectedAnno( selectedAnnotation.key, $event)">
+				</range-slider>
+			</div>
+		</div>
+
+	</div>
+	
+</div>

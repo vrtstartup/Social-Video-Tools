@@ -1,10 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
-node_modules
-dist
 aot
 server/projects
 *.ngfactory.ts
 worker/bin
 npm-debug.log
 logs
-projects
+data
