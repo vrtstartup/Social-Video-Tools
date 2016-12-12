@@ -21,6 +21,7 @@ deployment:
       - git add -A
       - git commit -m 'Created Build'
       - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
+      - git push -f git@heroku.com:social-video-tools-staging.git ${CIRCLE_BRANCH}:master
 
   development:
     branch: develop
