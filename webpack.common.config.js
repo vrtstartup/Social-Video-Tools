@@ -5,8 +5,6 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const config = require('./app/config/front.config');
-
 module.exports = function () {
     return {
 
@@ -73,10 +71,7 @@ module.exports = function () {
             new CopyWebpackPlugin([
                 { from: 'node_modules/videogular2/fonts', to: 'fonts' },
                 { from: './app/assets/', to: 'assets' },
-            ]),
-            new webpack.DefinePlugin({
-                'ENV': JSON.stringify( config.env ),
-            }),
+            ])
         ],
 
         devtool: false,

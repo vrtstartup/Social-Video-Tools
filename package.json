@@ -4,6 +4,7 @@
   "description": "Videogular2 Starter",
   "scripts": {
     "dev-server": "webpack-dev-server --config webpack.dev.js",
+    "prod-server": "webpack-dev-server --config webpack.prod.js",
     "worker": "node worker --ext js,ts",
     "server": "node server --ext js,ts",
     "uploader": "node uploader --ext js,ts",

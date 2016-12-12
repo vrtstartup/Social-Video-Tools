@@ -76,7 +76,7 @@ export class Jobs {
   }
 
   listenQueue(handler) {
-    this.refFfmpegQueue.on('value', (snapshot) => {
+    this.refFfmpegQueue.on('child_added', (snapshot) => {
       // this runs whenever a new job is created in the queue.
       // logger.verbose('got new queue data'); //#todo feedback
       const jobs = snapshot.val();

@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AngularFireModule } from 'angularfire2';
+import { AngularFireModule, AuthProviders, AuthMethods } from 'angularfire2';
 import { HttpModule } from '@angular/http';
 import { ExtBrowserXhr } from './common/classes/extBrowserXhr';
 import { NgModule } from '@angular/core';
@@ -15,7 +15,7 @@ import{ routing } from './common/services/routing.service';
 import { ProjectService } from './common/services/project.service';
 import { UserService } from './common/services/user.service';
 
-import firebaseConfig from './config/firebase.config';
+// import firebaseConfig from './config/firebase.config';
 import { RoleGuard } from './common/guards/role.guard';
 
 import { AppComponent } from './app.component';
@@ -43,6 +43,14 @@ import { SortByPropPipe } from './common/pipes/sortByProp.pipe';
 import { KeysPipe } from './common/pipes/keys.pipe';
 
 import { NgInitDir } from './common/directives/ngInit.directive';
+
+declare var FIREBASE_CONFIG;
+
+const firebaseAppConfig = FIREBASE_CONFIG;
+const firebaseAuthConfig = {
+    provider: AuthProviders.Custom,
+    method: AuthMethods.Password
+}
 
 @NgModule({
     declarations: [
@@ -76,7 +84,7 @@ import { NgInitDir } from './common/directives/ngInit.directive';
         VgOverlayPlayModule, 
         VgBufferingModule,
         HttpModule,
-        AngularFireModule.initializeApp( firebaseConfig()['firebaseConfig'], firebaseConfig()['firebaseAuthConfig']  ),
+        AngularFireModule.initializeApp( firebaseAppConfig, firebaseAuthConfig  ),
         routing,
     ],
     exports: [
