@@ -1,7 +1,10 @@
 <menu-bar></menu-bar>
 <div class="s-projects-menu">
-    <div>My projects</div>
-    <button class="s-btn" type="button" (click)="createNewProject($event)">Create New Project</button>
+    <div>My projects(filter)</div>
+    <button class="s-btn s-btn--hasicon" type="button" (click)="createNewProject($event)">
+        <span class="s-btn__text">Create New Project</span>
+        <span class="s-btn__icon"><md-icon svgSrc="assets/icons/icon-plus.svg"></md-icon></span> 
+    </button>
 </div>
 <div class="s-projects-container">
     <project-list></project-list>

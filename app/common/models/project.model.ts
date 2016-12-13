@@ -14,7 +14,7 @@ export class Project {
         delete project['$exists'];
         this.data = project;
 
-        this.getLastStatus();
+        //this.getLastStatus();
     }
     
     getAnnotations() {
@@ -113,17 +113,26 @@ export class Project {
         this.data['annotations'][`${key}`] = obj;
     }
 
-    getLastStatus() {
-        for(let i=0; i< possibleStatuses.length; i++) {
-            const status = possibleStatuses[i];
-            if(this.checkStatus(status)) {
-              if(status['label'] === 'stitchingProgress') status['message']['progress'] = this.data.status['stitchingProgress'];
-              if(status['label'] === 'downScaleProgress') status['message']['progress'] = this.data.status['downScaleProgress'];
-              this.lastStatus = status['message']
-            }
-        } 
+    // getLastStatus() {
+    //     for(let i=0; i< possibleStatuses.length; i++) {
+    //         const status = possibleStatuses[i];
+    //         if(this.checkStatus(status)) {
+    //           if(status['label'] === 'stitchingProgress') status['message']['progress'] = this.data.status['stitchingProgress'];
+    //           if(status['label'] === 'downScaleProgress') status['message']['progress'] = this.data.status['downScaleProgress'];
+    //           this.lastStatus = status['message']
+    //         }
+    //     } 
+    // }
+
+    get created() {
+        var date = new Date(this.data['created']);
+        return `${date.getHours()}:${date.getMinutes()} ${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`
     }
-    
+
+    get createdBy() {
+        return this.data.createdBy;
+    }
+
     get hasBumper() {
         // returns transitionDuration of bumper if true 
         if(this.data.annotations) {
