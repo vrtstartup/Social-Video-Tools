@@ -15,6 +15,7 @@ deployment:
   production:
     branch: master
     commands:
+      - tsc
       - npm run build-prod
       - git config user.name ${CIRCLE_USERNAME}
       - git config user.email matthiasdv@circleci.com
@@ -26,6 +27,7 @@ deployment:
   development:
     branch: develop
     commands:
+      - tsc
       - npm run build-dev
       - git config user.name ${CIRCLE_USERNAME}
       - git config user.email matthiasdv@circleci.com

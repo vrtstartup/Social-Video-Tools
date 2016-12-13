@@ -1,6 +1,6 @@
 require('ts-node/register');
 
-const firebase = require('firebase');
+const firebase:any = require('firebase');
 const path = require('path');
 const fs = require('fs');
 
