@@ -11,6 +11,7 @@ import { UserService } from '../../../common/services/user.service';
 export class ProjectsComponent implements OnInit {
   
   userId: string;
+  userEmail: string;
   userSubscribtion: any;
 
   af: AngularFire;
@@ -26,7 +27,7 @@ export class ProjectsComponent implements OnInit {
 
   ngOnInit(){
     this.userSubscribtion = this.userService.user$.subscribe( 
-      data => this.userId = data.userID ,
+      userData => { this.userId = userData.userID; this.userEmail = userData.email } ,
       err => console.log('authserviceErr', err)
     );
   }
@@ -37,13 +38,12 @@ export class ProjectsComponent implements OnInit {
 
   createNewProject($event) {
     // create new empty project
-    this.projectsRef.push({ user: this.userId })
+    this.projectsRef.push({ user: this.userId, created: Date.now(), createdBy: this.userEmail })
       .then((ref) => {
           // attach project id to user 
           this.af.database.object(`/users/${this.userId}/projects/${ref.key}`).set(true);
-          this.router.navigateByUrl(`/project/${ref.key}`);
+          this.router.navigateByUrl(`/projects/${ref.key}`);
       })
       .catch(err => console.log(err, 'could not create|upload a new project'));
   }
-
 }
