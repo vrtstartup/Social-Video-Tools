@@ -64,14 +64,24 @@ export class Jobs {
   kill(key, err) {
     logger.error(err);
     // make sure that faulty, error-throwing jobs dont get stuck in an execution loop
-    return db.ref("ffmpeg-queue").child(key).update({
-      status: 'error',
-      error: {
-        message: err.message ? err.message : 'none',
-        type: err.type ? err.type : 'none',
-        arguments: err.arguments ? err.arguments : 'none',
-        stack: err.stack ? err.stack : 'none'
-      }
+    const refErrors = db.ref('errors');
+
+    return db.ref("ffmpeg-queue").child(key).once('value', snapshot => {
+      const valOld = snapshot.val();
+      const keyOld = snapshot.key;
+
+      refErrors.child(keyOld).push({
+        status: 'error',
+        error: {
+          message: err.message ? err.message : 'none',
+          type: err.type ? err.type : 'none',
+          arguments: err.arguments ? err.arguments : 'none',
+          stack: err.stack ? err.stack : 'none'
+        },
+        timestamp: Date().toLocaleString()
+      });
+    }).then(data => {
+       db.ref("ffmpeg-queue").child(key).remove();
     });
   }
 
