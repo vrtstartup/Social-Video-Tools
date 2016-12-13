@@ -1,6 +1,5 @@
 require('ts-node/register');
 
-import * as path from 'path';
 import * as fs from 'fs';
 import { db } from '../common/services/firebase.service';
 import { Jobs } from '../common/services/jobs.service';
@@ -23,7 +22,6 @@ let busyProcessingStitch = false;
 
 // create temp dat dir if it doesnt exist
 const dataDir = config.filesystem.workingDirectory;
-
 if (!fs.existsSync(dataDir)){
     fs.mkdirSync(dataDir);
 }
@@ -124,17 +122,14 @@ function processLowResJob(project, job) {
         .then(project => projectService.updateProject(project, { 
           clip: project['data']['clip']
         }))
-        // scaledown
         .then((project:Project) => stateService.updateState(project, 'downscaled', false))
         .then(project => scaleDown(project, progressHandler, job))
-        // store
         .then((project:Project) => stateService.updateState(project, 'storingDownScaled', true))
         .then(project => storage.uploadFile(project, 'lowres'))
         .then((project:Project) => stateService.updateState(project, 'storingDownScaled', false))
-        // set final status
         .then((project:Project) => stateService.updateState(project, 'downscaled', true))
-        .then(resolve)
-        .catch(err => jobService.kill(job.id, err));
+        .catch(err => jobService.kill(job.id, err))
+        .then(resolve);
     });
 }
 
@@ -156,8 +151,9 @@ function processRenderJob(project,job) {
           .then((project:Project) => stateService.updateState(project, 'storingRender', true))
           .then(project => storage.uploadFile(project, 'render'))
           .then((project:Project) => stateService.updateState(project, 'storingRender', false))
-          .then(resolve)
-          .catch(err => jobService.kill(job.id, err));
+          .catch(err => jobService.kill(job.id, err))
+          .then(resolve);
+
     });
 }
 
@@ -168,8 +164,8 @@ function handleSubtitles(project) {
     if(project.hasAnnotations('subtitle')){
       logger.verbose('project has subtitles, preparing...');
       subtitle.makeAss(project)
-        .then(resolve)
-        .catch(errorHandler);
+        .catch(errorHandler)
+        .then(resolve);
     } else{
       logger.verbose('project doesnt have subtitles, continue...');
       resolve(project);

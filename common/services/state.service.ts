@@ -108,16 +108,10 @@ export class State {
           // send email 
           this.projectService.removeProjectProperty(project.data.id, 'status/stitchingProgress')
             .then( status => this.projectService.setProjectProperty(project.data.id, 'clip/renderUrl', renderUrl))
-            /* #todo: fix mail service. The following lines currently cause: 
-            *   error:  status=422, message=You tried to send to a recipient that has been marked as inactive.
-                Found inactive addresses: devriendt.matthias@vrt.be.
-                Inactive recipients are ones that have generated a hard bounce or a spam complaint. , code=406
-            * When mail delivery fails, process should still fail gracefully
-            */
-            // .then( status => this.projectService.getEmailByProject(project))
-            // .then( address =>  this.emailService.notify(address, type, project.data.id))
-            .then( info => resolve(project))
-            .catch(this.errorHandler.bind(this));
+            .then( status => this.projectService.getEmailByProject(project))
+            .then( address =>  this.emailService.notify(address, type, project.data.id))
+            .catch(this.errorHandler.bind(this))
+            .then( info => resolve(project));
         break;
 
         case 'archive':

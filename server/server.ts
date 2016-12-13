@@ -10,10 +10,10 @@ import { config } from '../common/config';
 const fServer = config.routing.fileServer;
 const logger = config.logger;
 
-const morgan = require('morgan');
-const path = require('path');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+const morgan:any = require('morgan');
+const path:any = require('path');
+const cors:any = require('cors');
+const bodyParser:any = require('body-parser');
 
 // init firebase
 // const db = FireBase.database();
@@ -26,11 +26,11 @@ const templates = new Templates();
 const server = express();
 const port = process.env.PORT || 3000;
 
-const uploadRoutes = require('./routes/upload.routes');
-const fileRoutes = require('./routes/file.routes');
-const templaterRoutes = require('./routes/templater.routes');
-const renderRoutes = require('./routes/render.routes');
-const stateRoutes = require('./routes/state.routes');
+const uploadRoutes:any = require('./routes/upload.routes');
+const fileRoutes:any = require('./routes/file.routes');
+const templaterRoutes:any = require('./routes/templater.routes');
+const renderRoutes:any = require('./routes/render.routes');
+const stateRoutes:any = require('./routes/state.routes');
 
 server.set('projects', projects);
 server.set('state', state);

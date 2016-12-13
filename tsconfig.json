@@ -3,6 +3,7 @@
   "buildOnSave": false,
   "compilerOptions": {
     "target": "es5",
+    "outDir": "build",
     "typeRoots": [
       "../node_modules/@types"
     ],
@@ -13,12 +14,13 @@
     "sourceMap": true,
     "types": [
       "es6-shim",
-      "node",
-      "hammerjs"
+      "node"
     ]
   },
-  "files": [
-    "node_modules/angularfire2/node_modules/firebase/firebase.d.ts"
+  
+  "include": [
+    "server/**/*.ts",
+    "worker/**/*.ts"
   ],
   "exclude": [
     "node_modules",

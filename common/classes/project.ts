@@ -99,7 +99,7 @@ export class Project {
         const projectName = this.data.id;
 
         const fileName = resolver.isUniqueFile(type) ? false : key;
-        const filePath = resolver.isSharedFile(type) ? resolver.getSharedFilePath(type, overlay['data']['name']) : resolver.getProjectFilePath(type, projectName, fileName);
+        const filePath = resolver.isSharedFile(type) ? resolver.getSharedFilePath(type, overlay['data']['name']) : resolver.getProjectFilePath(type, projectName, true, fileName);
 
         const pushObject = {
           type: overlay['data']['type'],
