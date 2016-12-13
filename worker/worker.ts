@@ -127,8 +127,8 @@ function processLowResJob(project, job) {
         }))
         .then(project => scaleDown(project, progressHandler, job))
         .then(project => storage.uploadFile(project, 'lowres'))
-        .then(resolve)
-        .catch(err => jobService.kill(job.id, err));
+        .catch(err => jobService.kill(job.id, err))
+        .then(resolve);
     });
 }
 
@@ -147,8 +147,8 @@ function processRenderJob(project,job) {
           .then(project => storage.uploadFile(project, 'ass'))
           .then(project => stitch(project, job, progressHandler))
           .then(project => storage.uploadFile(project, 'render'))
-          .then(resolve)
-          .catch(err => jobService.kill(job.id, err));
+          .catch(err => jobService.kill(job.id, err))
+          .then(resolve);
     });
 }
 
@@ -159,8 +159,8 @@ function handleSubtitles(project) {
     if(project.hasAnnotations('subtitle')){
       logger.verbose('project has subtitles, preparing...');
       subtitle.makeAss(project)
-        .then(resolve)
-        .catch(errorHandler);
+        .catch(errorHandler)
+        .then(resolve);
     } else{
       logger.verbose('project doesnt have subtitles, continue...');
       resolve(project);
