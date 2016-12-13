@@ -1,6 +1,5 @@
 require('ts-node/register');
 
-import * as path from 'path';
 import * as fs from 'fs';
 import { db } from '../common/services/firebase.service';
 import { Jobs } from '../common/services/jobs.service';
