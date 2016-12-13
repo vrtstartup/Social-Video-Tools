@@ -18,15 +18,25 @@
       <!--status-->
       <div class="s-project-item__status">
         <div *ngIf="project.data.status">
-          <div>Uploaded:<span>{{project.status?.uploaded}}</span></div>
-          <div>
-            Downscaled: {{project.data?.status?.downscaled}}
-            <progress-bar *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100" [task]="'downscaling'" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
-            <span *ngIf="project.data?.status?.storingDownScaled">storingDownScaled</span>
-            <span *ngIf="project.data?.status?.downscaled">done</span>
+          <!--downscaling-->
+          <div class="s-project-item__statusprocess">
+            <span *ngIf="project.data?.status?.downscaled"><md-icon svgSrc="assets/icons/icon-check.svg"></md-icon></span>
+            Downscale Process 
           </div>
-          <div>Templater:<span>Templater progress here</span></div>
-          <div>Stitching:<span>Stitching progress here</span></div>
+          <div class="s-project-item__statussubprocess">
+            <span *ngIf="project.status?.uploaded"><i>Uploaded:</i> {{project.status?.uploaded}}</span>
+          </div>
+          <div class="s-project-item__statussubprocess" *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100">
+            <span>Downscaling</span>
+            <span><progress-bar [progress]="project.data?.status?.downScaleProgress"></progress-bar></span>
+          </div>
+          <div class="s-project-item__statussubprocess">
+            <span *ngIf="project.data?.status?.storingDownScaled">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
+          </div>
+          <!--templater-->
+          <!--<div>Templater:<span>Templater progress here</span></div>
+          <!--stitiching-->
+          <!--<div>Stitching:<span>Stitching progress here</span></div>-->
         </div>
       </div>
     </div>

@@ -27,11 +27,11 @@ export function uploadFile(project, fileType: string){
         ContentType: fileConfig.files[fileType]['mime']
       }, (err, resp) => {
         if(err) logger.error(err);
-
         logger.info(`Upload done.`);
+        
         resolve(project);
       }).on('httpUploadProgress', (progress) => {
-        console.log(progress.loaded + " of " + progress.total + " bytes");
+        logger.info(progress.loaded + " of " + progress.total + " bytes");
       });
       
     })
