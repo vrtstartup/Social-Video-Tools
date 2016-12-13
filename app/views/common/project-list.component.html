@@ -3,30 +3,31 @@
   <div class="s-project-item" *ngFor="let project of projects">
     <!--image-->
     <div class="s-project-item__image">
-      <img src="http://placehold.it/160x90" alt="">
+      <img src="http://placehold.it/160x90/cccccc" alt="">
       <div class="s-project-item__previewbtn">
-        play
+        <md-icon svgSrc="assets/icons/icon-play.svg"></md-icon>
       </div>
     </div>
 
     <div class="s-project-item__info">
       <!--meta-->
       <div class="s-project-item__meta">
-        <span class="">15-06-2016</span> |
-        <span class="">joris compernol</span>
+        <span class="">{{project.created}}</span> |
+        <span class="">{{project.createdBy}}</span>
       </div>
       <!--status-->
       <div class="s-project-item__status">
-        <span *ngIf="project.lastStatus">
-            {{project.lastStatus.text}} 
-              <span *ngIf="project.lastStatus.progress">
-                {{project.lastStatus.progress}}%
-              </span>
-        </span>
-        <div>Uploaded:<span>progress here</span></div>
-        <div>Downscaled:<span>progress here</span></div>
-        <div>Templater:<span>progress here</span></div>
-        <div>Stitching:<span>progress here</span></div>
+        <div *ngIf="project.data.status">
+          <div>Uploaded:<span>{{project.status?.uploaded}}</span></div>
+          <div>
+            Downscaled: {{project.data?.status?.downscaled}}
+            <progress-bar *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100" [task]="'downscaling'" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
+            <span *ngIf="project.data?.status?.storingDownScaled">storingDownScaled</span>
+            <span *ngIf="project.data?.status?.downscaled">done</span>
+          </div>
+          <div>Templater:<span>Templater progress here</span></div>
+          <div>Stitching:<span>Stitching progress here</span></div>
+        </div>
       </div>
     </div>
 
@@ -34,6 +35,7 @@
     <div class="s-project-item__controls">
       <button class="s-btn" type="button">Download</button>
       <button class="s-btn s-btn--secondary" type="button" (click)="open(project.key)">Edit</button>
+      <button *ngIf="role > 1" class="s-btn s-btn--secondary" type="button" (click)="delete(project.key)">Delete</button>
     </div>
     <div class="s-project-item__morebtn" (click)="more = !false">
       ...

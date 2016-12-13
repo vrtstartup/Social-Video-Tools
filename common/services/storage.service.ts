@@ -30,7 +30,9 @@ export function uploadFile(project, fileType: string){
 
         logger.info(`Upload done.`);
         resolve(project);
-      }).on('httpUploadProgress', progress => {logger.info(progress)});
+      }).on('httpUploadProgress', progress => {
+        logger.info(progress.loaded + " of " + progress.total + " bytes: ", (progress.loaded / progress.total)*100 + '%');
+      });
     })
   });
 }
