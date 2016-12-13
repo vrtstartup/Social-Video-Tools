@@ -60,15 +60,30 @@ export class State {
           // });
         break;
 
+        case 'storingDownScaled':
+            if(!value){
+              this.projectService.removeProjectProperty(project.data.id, 'status/storingDownScaled')
+                .then(status => resolve(project), this.errorHandler);
+            }
+          resolve(project);
+        break;
+
         case 'downscaled':
           // salt link to trigger angular change detection
           const lowResUrl = resolver.storageUrl('lowres', project.data.id) + `?${Date.now()}${Math.floor(Math.random() * 1000000000)}`;
 
-          // additional hooks for the downscaled event go here
-          this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress')
-            .then(status => resolve(project), this.errorHandler);
+          // only true if 'uploaded downscaled & stored'
+          if(value) {
+            // remove statuses
+            this.projectService.removeProjectProperty(project.data.id, 'status/uploaded')
+              .then(status => resolve(project), this.errorHandler);
+            this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress')
+              .then(status => resolve(project), this.errorHandler);
 
-          if(value) this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl);
+            this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl);
+          }
+          
+          resolve(project);
         break;
 
         case 'subtitles':

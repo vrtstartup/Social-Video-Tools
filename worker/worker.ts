@@ -90,9 +90,7 @@ function handleJob(job, project) {
     switch (operation) {
       case 'lowres':
         logger.verbose('processing lowres operation...');
-        processLowResJob(project, job)
-          .then((project:Project) => stateService.updateState(project, 'downscaled', true))
-          .then(resolve, reject);
+        processLowResJob(project, job).then(resolve, reject);
         break;
 
       case 'render':
@@ -126,8 +124,15 @@ function processLowResJob(project, job) {
         .then(project => projectService.updateProject(project, { 
           clip: project['data']['clip']
         }))
+        // scaledown
+        .then((project:Project) => stateService.updateState(project, 'downscaled', false))
         .then(project => scaleDown(project, progressHandler, job))
+        // store
+        .then((project:Project) => stateService.updateState(project, 'storingDownScaled', true))
         .then(project => storage.uploadFile(project, 'lowres'))
+        .then((project:Project) => stateService.updateState(project, 'storingDownScaled', false))
+        // set final status
+        .then((project:Project) => stateService.updateState(project, 'downscaled', true))
         .then(resolve)
         .catch(err => jobService.kill(job.id, err));
     });
