@@ -5,8 +5,9 @@ import * as resolver from '../../common/services/resolver.service';
 import { Project } from '../../common/classes/project';
 import { logger } from '../../common/config/winston';
 import { fileConfig } from '../../common/config/files';
+import { storage } from  '../../common/config/s3'
 
-aws.config.update({region: 'eu-central-1'}); //#todo move to configuration file
+aws.config.update({region: storage.region}); //#todo move to configuration file
 
 const  s3 = new aws.S3({signatureVersion: 'v4'});
 
@@ -21,7 +22,7 @@ export function uploadFile(project, fileType: string){
       
       s3.putObject({
         ACL: 'public-read',
-        Bucket: 'social-video-tools',
+        Bucket: storage.bucket,
         Key: resolver.getProjectFileKey(fileType,project['data']['id']),
         Body: fileBuffer,
         ContentType: fileConfig.files[fileType]['mime']
@@ -42,7 +43,7 @@ export function signUrl(fileType:string, fileExtension: string, projectId: strin
   const fileKey = resolver.getProjectFileKey(fileType, projectId);
 
   const s3Params = {
-    Bucket: 'social-video-tools',
+    Bucket: storage.bucket,
     Key: fileKey,
     Expires: 60,
     ContentType: fileType,

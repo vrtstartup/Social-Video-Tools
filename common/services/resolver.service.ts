@@ -78,7 +78,7 @@ export function storageUrl(fileType:string, baseDirectory:string){
   const file =  config.filesystem.files[fileType]; //config
   const fileName = this.getFileNameByType(fileType);
 
-  return `https://s3.eu-central-1.amazonaws.com/social-video-tools/${baseDirectory}/${fileName}`;
+  return `https://s3.${config.storage.region}.amazonaws.com/${config.storage.bucket}/${baseDirectory}/${fileName}`;
 }
 
 export function makeProjectDirectories(baseDirectory:string) {
