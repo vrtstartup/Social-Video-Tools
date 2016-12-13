@@ -152,7 +152,10 @@ function processRenderJob(project,job) {
         handleSubtitles(project)
           .then(project => storage.uploadFile(project, 'ass'))
           .then(project => stitch(project, job, progressHandler))
+          // store
+          .then((project:Project) => stateService.updateState(project, 'storingRender', true))
           .then(project => storage.uploadFile(project, 'render'))
+          .then((project:Project) => stateService.updateState(project, 'storingRender', false))
           .then(resolve)
           .catch(err => jobService.kill(job.id, err));
     });
