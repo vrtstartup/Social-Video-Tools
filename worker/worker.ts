@@ -23,7 +23,6 @@ let busyProcessingStitch = false;
 
 // create temp dat dir if it doesnt exist
 const dataDir = config.filesystem.workingDirectory;
-
 if (!fs.existsSync(dataDir)){
     fs.mkdirSync(dataDir);
 }

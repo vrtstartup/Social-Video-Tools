@@ -65,7 +65,7 @@ export function scaleDown(project, messageHandler, job) {
     const baseDir = project.data.files.baseDir;
     const lowresFileName = resolver.getFileNameByType('lowres', baseDir);
     const input = resolver.storageUrl('source', baseDir); //#todo input stream instead of HTTP
-    const output = resolver.destinationFile('lowres', baseDir, lowresFileName);
+    const output = resolver.getProjectFilePath('lowres', baseDir, false, lowresFileName);
     const scaleFilter = `scale='min(${config.encoding.videoMaxWidth.toString()}\\,iw):-2'`;
 
     return new Promise((resolve:any, reject) => {
@@ -105,9 +105,9 @@ export function stitch(project, job, messageHandler) {
     let renderDuration = (outro) ? sourceLength + (Number(outro.duration) - Number(outro.transitionDuration)) : sourceLength;
 
     // project files
-    const assFile = resolver.getProjectFilePath('ass', baseDir);
+    const assFile = resolver.getProjectFilePath('ass', baseDir, true);
     const sourceFile = resolver.storageUrl('source', baseDir); //#todo input stream instead of HTTP
-    const renderFile = resolver.getProjectFilePath('render', baseDir);
+    const renderFile = resolver.getProjectFilePath('render', baseDir, true);
     const outroFile = outro.filePath;
 
     // used to wire ffmpeg inputs and outputs together

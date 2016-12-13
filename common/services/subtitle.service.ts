@@ -13,7 +13,7 @@ export class Subtitle {
   }
 
   makeAss(project){
-    const file = resolve.getProjectFilePath('ass', project.data.files.baseDir);
+    const file = resolve.getProjectFilePath('ass', project.data.files.baseDir, true);
     const arrPromise = [
       project.getAnnotations('subtitle'),
       this.styleService.getAll()

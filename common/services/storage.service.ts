@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as aws from 'aws-sdk';
-// const writeStr
 import * as resolver from '../../common/services/resolver.service';
 import { Project } from '../../common/classes/project';
 import { logger } from '../../common/config/winston';
@@ -13,7 +12,7 @@ const  s3 = new aws.S3({signatureVersion: 'v4'});
 
 export function uploadFile(project, fileType: string){
   // get file 
-  const filePath = resolver.getProjectFilePath(fileType, project['data']['id']);
+  const filePath = resolver.getProjectFilePath(fileType, project['data']['id'], true);
   logger.info(`Uploading files for ${project.data.id}`);
   
   return new Promise((resolve, reject) => {
@@ -31,7 +30,7 @@ export function uploadFile(project, fileType: string){
 
         logger.info(`Upload done.`);
         resolve(project);
-      })
+      }).on('httpUploadProgress', progress => {logger.info(progress)});
     })
   });
 }
