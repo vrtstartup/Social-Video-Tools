@@ -34,6 +34,14 @@
         background: hsl(0,0,95);
         color: $s-link;
     }
+    &--white {
+        background: white;
+        color: $s-link;
+        border: 1px solid hsl(0%,0%,90%);
+        &:hover {
+            border: 0;
+        }
+    }
     &--display-block {
         width: 100%;
     }
@@ -61,5 +69,8 @@
             vertical-align: middle;
             width: 14px;
         }
+    }
+    &--inputsize {
+        line-height: 1.6rem;
     }
 }

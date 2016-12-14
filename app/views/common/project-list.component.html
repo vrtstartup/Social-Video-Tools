@@ -1,3 +1,17 @@
+<div class="s-project-filter" style="padding:1rem;">
+  <form #f="ngForm" (ngSubmit)="setUserByEmail(f.value, f.valid)" novalidate>
+      <!-- we will place our fields here -->
+      <div class="s-formrow">
+        <div class="s-formitem s-formitem--block">
+          <input type="text" name="email" [(ngModel)]="userEmail">
+        </div>
+        <div class="s-formitem">
+          <button class="s-btn s-btn--white s-btn--inputsize" type="submit">Filter</button>
+        </div>
+      </div>
+  </form>
+</div>
+
 <div class="s-project-list">
 
   <div class="s-project-item" *ngFor="let project of projects">
@@ -21,7 +35,7 @@
           <!--downscaling-->
           <div class="s-project-item__statusprocess">
             <span *ngIf="project.data?.status?.downscaled"><md-icon svgSrc="assets/icons/icon-check.svg"></md-icon></span>
-            Downscale Process 
+            <span *ngIf="project.data?.status?.downscaled != null">Downscale Process</span> 
           </div>
           <div class="s-project-item__statussubprocess">
             <span *ngIf="project.status?.uploaded"><i>Uploaded:</i> {{project.status?.uploaded}}</span>
@@ -33,10 +47,23 @@
           <div class="s-project-item__statussubprocess">
             <span *ngIf="project.data?.status?.storingDownScaled">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
           </div>
+
           <!--templater-->
           <!--<div>Templater:<span>Templater progress here</span></div>
+
           <!--stitiching-->
-          <!--<div>Stitching:<span>Stitching progress here</span></div>-->
+          <div class="s-project-item__statusprocess">
+            <span *ngIf="project.data?.status?.render"><md-icon svgSrc="assets/icons/icon-check.svg"></md-icon></span>
+            <span *ngIf="project.data?.status?.render != null">Rendering Process</span>
+          </div>
+          <div class="s-project-item__statussubprocess" *ngIf="project.data?.status?.stitchingProgress > 0 && project.data?.status?.stitchingProgress < 100">
+            <span>Rendering Movie</span>
+            <span><progress-bar [progress]="project.data?.status?.stitchingProgress"></progress-bar></span>
+          </div>
+          <div class="s-project-item__statussubprocess">
+            <span *ngIf="project.data?.status?.storingRender">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
+          </div>
+          
         </div>
       </div>
     </div>

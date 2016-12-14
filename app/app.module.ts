@@ -41,6 +41,7 @@ import 'hammerjs';
 import { ListPipe } from './common/pipes/list.pipe';
 import { SortByPropPipe } from './common/pipes/sortByProp.pipe';
 import { KeysPipe } from './common/pipes/keys.pipe';
+import { ParseEmailPipe } from './common/pipes/parseEmail.pipe';
 
 import { NgInitDir } from './common/directives/ngInit.directive';
 
@@ -71,6 +72,7 @@ const firebaseAuthConfig = {
         ListPipe,
         SortByPropPipe,
         KeysPipe,
+        ParseEmailPipe,
         NgInitDir,
     ],
     imports: [

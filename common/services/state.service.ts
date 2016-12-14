@@ -68,6 +68,14 @@ export class State {
           resolve(project);
         break;
 
+        case 'storingRender':
+            if(!value){
+              this.projectService.removeProjectProperty(project.data.id, 'status/storingRender')
+                .then(status => resolve(project), this.errorHandler);
+            }
+          resolve(project);
+        break;
+
         case 'downscaled':
           // salt link to trigger angular change detection
           const lowResUrl = resolver.storageUrl('lowres', project.data.id) + `?${Date.now()}${Math.floor(Math.random() * 1000000000)}`;
