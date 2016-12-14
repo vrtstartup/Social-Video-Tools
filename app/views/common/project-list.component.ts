@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProjectService } from '../../common/services/project.service';
 import { Project } from '../../common/models/project.model';
+import { Http } from '@angular/http';
 import { AngularFire, FirebaseListObservable} from 'angularfire2';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
@@ -20,7 +21,9 @@ export class ProjectListComponent implements OnInit {
   constructor(
       private af:AngularFire,
       private projectService: ProjectService, 
-      private router: Router) {
+      private router: Router,
+      private http: Http
+    ) {
       this.af = af;
       this.userEmail = 'joris.compernol@vrt.be';
   }
@@ -35,6 +38,10 @@ export class ProjectListComponent implements OnInit {
         last: 10,
       };
       this.projectService.setUserQuerySubject(userQuery);
+  }
+
+  downloadFile(projectKey: string){
+    location.href = `api/file/download/${projectKey}`;
   }
 
   open(projectId: string){ 

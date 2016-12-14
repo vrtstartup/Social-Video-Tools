@@ -41,12 +41,13 @@ export function signUrl(fileType:string, fileExtension: string, projectId: strin
   * sign an url so a client can make a call directly to S3
   */
   const fileKey = resolver.getProjectFileKey(fileType, projectId);
+  const mimeType = resolver.getMimeTypeByFileType(fileType);
 
   const s3Params = {
     Bucket: storage.bucket,
     Key: fileKey,
     Expires: 60,
-    ContentType: fileType,
+    ContentType: mimeType,
     ACL: 'public-read',
   };
 
@@ -61,3 +62,24 @@ export function signUrl(fileType:string, fileExtension: string, projectId: strin
     });
   })
 };
+
+export function getReadStream(fileType:string, projectId: string){
+  const fileKey = resolver.getProjectFileKey(fileType, projectId);
+
+  const s3Params = {
+    Bucket: storage.bucket,
+    Key: fileKey,
+    Stream: true
+  };
+
+  return new Promise((resolve, reject) => {
+    s3.getObject(s3Params, (err, data) => {
+      if(err) {
+        logger.error(err);
+        reject(err);
+      }; 
+
+      resolve(data);
+    });
+  });
+}
