@@ -26,7 +26,6 @@ import { VrtVideoPlayer } from "./views/public/project/components/vrtvideo-playe
 import { ProgressComponent } from './views/public/project/components/progress.component';
 import { ProgressBarComponent } from './views/common/progressbar.component';
 import { RangeSliderComponent } from './views/public/project/components/range-slider.component';
-import { DownloadComponent } from './views/public/download/download.component';
 import { AdminComponent } from './views/admin/admin.component';
 import { DashboardComponent } from './views/admin/dashboard.component';
 import { UsersComponent } from './views/admin/users.component';
@@ -60,7 +59,6 @@ const firebaseAuthConfig = {
         ProjectComponent,
         ProgressComponent,
         ProgressBarComponent,
-        DownloadComponent,
         AdminComponent,
         DashboardComponent,
         UsersComponent,
