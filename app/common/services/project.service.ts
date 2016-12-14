@@ -19,26 +19,33 @@ export class ProjectService {
 
       this.usersQuerySubject = new Subject();
       this.userQuerySubject = new Subject();
-
+      
+      // get all projects
       this.projects$ = af.database.list('/projects', {
         query: { 
           limitToLast: this.usersQuerySubject.map(d => {return d.last}),
         }
-      }).map(projectsData => {
+      })
+      .map(projectsData => {
         let arrProjects: Array<Project> = [];
+        projectsData.sort((a,b) => b.created - a.created ); // sort on creationdate
         projectsData.forEach(projectData => arrProjects.push(new Project(projectData)));
 
         return arrProjects;
       });
-      
+
+      // filter projects by user
       this.projectsByUser$ = af.database.list(`/projects`, { 
         query: { 
           limitToLast: this.userQuerySubject.map(d => {return d.last}),
           orderByChild: 'createdBy',
           equalTo: this.userQuerySubject.map(d => {return d.email})
         }
-      }).map(projectsData => {
+      })
+      .map(projectsData => {
+        console.log('projectsData', projectsData)
         let arrProjects: Array<Project> = [];
+        projectsData.sort((a,b) => b.created - a.created );
         projectsData.forEach(projectData => arrProjects.push(new Project(projectData)));
 
         return arrProjects;

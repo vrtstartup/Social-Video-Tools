@@ -46,7 +46,7 @@ export class ProjectListComponent implements OnInit {
       // TODO check if email exists and inform user
       if(formdata.email === '') {
         // query all project if no email adress provided
-        this.projectService.projects$.subscribe( projects => { this.projects = projects;})
+        this.projectService.projects$.subscribe( projects => this.projects = projects )
         const usersQuery = {last: 30};
         this.projectService.setUsersQuerySubject(usersQuery);
         return
