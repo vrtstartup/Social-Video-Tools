@@ -43,7 +43,7 @@
 
     <!--controls-->
     <div class="s-project-item__controls">
-      <button class="s-btn" type="button">Download</button>
+      <button class="s-btn" type="button" (click)="downloadFile(project.key)">Download</button>
       <button class="s-btn s-btn--secondary" type="button" (click)="open(project.key)">Edit</button>
       <button *ngIf="role > 1" class="s-btn s-btn--secondary" type="button" (click)="delete(project.key)">Delete</button>
     </div>
