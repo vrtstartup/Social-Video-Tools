@@ -30,7 +30,9 @@
 	<div class="s-submenu" *ngIf="project && !project.isRendering()">
 		<!--once downscaled show controls-->
 		<div *ngIf="project?.data?.status?.downscaled">
-			<button type="button" class="s-btn" (click)="addAnnotation()">Add Annotation(U)</button>
+			<button type="button" class="s-btn" (click)="addAnnotation('subtitle')">Add Annotation(U)</button>
+			<button type="button" class="s-btn" (click)="addAnnotation('subtitleTwo')">Add Annotation Two(U)</button>
+			<button type="button" class="s-btn" (click)="addAnnotation('subtitleThree')">Add Annotation Three(U)</button>
 		</div>
 	</div>
 
