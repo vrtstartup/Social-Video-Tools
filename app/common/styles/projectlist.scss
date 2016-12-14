@@ -1,3 +1,14 @@
+.s-project-filter {
+    input[type=text] {
+        margin: 0;
+        background: #f2f2f2;
+        border: 0;
+        border-bottom: 1px solid #d3d3d3;
+        color: #979797;
+        padding-left: 0; 
+    }
+}
+
 .s-project-list { 
     display: flex;
     flex-direction: column;
@@ -5,7 +16,6 @@
 }
 
 .s-project-item {
-
     background: white;
     box-shadow: 0 4px 10px rgba(150,150,150,.2);
     border-radius: 3px;

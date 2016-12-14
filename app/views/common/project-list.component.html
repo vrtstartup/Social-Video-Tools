@@ -1,3 +1,17 @@
+<div class="s-project-filter" style="padding:1rem;">
+  <form #f="ngForm" (ngSubmit)="setUserByEmail(f.value, f.valid)" novalidate>
+      <!-- we will place our fields here -->
+      <div class="s-formrow">
+        <div class="s-formitem s-formitem--block">
+          <input type="text" name="email" [(ngModel)]="userEmail">
+        </div>
+        <div class="s-formitem">
+          <button class="s-btn s-btn--white s-btn--inputsize" type="submit">Filter</button>
+        </div>
+      </div>
+  </form>
+</div>
+
 <div class="s-project-list">
 
   <div class="s-project-item" *ngFor="let project of projects">
