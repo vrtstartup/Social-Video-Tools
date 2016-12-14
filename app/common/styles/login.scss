@@ -10,6 +10,11 @@
         color: #6da1e8;
         font-size: 1.6rem;
     }
+    // override
+    .s-form__error {
+        color: white;
+        margin-top: 0;
+    }
 }
 .s-login-background__wrapper {
     height: 100vh; 
@@ -49,14 +54,4 @@
     text-align: right;
     z-index: 1;
 }
-.s-form {
-    display: flex;
-    flex-direction: column;
-}
-.s-form__row {
-    flex: 1 1 100%;
-}
-.s-form__error {
-    color: $s-gray;
-    margin-top: 0;
-}
+

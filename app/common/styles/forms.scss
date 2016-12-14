@@ -207,6 +207,10 @@ select[multiple] {
     padding: .5rem .5rem .3rem;
 }
 // micro-grid
+.s-form {
+    display: flex;
+    flex-direction: column;
+}
 .s-formrow {
     display: flex;
     flex-direction: row;
