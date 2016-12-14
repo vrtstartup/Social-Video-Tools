@@ -5,7 +5,12 @@
         border: 0;
         border-bottom: 1px solid #d3d3d3;
         color: #979797;
-        padding-left: 0; 
+        padding-left: .5rem; 
+        &:focus {
+            box-shadow: none;
+            border-bottom: 1px solid $s-link; 
+            background: none;
+        }
     }
 }
 
@@ -20,7 +25,7 @@
     box-shadow: 0 4px 10px rgba(150,150,150,.2);
     border-radius: 3px;
     display: flex;
-    flex: 1 1 100%;
+    flex: 1 1 auto;
     flex-direction: row;
     margin-bottom: 1rem;
     padding: 1rem;
