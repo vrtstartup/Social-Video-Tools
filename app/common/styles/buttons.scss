@@ -34,12 +34,43 @@
         background: hsl(0,0,95);
         color: $s-link;
     }
+    &--white {
+        background: white;
+        color: $s-link;
+        border: 1px solid hsl(0%,0%,90%);
+        &:hover {
+            border: 0;
+        }
+    }
     &--display-block {
         width: 100%;
     }
     &--large {
         font-size: 1rem;
-        padding: 1rem;
+        padding: 1rem 2rem;
     }
-    
+    span:last-child {
+        margin-right: 0; 
+    }
+    span:first-child {
+        margin-left: 0; 
+    }
+    &__text { 
+        display: inline-block;
+    }
+    &__icon { 
+        display: inline-block;
+        line-height: 0;
+        margin: 0 .25rem;
+        md-icon {
+            height: 14px;
+            position: relative;
+            top: -1px;
+            vertical-align: middle;
+            width: 14px;
+        }
+    }
+    &--inputsize {
+        line-height: 1.6rem;
+    }
 }

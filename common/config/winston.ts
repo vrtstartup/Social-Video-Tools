@@ -1,7 +1,7 @@
 import { resolve } from 'path';
 import * as fs from 'fs';
 
-const winston = require('winston');
+const winston:any = require('winston');
 
 const tsFormat = () => (new Date()).toLocaleTimeString();
 const logDir = resolve('logs');

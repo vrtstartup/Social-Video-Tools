@@ -18,8 +18,6 @@ export class UsersComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(){ 
-    console.log('users component loaded');
-    console.log(this.usersService);
     this.usersService.users$.subscribe(this.handleUsers.bind(this));
   }
 
@@ -28,12 +26,11 @@ export class UsersComponent implements OnInit, OnChanges {
   }
 
   private echoUsers(){ 
-    console.log(this.users);
+    //console.log(this.users);
   }
 
   private handleUsers( users:Array<User> ) {
     this.users = users;
-    console.log(this.users);
   }
 
 }

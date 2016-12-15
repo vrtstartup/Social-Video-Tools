@@ -1,5 +1,5 @@
 import { config } from '../../common/config';
-const postmark = require('postmark');
+const postmark:any = require('postmark');
 
 export class Email {
   constructor() {}

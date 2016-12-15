@@ -81,7 +81,7 @@ export class LoginComponent implements OnInit {
 
       this.auth.createUser(credentials)
         .then(user => {
-          this.af.database.object(`/users/${user.uid}/role`).set('user'); // set user role
+          this.af.database.object(`/users/${user.uid}/role`).set('0'); // set user role
           this.af.database.object(`/users/${user.uid}/email`).set(user.auth.email); //set user email
           this.router.navigate(['projects'])
         })

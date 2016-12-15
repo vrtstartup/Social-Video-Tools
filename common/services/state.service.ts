@@ -60,15 +60,38 @@ export class State {
           // });
         break;
 
+        case 'storingDownScaled':
+            if(!value){
+              this.projectService.removeProjectProperty(project.data.id, 'status/storingDownScaled')
+                .then(status => resolve(project), this.errorHandler);
+            }
+          resolve(project);
+        break;
+
+        case 'storingRender':
+            if(!value){
+              this.projectService.removeProjectProperty(project.data.id, 'status/storingRender')
+                .then(status => resolve(project), this.errorHandler);
+            }
+          resolve(project);
+        break;
+
         case 'downscaled':
           // salt link to trigger angular change detection
           const lowResUrl = resolver.storageUrl('lowres', project.data.id) + `?${Date.now()}${Math.floor(Math.random() * 1000000000)}`;
 
-          // additional hooks for the downscaled event go here
-          this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress')
-            .then(status => resolve(project), this.errorHandler);
+          // only true if 'uploaded downscaled & stored'
+          if(value) {
+            // remove statuses
+            this.projectService.removeProjectProperty(project.data.id, 'status/uploaded')
+              .then(status => resolve(project), this.errorHandler);
+            this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress')
+              .then(status => resolve(project), this.errorHandler);
 
-          if(value) this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl);
+            this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl);
+          }
+          
+          resolve(project);
         break;
 
         case 'subtitles':
@@ -85,16 +108,10 @@ export class State {
           // send email 
           this.projectService.removeProjectProperty(project.data.id, 'status/stitchingProgress')
             .then( status => this.projectService.setProjectProperty(project.data.id, 'clip/renderUrl', renderUrl))
-            /* #todo: fix mail service. The following lines currently cause: 
-            *   error:  status=422, message=You tried to send to a recipient that has been marked as inactive.
-                Found inactive addresses: devriendt.matthias@vrt.be.
-                Inactive recipients are ones that have generated a hard bounce or a spam complaint. , code=406
-            * When mail delivery fails, process should still fail gracefully
-            */
             // .then( status => this.projectService.getEmailByProject(project))
             // .then( address =>  this.emailService.notify(address, type, project.data.id))
-            .then( info => resolve(project))
-            .catch(this.errorHandler.bind(this));
+            .catch(this.errorHandler.bind(this))
+            .then( info => resolve(project));
         break;
 
         case 'archive':

@@ -9,13 +9,16 @@ dependencies:
   override:
     - npm install
     - npm install --only=dev
+    - npm i -g typescript
   cache_directories:
     - node_modules
 deployment:
   production:
     branch: master
     commands:
+      - tsc
       - npm run build-prod
+      - cp -R dist/ build/dist
       - git config user.name ${CIRCLE_USERNAME}
       - git config user.email matthiasdv@circleci.com
       - git add -A
@@ -26,7 +29,9 @@ deployment:
   development:
     branch: develop
     commands:
+      - tsc
       - npm run build-dev
+      - cp -R dist/ build/dist
       - git config user.name ${CIRCLE_USERNAME}
       - git config user.email matthiasdv@circleci.com
       - git add -A

@@ -74,7 +74,7 @@ export class Project {
 
         // append text fields 
         const arrOverlayTextKeys = Object.keys(overlay['data']['text']);
-        arrOverlayTextKeys.forEach( key => obj[key] = overlay['data']['text'][key] );
+        arrOverlayTextKeys.forEach( key => obj[key] = overlay['data']['text'][key]['text'] );
 
         // append afterjob vars
         obj['projectId'] = this.data.id;
@@ -99,7 +99,7 @@ export class Project {
         const projectName = this.data.id;
 
         const fileName = resolver.isUniqueFile(type) ? false : key;
-        const filePath = resolver.isSharedFile(type) ? resolver.getSharedFilePath(type, overlay['data']['name']) : resolver.getProjectFilePath(type, projectName, fileName);
+        const filePath = resolver.isSharedFile(type) ? resolver.getSharedFilePath(type, overlay['data']['name']) : resolver.getProjectFilePath(type, projectName, true, fileName);
 
         const pushObject = {
           type: overlay['data']['type'],

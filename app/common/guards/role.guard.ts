@@ -16,10 +16,10 @@ export class RoleGuard implements CanActivate {
 
   canActivate(route:ActivatedRouteSnapshot, state:RouterStateSnapshot): Observable<boolean>|boolean{
 
-    const allowedRoles = route.data['roles'];
+    const allowedRoles = route.data['allowedRoles'];
 
     return this.userService.user$.map( userData => {
-      if(userData && this.validateRole(userData, allowedRoles)) {
+      if(userData && userData['role'] >= allowedRoles) {
         return true;
       } 
 
@@ -28,10 +28,5 @@ export class RoleGuard implements CanActivate {
       return false;
       
     }).first()
-  }
-
-  validateRole(userData:Object, allowedRoles): boolean { 
-    // check if userData['role'] is allowed for this route
-    return allowedRoles.includes(userData['role']);
   }
 }

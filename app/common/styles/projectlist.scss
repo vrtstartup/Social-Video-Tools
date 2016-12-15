@@ -1,3 +1,19 @@
+.s-project-filter {
+    input[type=text] {
+        margin: 0;
+        background: #f2f2f2;
+        border: 0;
+        border-bottom: 1px solid #d3d3d3;
+        color: #979797;
+        padding-left: .5rem; 
+        &:focus {
+            box-shadow: none;
+            border-bottom: 1px solid $s-link; 
+            background: none;
+        }
+    }
+}
+
 .s-project-list { 
     display: flex;
     flex-direction: column;
@@ -5,12 +21,11 @@
 }
 
 .s-project-item {
-
     background: white;
     box-shadow: 0 4px 10px rgba(150,150,150,.2);
     border-radius: 3px;
     display: flex;
-    flex: 1 1 100%;
+    flex: 1 1 auto;
     flex-direction: row;
     margin-bottom: 1rem;
     padding: 1rem;
@@ -29,12 +44,18 @@
         &:hover {
             border-bottom: 2px solid $s-link;
         }
+        &:hover md-icon { 
+            fill: $s-link;
+        }
     }
     &__previewbtn {
         position: absolute;
         left: 50%;
         top: 50%;
         transform: translate(-50%,-50%);
+        md-icon {
+            fill: white;
+        }
     }
     &__info {
         color: hsl(0,0,50%);
@@ -45,12 +66,40 @@
         font-size: .85rem;
     }
     &__meta {
-        flex: 1 1 auto;
+        flex: 0 1 auto;
+        margin-bottom: .5rem
     }
     &__status {
         flex: 1 1 auto;
+        md-icon {
+            height: 16px;
+            vertical-align: middle;
+            width: 16px;
+            position: relative;
+            top: -1px;
+        }
     }
-
+    &__statusprocess {
+        margin-bottom: .2rem;
+    }
+    &__statussubprocess {
+        color: hsl(0,0,60%);
+        display: flex;
+        font-size: .75rem;
+        line-height: 12px;
+        > span {
+            flex: 1 1 auto;
+        }
+        > span:first-child {
+            flex: 0 1 auto;
+            margin-right: .5rem;
+        }
+        .s-progress {
+            height: 0.6rem;
+            top: 1px;
+            position: relative;
+        }
+    }
     &__controls {
         align-self: flex-end;
         display: inline-block;
@@ -67,18 +116,19 @@
     }
     &__more {
         background: #fff;
-        box-shadow: 0 7px 10px 0 rgba($s-primary, .3);
+        border: 1px solid #f2f2f2;
+        box-shadow: 0 7px 10px 0 rgba($s-primary, .3), 0 0 0 -1px hsl(0,0,90%);
         border-bottom: 1px solid $s-link;
         border-radius: 3px;
-        color: $s-primary;
+        color: $s-link;
         font-size: 0.9rem;
         line-height: 2rem;
         list-style: none;
         min-width: 120px;
         padding: .5rem 1rem;
         position: absolute;
-        top: 1rem;
-        right: 0;
+        top: 1.5rem;        
+        right: 1rem;
         z-index: 101;
         li:hover {
             color: $s-link;
