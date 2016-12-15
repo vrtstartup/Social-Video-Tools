@@ -11,7 +11,6 @@ import './project.component.scss';
 
 // TODO remove | only for test purposes
 import testTemplate from '../../../common/models/testTemplate.model';
-import testStyles from '../../../common/models/testStyles.model';
 
 @Component({
   providers: [UploadService],
@@ -62,7 +61,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.templatesRef = af.database.object('/templates');
     this.templatesRef.subscribe((s: any) => this.templates = s);
 
-    this.stylesRef = af.database.object('/styles');
 
     // interface
     //this.showOpenDialog = false;
@@ -70,7 +68,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
     // TODO remove | only for test purposes | 
     // should only be set once => when server restarts
     this.templatesRef.set(testTemplate);
-    this.stylesRef.set(testStyles);
   }
 
   ngOnInit() {
@@ -95,33 +92,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
   ngOnDestroy(){
     this.userSubscribtion.unsubscribe();
   }
-
-  /* project ------ */
-  // createNewProject($event) {
-  //   // reset some values
-  //   this.selectedAnnotation = false;
-  //   // create new empty project
-  //   this.projectsRef.push({ user: this.userId })
-  //     .then((ref) => {
-  //       this.projectRef = this.af.database.object(ref.toString());
-  //       this.projectRef.subscribe((s: any) => {
-  //         // new project model
-  //         this.project = new Project(s);
-
-  //         if (this.project.remapAnnotationsTime() ){
-  //           this.updateProject();
-  //         };
-          
-  //       });
-
-  //       // attach project id to user 
-  //       this.af.database.object(`/users/${this.userId}/projects/${ref.key}`).set(true);
-
-  //       // upload
-  //       this.uploadSource($event, ref.key);
-  //     })
-  //     .catch(err => console.log(err, 'could not create|upload a new project'));
-  // }
 
   openProject(id: string){
     //this.showOpenDialog = false;
@@ -168,8 +138,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   /* annotations -- */
-  addAnnotation() {
-    let newAnno = this.project.addAnnotation( this.templates['subtitle']);
+  addAnnotation(annotationName: string) {
+    let newAnno = this.project.addAnnotation( this.templates[annotationName]);
     this.updateSelectedAnno(newAnno.key, newAnno);
   }
 
