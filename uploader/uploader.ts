@@ -27,7 +27,7 @@ const endpointUpload = `${baseUrl}/api/upload/overlay`;
 const endpointUpdate = `${baseUrl}/api/templater/status`;
 
 // assign parameters passed by bot to process 
-const filePath = path.resolve(uploader.outFolder, process.argv[2], `.${uploader.fileExtension}`);
+const filePath = path.resolve(uploader.outFolder, `${process.argv[2]}.${uploader.fileExtension}`);
 const projectId = process.argv[3];
 const overlayId = process.argv[4];
 
