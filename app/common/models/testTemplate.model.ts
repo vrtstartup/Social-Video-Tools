@@ -2,7 +2,6 @@ export default {
     subtitle: {
         name: 'subtitle',
         ass: {
-            name: 'subtitle',
             fontname: 'arial',
             fontsize: 24,
             primaryColour: '0xFFFFFF',
@@ -29,9 +28,8 @@ export default {
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleTwo: {
-        name: 'subtitle',
+        name: 'DeredactieBackdrop',
         ass: {
-            name: 'DeredactieBackdrop',
             fontname: 'arial',
             fontsize: 24,
             primaryColour: '0xFFFFFF',
@@ -58,9 +56,8 @@ export default {
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleThree: {
-        name: 'subtitle',
+        name: 'subtitDeredactieMarkeringle',
         ass: {
-            name: 'DeredactieMarkering',
             fontname: 'arial',
             fontsize: 28,
             primaryColour: '0xFFFFFF',
