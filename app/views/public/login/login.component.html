@@ -43,7 +43,7 @@
         <!--Register-->
         <div class="s-login__form s-slideIn"  *ngIf="activeFormGroup === 'registerForm'">
 
-            <div class=" s-info">{{ errorMessage }}</div>
+            <div class="s-info">{{ errorMessage }}</div>
 
             <form [formGroup]="registerForm" (submit)="register($event)" autocomplete="nope" novalidate>
                 <div class="">
