@@ -20,7 +20,8 @@
   
   "include": [
     "server/**/*.ts",
-    "worker/**/*.ts"
+    "worker/**/*.ts",
+    "uploader/**/*.ts"
   ],
   "exclude": [
     "node_modules",
