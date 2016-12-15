@@ -22,7 +22,7 @@ const restler = require('restler');
 */ 
 
 // routing
-const baseUrl = `${routingConfig.fileServer.protocol}://${routingConfig.fileServer.domain}:${routingConfig.fileServer.port}`;
+const baseUrl = `${routingConfig.fileServer.protocol}://${routingConfig.fileServer.domain}`;
 const endpointUpload = `${baseUrl}/api/upload/overlay`;
 const endpointUpdate = `${baseUrl}/api/templater/status`;
 
