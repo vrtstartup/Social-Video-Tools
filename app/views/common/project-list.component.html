@@ -72,12 +72,13 @@
     <div class="s-project-item__controls">
       <button class="s-btn" type="button" (click)="downloadFile(project.key)">Download</button>
       <button class="s-btn s-btn--secondary" type="button" (click)="open(project.key)">Edit</button>
-      <button *ngIf="role > 1" class="s-btn s-btn--secondary" type="button" (click)="delete(project.key)">Delete</button>
     </div>
-    <div class="s-project-item__morebtn" (click)="more = !false">
-      ...
+
+    <div id="{{project.key}}" *ngIf="role > 1">
+      <div class="s-project-item__morebtn" (click)="showExtra(project.key)">...</div>
+      <ul class="s-project-item__more s-slideIn" *ngIf="activeExtra === project.key">
+        <li *ngIf="role > 1" class=""(click)="deleteProject(project.key)">Delete</li>
+      </ul>
     </div>
-    <ul class="s-project-item__more" *ngIf="more">
-      <li>delete</li>
-    </ul>
+
   </div>

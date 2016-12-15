@@ -19,7 +19,7 @@ export class ProjectService {
 
       this.usersQuerySubject = new Subject();
       this.userQuerySubject = new Subject();
-      
+
       // get all projects
       this.projects$ = af.database.list('/projects', {
         query: { 
@@ -43,7 +43,6 @@ export class ProjectService {
         }
       })
       .map(projectsData => {
-        console.log('projectsData', projectsData)
         let arrProjects: Array<Project> = [];
         projectsData.sort((a,b) => b.created - a.created );
         projectsData.forEach(projectData => arrProjects.push(new Project(projectData)));
@@ -59,5 +58,13 @@ export class ProjectService {
     
     setUserQuerySubject(userQuery){
       this.userQuerySubject.next(userQuery);
+    }
+
+    deleteProject(key, userId){
+      const projectsList = this.af.database.list('/projects') 
+      projectsList.remove(key);
+
+      const projectsUserList = this.af.database.list(`/users/${userId}/projects`)
+      projectsUserList.remove(key);
     }
 }

@@ -116,18 +116,19 @@
     }
     &__more {
         background: #fff;
-        box-shadow: 0 7px 10px 0 rgba($s-primary, .3);
+        border: 1px solid #f2f2f2;
+        box-shadow: 0 7px 10px 0 rgba($s-primary, .3), 0 0 0 -1px hsl(0,0,90%);
         border-bottom: 1px solid $s-link;
         border-radius: 3px;
-        color: $s-primary;
+        color: $s-link;
         font-size: 0.9rem;
         line-height: 2rem;
         list-style: none;
         min-width: 120px;
         padding: .5rem 1rem;
         position: absolute;
-        top: 1rem;
-        right: 0;
+        top: 1.5rem;        
+        right: 1rem;
         z-index: 101;
         li:hover {
             color: $s-link;

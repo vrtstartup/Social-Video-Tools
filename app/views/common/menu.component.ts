@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FirebaseAuth } from 'angularfire2';
 
 @Component({
     selector: 'menu-bar',
-    templateUrl: './menu.component.html'
+    templateUrl: './menu.component.html',
+    host: {
+        '(document:click)': 'onClick($event)',
+    },
 })
 
 export class MenuComponent implements OnInit {
@@ -13,15 +16,16 @@ export class MenuComponent implements OnInit {
 
     constructor(
         public router: Router,
-        public auth: FirebaseAuth){}
+        public auth: FirebaseAuth,
+        private _el: ElementRef) { }
 
-    ngOnInit() {}
+    ngOnInit() { }
 
     onClickUserMenu() {
         this.toggleUserMenu();
     }
-    
-    toggleUserMenu(){
+
+    toggleUserMenu() {
         this.showUserMenu = !this.showUserMenu;
     }
 
@@ -29,6 +33,12 @@ export class MenuComponent implements OnInit {
         this.toggleUserMenu();
         this.auth.logout();
         this.router.navigate(['/login']);
+    }
+
+    onClick(event) {
+        if (!this._el.nativeElement.querySelector('#s-menubar-dropdown').contains(event.target)) {
+            this.showUserMenu = false;
+        }
     }
 
 }
