@@ -16,9 +16,12 @@ router.get('/queue', (req, res) => {
   let data = [];
 
   let project = jobService.getFirst('templater-queue')
-    .then(job => projectService.getProjectByJob(job), reason => res.json([]))
+    .then(job =>projectService.getProjectByJob(job), reason => res.json([]))
     .then( project => res.json(project.parseOverlays()))
-    .catch(errorHandler);
+    .catch(err => {
+      errorHandler(err);
+      res.json({message: 'no jobs available'});
+    });
 
 });
 
