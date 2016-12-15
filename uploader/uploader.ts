@@ -31,18 +31,15 @@ const filePath = path.resolve(uploader.outFolder, process.argv[2]);
 const projectId = process.argv[3];
 const overlayId = process.argv[4];
 
-
-console.log(filePath, projectId, overlayId);
-
 // mock values
 // const filePath = `/Users/matthiasdevriendt/Movies/vrt_test/asset.mov`;
-// const projectId = `-KWb63WvkyqXjOXVDlIp`;
-// const overlayId = '-KWb64_xtsgglrGzHLO6';
+// const projectId = `-KZ0rIcAlIo6wSkw7003`;
+// const overlayId = '-ANNOE5K644ELJJC2313';
 
 // Upload file 
-// uploadVideo(filePath)
-//   .then(response => updateOverlayStatus(projectId, overlayId))
-//   .catch(errorHandler);
+uploadVideo(filePath)
+  .then(response => updateOverlayStatus(projectId, overlayId))
+  .catch(errorHandler);
 
 function uploadVideo( filePath ) {
   return new Promise((resolve, reject) => {
