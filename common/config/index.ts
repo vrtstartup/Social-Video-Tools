@@ -5,6 +5,7 @@ import { routingConfig } from './routing';
 import { mailConfig } from './mail';
 import { logger } from './winston';
 import { storage } from './s3';
+import { uploader } from './uploader';
 
 export const config = { 
   encoding: encodingConfig,
@@ -13,5 +14,6 @@ export const config = {
   firebase: fbConfig,
   routing: routingConfig,
   mail: mailConfig,
+  uploader: uploader,
   logger: logger
 }

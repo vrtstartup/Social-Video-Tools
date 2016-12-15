@@ -1,8 +1,10 @@
 import * as fs from 'fs';
 import { routingConfig } from '../common/config/routing';
 import { encodingConfig } from '../common/config/encoding';
+import { uploader } from '../common/config/uploader';
 import { logger } from '../common/config/winston';
 
+const path = require('path');
 const restler = require('restler');
 
 /*
@@ -25,7 +27,7 @@ const endpointUpload = `${baseUrl}/api/upload/overlay`;
 const endpointUpdate = `${baseUrl}/api/templater/status`;
 
 // assign parameters passed by bot to process 
-const filePath = process.argv[2];
+const filePath = path.resolve(uploader.outFolder, process.argv[2]);
 const projectId = process.argv[3];
 const overlayId = process.argv[4];
 
