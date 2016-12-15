@@ -11,13 +11,11 @@ router.get('/queue', (req, res) => {
   const templateService = req.app.get('templates');
   const jobService = req.app.get('jobs');
   const projectService = req.app.get('projects');
-
   // return data
   let data = [];
-
-  let project = jobService.getFirst('templater-queue')
-    .then(job =>projectService.getProjectByJob(job), reason => res.json([]))
-    .then( project => res.json(project.parseOverlays()))
+  let project = jobService.getFirst('templater-queue', 'render-assets')
+    .then(job =>projectService.getProjectByJob(job))
+    .then( project => { res.json(project.parseOverlays())})
     .catch(err => {
       errorHandler(err);
       res.json({message: 'no jobs available'});
