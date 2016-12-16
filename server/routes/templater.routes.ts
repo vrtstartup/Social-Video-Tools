@@ -18,7 +18,7 @@ router.get('/queue', (req, res) => {
     .then( project => { res.json(project.parseOverlays())})
     .catch(err => {
       errorHandler(err);
-      res.json({message: 'no jobs available'});
+      res.json([]);
     });
 
 });
