@@ -78,7 +78,7 @@
 											<label class="s-anno-inputs__label" for="">{{i}}-{{input.label}}</label>
 											<input class="s-anno-inputs__input" type="text" [(ngModel)]="input.text" 
 												(keyup)="onKey(input)"
-												(blur)="onBlur()" [ngModelOptions]="{standalone: true}">
+												(blur)="onBlur(input)" [ngModelOptions]="{standalone: true}">
 										</div>
 									</form>
 								</div>

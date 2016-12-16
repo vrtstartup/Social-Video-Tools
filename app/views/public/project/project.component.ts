@@ -179,23 +179,26 @@ export class ProjectComponent implements OnInit, OnDestroy {
       //   this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
       // }
 
-      //this.updateAnnotation(this.selectedAnnotation.key, this.selectedAnnotation);
+      this.updateAnnotation(this.selectedAnnotation.key, this.selectedAnnotation);
       //this.setSelectedAnno(this.selectedAnnotation.key);
-      //this.updateProject();
+      this.updateProject();
     }
   }
 
   // TODO
-  onBlur() {
+  onBlur(input) {
+    this.selectedAnnotation.data.text[input.key] = input;
+    this.updateAnnotation(this.selectedAnnotation.key, this.selectedAnnotation);
+    //this.setSelectedAnno(this.selectedAnnotation.key);
     this.updateProject();
   }
 
-  onKey(input){
-    this.selectedAnnotation.data.text[input.key] = input;
-    this.setSelectedAnno(this.selectedAnnotation.key);
-    // update project => dont push yet to db
-    this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
-  }
+  // onKey(input){
+  //   this.selectedAnnotation.data.text[input.key] = input;
+  //   this.setSelectedAnno(this.selectedAnnotation.key);
+  //   // update project => dont push yet to db
+  //   this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
+  // }
 
   /* render ------- */
   addToRenderQueue() {
