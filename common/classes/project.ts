@@ -65,7 +65,7 @@ export class Project {
         const obj = {};
 
         // append some variable props
-        obj['id'] = key;
+        obj['id'] = `${key}---${this.generateId(16)}`; // add a random element so templater bot doesn't skip
         obj['output'] = key;
 
         // append templater bot fields
@@ -133,6 +133,15 @@ export class Project {
       duration: data.duration,
       transitionDuration: data.transitionDuration
     };
-    
   }
+
+  generateId(length: number){
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < length; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+  } 
 }
