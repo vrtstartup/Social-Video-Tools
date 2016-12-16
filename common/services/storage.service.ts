@@ -36,11 +36,11 @@ export function uploadFile(project, fileType: string){
   });
 }
 
-export function signUrl(fileType:string, fileExtension: string, projectId: string) {
+export function signUrl(fileType:string, fileExtension: string, projectId: string, annotationId?: string) {
   /*
   * sign an url so a client can make a call directly to S3
   */
-  const fileKey = resolver.getProjectFileKey(fileType, projectId);
+  const fileKey = (fileType === 'overlay') ? resolver.getProjectFileKey(fileType, projectId, annotationId) : resolver.getProjectFileKey(fileType, projectId);
   const mimeType = resolver.getMimeTypeByFileType(fileType);
 
   const s3Params = {

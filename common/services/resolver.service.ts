@@ -40,8 +40,11 @@ export function getSharedFilePath(type: string, fileName: string) {
 }
 
 export function getProjectFilePath(type: string, projectName: string, includeExt?: boolean, fileName?: any){
-  //  return a fully resolved path to a project file
-  // i.e. /app/data/-xfdgjlksjd234source.mp4
+  // return a fully resolved path to a LOCAL (temporary) project file:
+  //    i.e. /app/data/-xfdgjlksjd234source.mp4
+  //
+  // this function is used to temporarily store ffmpeg output (lowres, render) and ASS subtitle files
+  // before uploading them to S3
   const fileConfig = getFileConfigByType(type);
   const workingDir = config.filesystem.workingDirectory;
   const fName = fileName ? fileName : fileConfig['name']; // if fileName is not explicitly set, it's a unique file whose name has been set in the config 

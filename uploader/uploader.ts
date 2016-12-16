@@ -52,7 +52,7 @@ function signRequest( filePath ) {
 
       // get signed request
       // #todo urlencode and decode
-      restler.get(`${endpointUpload}?project-id=${projectId}&file-type=overlay&file-ext=${uploader.fileExtension}`)
+      restler.get(`${endpointUpload}?project-id=${projectId}&annotation-id=${overlayId}&file-type=overlay&file-ext=${uploader.fileExtension}`)
         .on('complete', resolve)
         .on('error', reject);
     });
