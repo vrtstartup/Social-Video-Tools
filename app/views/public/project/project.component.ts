@@ -7,8 +7,6 @@ import { UploadService } from '../../../common/services/upload.service';
 import { Project } from '../../../common/models/project.model';
 import { UserService } from '../../../common/services/user.service';
 
-import './project.component.scss';
-
 // TODO remove | only for test purposes
 import testTemplate from '../../../common/models/testTemplate.model';
 
@@ -24,6 +22,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   userMessage: string = '';
   uploadProgress: any;
   downScaleProgress: any;
+  templateSelectorFlag: any;
 
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
@@ -84,9 +83,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
       }, err => console.log(err));
 
     this.projectId =  this.route.snapshot.params['id'];
-    if(this.projectId) {
-      this.openProject(this.projectId);
-    }
+    if(this.projectId) { this.openProject(this.projectId)}
   }
 
   ngOnDestroy(){
@@ -94,16 +91,19 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   openProject(id: string){
-    //this.showOpenDialog = false;
     this.projectRef = this.af.database.object(`/projects/${id}`);
     this.projectRef.subscribe( s => {
       this.project = new Project(s);
-      this.setSelectedAnno(this.project.getFirstAnnotationKey());
-    });
+        console.log(this.selectedAnnotation)
+        this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
+    }).unsubscribe();
   }
 
   updateProject() {
     this.projectRef.update(this.project.data);
+    this.projectRef.subscribe( s => {
+      this.project = new Project(s);
+    }).unsubscribe();
   }
 
   /* upload ------- */
@@ -140,17 +140,19 @@ export class ProjectComponent implements OnInit, OnDestroy {
   /* annotations -- */
   addAnnotation(annotationName: string) {
     let newAnno = this.project.addAnnotation( this.templates[annotationName]);
-    this.updateSelectedAnno(newAnno.key, newAnno);
+    this.updateProject();
+    this.setSelectedAnno(newAnno.key);
   }
 
   setSelectedAnno(key) {
+    this.toggleTemplateSelector();
     this.selectedAnnotation = this.project.getAnnotation(key);
   }
 
-  updateSelectedAnno(key, obj) {
-    this.project.updateSelectedAnno(key, obj);
-    this.setSelectedAnno(key);
+  updateAnnotation(key, obj) {
+    this.project.updateAnnotation(key, obj);
     this.updateProject();
+    //this.setSelectedAnno(key);
   }
 
   deleteAnnotation(key) {
@@ -162,27 +164,26 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.updateProject();
   }
 
-  updateSelectedAnnoTemplate(template) {
+  updateTemplate(template) {
     // only update if you select a different template for the annotation
-    if (template.name != this.selectedAnnotation.data.name) {
+    if (template.key != this.selectedAnnotation.data.key) {
       // update selectedAnno with new template
       this.selectedAnnotation.data = template;
-      if (template.duration) {
-        // if duration exceeds movieLength
-        if (this.selectedAnnotation.start + template.duration > this.project.data.clip.movieLength) {
-          this.selectedAnnotation.start = this.project.data.clip.movieLength - template.duration;
-        }
-        this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
-      }
+      this.toggleTemplateSelector();
+      
+      // if (template.duration) {
+      //   // if duration exceeds movieLength
+      //   if (this.selectedAnnotation.start + template.duration > this.project.data.clip.movieLength) {
+      //     this.selectedAnnotation.start = this.project.data.clip.movieLength - template.duration;
+      //   }
+      //   this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
+      // }
 
-      this.updateSelectedAnno(this.selectedAnnotation.key, this.selectedAnnotation);
-      this.setSelectedAnno(this.selectedAnnotation.key);
-      this.updateProject();
+      //this.updateAnnotation(this.selectedAnnotation.key, this.selectedAnnotation);
+      //this.setSelectedAnno(this.selectedAnnotation.key);
+      //this.updateProject();
     }
   }
-  
-  //toggleOpenDialog() { this.showOpenDialog = !this.showOpenDialog; }
-  //hideOpenDialog() { this.showOpenDialog = false; }
 
   // TODO
   onBlur() {
@@ -200,6 +201,14 @@ export class ProjectComponent implements OnInit, OnDestroy {
   addToRenderQueue() {
     this.http.post('api/render/stitch', { projectId: this.projectId })
       .subscribe((data) => { });
+  }
+
+  toggleTemplateSelector(key?){
+    //console.log(key);
+    if(key === 'undefined' || this.templateSelectorFlag === key) { 
+      return this.templateSelectorFlag = ''; 
+    }
+    this.templateSelectorFlag = key;
   }
 
 }

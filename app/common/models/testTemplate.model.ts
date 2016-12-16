@@ -1,6 +1,7 @@
 export default {
     subtitle: {
-        name: 'subtitle',
+        key: 'subtitle',
+        imageUrl: './assets/overlay/title_01.gif',
         ass: {
             name: 'subtitle',
             fontname: 'arial',
@@ -23,13 +24,13 @@ export default {
             }, 
         },
         aeTemplate: './testTemplate.aep',
-        imageUrl: 'http://placehold.it/250x250',
         type: 'subtitle',
         templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:green; }</style>',
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleTwo: {
-        name: 'subtitle',
+        key: 'subtitleTwo',
+        imageUrl: './assets/overlay/title_01.gif',
         ass: {
             name: 'DeredactieBackdrop',
             fontname: 'arial',
@@ -52,13 +53,13 @@ export default {
             }, 
         },
         aeTemplate: './testTemplate.aep',
-        imageUrl: 'http://placehold.it/250x250',
         type: 'subtitle',
         templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:yellow; }</style>',
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleThree: {
-        name: 'subtitle',
+        key: 'subtitleThree',
+        imageUrl: './assets/overlay/title_01.gif',
         ass: {
             name: 'DeredactieMarkering',
             fontname: 'arial',
@@ -81,14 +82,13 @@ export default {
             }, 
         },
         aeTemplate: './testTemplate.aep',
-        imageUrl: 'http://placehold.it/250x250',
         type: 'subtitle',
         templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:blue; }</style>',
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
     },
     overlayKetnet: { 
-        name: 'overlayKetnet',
-        imageUrl: 'http://placehold.it/250x250',
+        key: 'overlayKetnet',
+        imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
         duration: 5,
         bot: {
@@ -125,8 +125,8 @@ export default {
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
     },
     overlayStubru: { 
-        name: 'overlayStubru',
-        imageUrl: 'http://placehold.it/250x250',
+        key: 'overlayStubru',
+        imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
         duration: 7,
         bot: {
@@ -163,15 +163,15 @@ export default {
         templateHtml: '<div id="overlayStubru" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',        
     },    
     bumper: {
-        name: 'bumper', 
-        imageUrl: 'http://placehold.it/250x250',
+        key: 'bumper', 
+        imageUrl: './assets/bumper/deredactie_01.gif',
         duration: 7,
         transitionDuration: 3,
         type: 'outro',
     },
     logo: {
-        name:'logo1',
-        imageUrl: 'http://placehold.it/250x250',
+        key:'logo',
+        imageUrl: './assets/logo/deredactie_01.gif',
         scale: 1,
         width: 266,
         height: 130,
