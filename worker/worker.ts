@@ -151,6 +151,7 @@ function processRenderJob(project,job) {
           .then((project:Project) => stateService.updateState(project, 'storingRender', true))
           .then(project => storage.uploadFile(project, 'render'))
           .then((project:Project) => stateService.updateState(project, 'storingRender', false))
+          .then((project:Project) => stateService.updateState(project, 'render', true))
           .catch(err => jobService.kill(job.id, err))
           .then(resolve);
 

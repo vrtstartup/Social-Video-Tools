@@ -15,5 +15,4 @@ router.get('/sign-s3', (req, res) =>{
     .catch(console.log);
 });
 
-
 module.exports = router;

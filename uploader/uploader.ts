@@ -36,8 +36,8 @@ const overlayId = process.argv[4];
 
 // mock values
 // const filePath = `/Users/matthiasdevriendt/Movies/vrt_test/asset.mov`;
-// const projectId = `-KZ6I9yHQuMiuA3d13zz`;
-// const overlayId = '-ANNOF2061CB4HIF5FBE';
+// const projectId = `-KZ7FH-EQ4VI01QuqUYL`;
+// const overlayId = '-ANNO6HF4G57DI03DFJ0';
 
 // Upload file 
 signRequest(filePath)

@@ -28,6 +28,11 @@ export function getFileNameByType(fileType:string, fileId?:string) {
   return fileName;
 }
 
+function getParentPropertyByFileType(fileType: string): string{
+  const file = config.filesystem.files[fileType];
+  return file['directory'];
+}
+
 export function getProjectFilePath(type: string, projectName: string, includeExt?: boolean, fileName?: any){
   // return a fully resolved path to a LOCAL (temporary) project file:
   //    i.e. /app/data/-xfdgjlksjd234source.mp4
@@ -49,19 +54,21 @@ export function getProjectFilePath(type: string, projectName: string, includeExt
 * S3 related stuff 
 *
 */ 
-export function getProjectFileKey(type: string, projectId: string, fileName?: any): string{
+export function getProjectFileKey(fileType: string, projectId: string, fileName?: any): string{
   // return the key of an object stored in a remote s3 bucket
-  const fileConfig = getFileConfigByType(type);
+  const fileConfig = getFileConfigByType(fileType);
+  const parentProp = getParentPropertyByFileType(fileType);
   const fName = fileName ? fileName : fileConfig['name']; // if fileName is not explicitly set (overlay), it's a unique file whose name has been set in the config 
   const ext = fileConfig['extension'];
 
-  return `${projectId}/${fName}.${ext}`;
+  return `${parentProp}/${projectId}/${fName}.${ext}`;
 }
 
 export function storageUrl(fileType:string, baseDirectory:string, annotationId?: any){
   // return public url to file in s3 bucket
-  const file =  config.filesystem.files[fileType]; //config
-  const fileName = annotationId ?  annotationId : this.getFileNameByType(fileType);
+  const parentProp = getParentPropertyByFileType(fileType);
+  const file =  config.filesystem.files[fileType];
+  const fileName = annotationId ?  annotationId : getFileNameByType(fileType);
 
-  return `https://s3.${config.storage.region}.amazonaws.com/${config.storage.bucket}/${baseDirectory}/${fileName}`;
+  return `https://s3.${config.storage.region}.amazonaws.com/${config.storage.bucket}/${parentProp}/${baseDirectory}/${fileName}`;
 }

@@ -1,4 +1,5 @@
 import * as resolver from '../../common/services/resolver.service';
+import { fileConfig } from '../config/files';
 
 export class Project {
   public data;
@@ -97,9 +98,8 @@ export class Project {
       if(overlays.hasOwnProperty(key) && overlays[key] !== null && overlays[key] !== undefined ){
         const overlay = overlays[key];
         const projectName = this.data.id;
-
-        const fileName = resolver.isUniqueFile(type) ? false : key;
-        const filePath = resolver.isSharedFile(type) ? resolver.storageUrl(type, projectName, key) : resolver.storageUrl(type, projectName);
+        const filename = `${key}.${fileConfig.files.overlay.extension}`;
+        const filePath = resolver.storageUrl(type, projectName, filename);
 
         const pushObject = {
           type: overlay['data']['type'],
