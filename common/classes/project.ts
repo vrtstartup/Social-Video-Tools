@@ -128,7 +128,7 @@ export class Project {
     
     return {
       type: 'outro',
-      filePath: resolver.getSharedFilePath('outro', data['name']),
+      // filePath: resolver.getSharedFilePath('outro', data['name']),
       start: Number(this.data.clip.movieLength) - Number(data.transitionDuration),
       duration: data.duration,
       transitionDuration: data.transitionDuration
