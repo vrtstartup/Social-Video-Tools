@@ -38,7 +38,7 @@ export class Jobs {
           }
         }
 
-        reject(false); // no more available jobs
+        resolve(false); // no more available jobs
       });
     });
   }
