@@ -74,7 +74,7 @@ export class Project {
 
         // append text fields 
         const arrOverlayTextKeys = Object.keys(overlay['data']['text']);
-        arrOverlayTextKeys.forEach( key => obj[key] = overlay['data']['text'][key] );
+        arrOverlayTextKeys.forEach( key => obj[key] = overlay['data']['text'][key]['text'] );
 
         // append afterjob vars
         obj['projectId'] = this.data.id;

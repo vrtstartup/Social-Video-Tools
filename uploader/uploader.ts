@@ -1,9 +1,11 @@
 import * as fs from 'fs';
-import { config } from '../common/config';
+import { routingConfig } from '../common/config/routing';
+import { encodingConfig } from '../common/config/encoding';
+import { uploader } from '../common/config/uploader';
+import { logger } from '../common/config/winston';
 
+const path = require('path');
 const restler = require('restler');
-
-const logger = config.logger; 
 
 /*
 *
@@ -20,19 +22,19 @@ const logger = config.logger;
 */ 
 
 // routing
-const baseUrl = `${config.routing.fileServer.protocol}://${config.routing.fileServer.domain}:${config.routing.fileServer.port}`;
+const baseUrl = `${routingConfig.fileServer.protocol}://${routingConfig.fileServer.domain}`;
 const endpointUpload = `${baseUrl}/api/upload/overlay`;
 const endpointUpdate = `${baseUrl}/api/templater/status`;
 
 // assign parameters passed by bot to process 
-// const filePath = process.argv[0];
-// const projectId = process.argv[1];
-// const overlayId = process.argv[2];
+const filePath = path.resolve(uploader.outFolder, `${process.argv[2]}.${uploader.fileExtension}`);
+const projectId = process.argv[3];
+const overlayId = process.argv[4];
 
 // mock values
-const filePath = `/Users/matthiasdevriendt/Movies/vrt_test/asset.mov`;
-const projectId = `-KWb63WvkyqXjOXVDlIp`;
-const overlayId = '-KWb64_xtsgglrGzHLO6';
+// const filePath = `/Users/matthiasdevriendt/Movies/vrt_test/asset.mov`;
+// const projectId = `-KZ0rIcAlIo6wSkw7003`;
+// const overlayId = '-ANNOE5K644ELJJC2313';
 
 // Upload file 
 uploadVideo(filePath)
@@ -49,7 +51,7 @@ function uploadVideo( filePath ) {
         data: {
           "projectId": projectId,
           "overlayId": overlayId,
-          "video": restler.file(filePath, null, stats.size, null, config.encoding.format.video.mimeType)
+          "video": restler.file(filePath, null, stats.size, null, encodingConfig.format.video.mimeType)
         }
       }).on('complete', resolve);
     });

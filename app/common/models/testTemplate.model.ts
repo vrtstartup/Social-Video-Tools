@@ -3,7 +3,6 @@ export default {
         key: 'subtitle',
         imageUrl: './assets/overlay/title_01.gif',
         ass: {
-            name: 'subtitle',
             fontname: 'arial',
             fontsize: 24,
             primaryColour: '0xFFFFFF',
@@ -31,8 +30,8 @@ export default {
     subtitleTwo: {
         key: 'subtitleTwo',
         imageUrl: './assets/overlay/title_01.gif',
+        name: 'DeredactieBackdrop',
         ass: {
-            name: 'DeredactieBackdrop',
             fontname: 'arial',
             fontsize: 24,
             primaryColour: '0xFFFFFF',
@@ -60,8 +59,8 @@ export default {
     subtitleThree: {
         key: 'subtitleThree',
         imageUrl: './assets/overlay/title_01.gif',
+        name: 'subtitDeredactieMarkeringle',
         ass: {
-            name: 'DeredactieMarkering',
             fontname: 'arial',
             fontsize: 28,
             primaryColour: '0xFFFFFF',
@@ -161,7 +160,54 @@ export default {
         },
         templateCss: '<style>.wrapper{ background: rgba(0,0,0,0); color:pink; }</style>',
         templateHtml: '<div id="overlayStubru" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',        
-    },    
+    },  
+
+    testTemplate: { 
+        name: 'testTemplate',
+        imageUrl: 'http://placehold.it/250x250',
+        type: 'overlay',
+        duration: 5,
+        bot: {
+            "render-status": 'ready',
+            aep: 'D:\\videoTemplater\\dropbox\\ae\\Templater\\template.aep',
+            bot: 'render',
+            module: 'jpg2000',
+            output: 'DISISEENTEST/clips/something',
+            color1: '1B2A36',
+            color2: '4CBF23',
+            Text1:' {{off}}',
+            LowText:' {{off}}',
+            HighText:' {{off}}',
+            BigText:' {{off}}',
+            HighlightText:' {{off}}',
+            Text2AK:' {{off}}',
+            Text4AK:' {{off}}',
+            Text5:' {{off}}',
+        },
+        text: {
+            Text2DR: {
+                label: 'Title',
+                text: 'Hier komt de title',
+                layerId: 'Text2DR',
+                key: 'Text2DR',
+            }, 
+        },
+        layer: {            
+            layer01: { 
+                visible: 'false',
+                layerId: 'layer01',
+                key: 'layer01'
+            }, 
+            layer02: { 
+                visible: 'false',
+                layerId: 'layer02',
+                key: 'layer02'
+            }
+        },
+        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
+        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
+    },
+
     bumper: {
         key: 'bumper', 
         imageUrl: './assets/bumper/deredactie_01.gif',

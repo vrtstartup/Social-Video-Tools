@@ -108,8 +108,8 @@ export class State {
           // send email 
           this.projectService.removeProjectProperty(project.data.id, 'status/stitchingProgress')
             .then( status => this.projectService.setProjectProperty(project.data.id, 'clip/renderUrl', renderUrl))
-            .then( status => this.projectService.getEmailByProject(project))
-            .then( address =>  this.emailService.notify(address, type, project.data.id))
+            // .then( status => this.projectService.getEmailByProject(project))
+            // .then( address =>  this.emailService.notify(address, type, project.data.id))
             .catch(this.errorHandler.bind(this))
             .then( info => resolve(project));
         break;

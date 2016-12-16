@@ -46,6 +46,8 @@ export class Subtitle {
 
       arrKeys.forEach(i => {
         const style = subtitles[i]['data']['ass'];
+        style['name'] = subtitles[i]['data']['name'];
+        
         if(arrStyles.indexOf(style['name']) === -1){
           stream.write(this.formatStyle(style));
           arrStyles.push(style['name']);

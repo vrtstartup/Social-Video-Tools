@@ -5,6 +5,7 @@ import { Project } from '../../common/models/project.model';
 import { Http } from '@angular/http';
 import { AngularFire, FirebaseListObservable } from 'angularfire2';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { UserService } from '../../common/services/user.service';
 
 @Component({
   selector: 'project-list',
@@ -21,6 +22,7 @@ export class ProjectListComponent implements OnInit {
   private projects: Array<Project>;
   public userEmail = '';
   private activeExtra: any;
+  private userSubscribtion: any;
 
   constructor(
     private http: Http,
@@ -28,16 +30,27 @@ export class ProjectListComponent implements OnInit {
     private _el: ElementRef,
     private router: Router,
     private projectService: ProjectService,
+    public userService: UserService
   ) {
     this.af = af;
-    this.userEmail = 'joris.compernol@vrt.be';
+    this.userEmail = '';
   }
 
   ngOnInit() {
+    // get user email
+    this.userSubscribtion = this.userService.user$.subscribe( user => {
+        if(user){
+          this.userEmail = user['email'];
+          this.setUserByEmail({email: this.userEmail});
+        }  
+      }, err => console.log('authserviceErr', err)
+     );
+
     // query by userId
     this.projectService.projectsByUser$.subscribe(projectsbyuser => {
       this.projects = projectsbyuser;
-    })
+    });
+
     const userQuery = {
       email: this.userEmail,
       last: 10,
@@ -69,10 +82,12 @@ export class ProjectListComponent implements OnInit {
       this.projectService.setUsersQuerySubject(usersQuery);
       return
     }
+
     const userQuery = {
       email: formdata.email,
       last: 10,
     };
+
     this.projectService.setUserQuerySubject(userQuery);
   }
 
