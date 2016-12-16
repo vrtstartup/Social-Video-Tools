@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
+import 'rxjs/add/operator/take';
 import { UploadService } from '../../../common/services/upload.service';
 import { Project } from '../../../common/models/project.model';
 import { UserService } from '../../../common/services/user.service';
@@ -29,6 +30,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   templaterQueueRef: FirebaseListObservable<any[]>;
   projectsRef: FirebaseListObservable<any[]>;
   projects: any[];
+  projectRefOnce: Observable<any[]>;
   projectRef: FirebaseObjectObservable<any[]>;
   project: any;
   selectedAnnotation: any;
@@ -70,11 +72,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.userSubscribtion = this.userService.user$.subscribe( 
-      data => this.userId = data.userID ,
-      err => console.log('authserviceErr', err)
-     );
-    
+    this.projectId =  this.route.snapshot.params['id'];
+    console.log(this.projectId);
+    if(this.projectId) { this.openProject(this.projectId)}
+
     // subscribe to service observable
     this.uploadService.progress$
       .subscribe(data => {
@@ -82,8 +83,12 @@ export class ProjectComponent implements OnInit, OnDestroy {
         this.zone.run(() => this.uploadProgress = data);
       }, err => console.log(err));
 
-    this.projectId =  this.route.snapshot.params['id'];
-    if(this.projectId) { this.openProject(this.projectId)}
+    this.userSubscribtion = this.userService.user$.subscribe( 
+      data => this.userId = data.userID ,
+      err => console.log('authserviceErr', err)
+     );
+
+    this.projectRef = this.af.database.object(`/projects/${this.projectId}`);
   }
 
   ngOnDestroy(){
@@ -91,19 +96,18 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   openProject(id: string){
-    this.projectRef = this.af.database.object(`/projects/${id}`);
-    this.projectRef.subscribe( s => {
-      this.project = new Project(s);
-        console.log(this.selectedAnnotation)
-        this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
-    }).unsubscribe();
+    this.projectRefOnce = this.af.database.object(`/projects/${id}`, { preserveSnapshot: true}).take(1);
+    this.projectRefOnce.subscribe( snapshot => {
+      this.project = new Project( snapshot['val']() );
+      this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
+    }) ;
   }
 
   updateProject() {
     this.projectRef.update(this.project.data);
     this.projectRef.subscribe( s => {
       this.project = new Project(s);
-    }).unsubscribe();
+    });
   }
 
   /* upload ------- */

@@ -77,7 +77,7 @@
 										<div *ngFor="let input of (selectedAnnotation.data.text | list); let i = index">
 											<label class="s-anno-inputs__label" for="">{{i}}-{{input.label}}</label>
 											<input class="s-anno-inputs__input" type="text" [(ngModel)]="input.text" 
-												(keyup)="onKey(input)"
+												
 												(blur)="onBlur(input)" [ngModelOptions]="{standalone: true}">
 										</div>
 									</form>
