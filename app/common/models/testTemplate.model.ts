@@ -170,7 +170,6 @@ export default {
             aep: 'D:\\videoTemplater\\dropbox\\ae\\Templater\\template.aep',
             bot: 'render',
             module: 'jpg2000',
-            output: 'DISISEENTEST/clips/something',
             color1: '1B2A36',
             color2: '4CBF23',
             Text1:' {{off}}',
