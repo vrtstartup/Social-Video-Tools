@@ -14,12 +14,9 @@ router.get('/queue', (req, res) => {
   // return data
   let data = [];
   let project = jobService.getFirst('templater-queue', 'render-assets')
-    .then(job =>projectService.getProjectByJob(job))
+    .then(job => projectService.getProjectByJob(job))
     .then( project => { res.json(project.parseOverlays())})
-    .catch(err => {
-      errorHandler(err);
-      res.json([]);
-    });
+    .catch(err => res.json([]));
 
 });
 
