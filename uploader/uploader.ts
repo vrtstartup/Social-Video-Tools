@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { Observable } from 'rxjs/Rx';
 import { routingConfig } from '../common/config/routing';
 import { encodingConfig } from '../common/config/encoding';
 import { uploader } from '../common/config/uploader';
@@ -6,6 +7,7 @@ import { logger } from '../common/config/winston';
 
 const path = require('path');
 const restler = require('restler');
+const req = require('request');
 
 /*
 *
@@ -22,8 +24,9 @@ const restler = require('restler');
 */ 
 
 // routing
+// const baseUrl = `http://localhost:3000`;
 const baseUrl = `${routingConfig.fileServer.protocol}://${routingConfig.fileServer.domain}`;
-const endpointUpload = `${baseUrl}/api/upload/overlay`;
+const endpointUpload = `${baseUrl}/api/upload/sign-s3`;
 const endpointUpdate = `${baseUrl}/api/templater/status`;
 
 // assign parameters passed by bot to process 
@@ -33,27 +36,25 @@ const overlayId = process.argv[4];
 
 // mock values
 // const filePath = `/Users/matthiasdevriendt/Movies/vrt_test/asset.mov`;
-// const projectId = `-KZ0rIcAlIo6wSkw7003`;
-// const overlayId = '-ANNOE5K644ELJJC2313';
+// const projectId = `-KZ6I9yHQuMiuA3d13zz`;
+// const overlayId = '-ANNOF2061CB4HIF5FBE';
 
 // Upload file 
-uploadVideo(filePath)
+signRequest(filePath)
+  .then(sendRequest)
   .then(response => updateOverlayStatus(projectId, overlayId))
   .catch(errorHandler);
 
-function uploadVideo( filePath ) {
+function signRequest( filePath ) {
   return new Promise((resolve, reject) => {
     fs.stat(filePath, (err, stats) => {
       if(err) return reject(err);
 
-      restler.post(endpointUpload, {
-        multipart: true,
-        data: {
-          "projectId": projectId,
-          "overlayId": overlayId,
-          "video": restler.file(filePath, null, stats.size, null, encodingConfig.format.video.mimeType)
-        }
-      }).on('complete', resolve);
+      // get signed request
+      // #todo urlencode and decode
+      restler.get(`${endpointUpload}?project-id=${projectId}&annotation-id=${overlayId}&file-type=overlay&file-ext=${uploader.fileExtension}`)
+        .on('complete', resolve)
+        .on('error', reject);
     });
   });
 }
@@ -70,5 +71,59 @@ function updateOverlayStatus(projectId, overlayId) {
       .on('error', reject);
   });
 }
+
+function sendRequest(data: Object){
+  const url = data['signedRequest'];
+  const stream = getFileStream(filePath);
+  const stats = fs.statSync(filePath);
+
+  return new Promise((resolve, reject) => {
+    stream.pipe(req({
+      method: "PUT",
+      uri: url,
+      headers: {
+        'Content-Length': stats['size']
+      }
+    }, (err, res, body) => {
+      if(err) reject(err);
+      resolve(body);
+    }))
+  });
+}
+
+function getFileStream(filePath: string){
+  return fs.createReadStream(filePath);
+}
+
+function uploadFile(file: File, signedRequest: string){
+    return Observable.create( observer => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', signedRequest);
+
+      xhr.onreadystatechange = () => {
+        if(xhr.readyState === 4) {
+          if(xhr.status === 200) {
+            observer.next(xhr.response);
+            observer.complete();
+          } else{
+            console.log(xhr.responseText);
+            console.log('could not upload file');
+          }
+        };
+      };
+
+      xhr.upload.onprogress = (event) => {
+        this.progress = Math.round(event.loaded / event.total * 100);
+        
+        this.progressObserver
+          .next(this.progress)
+        };
+
+      xhr.upload.onerror = (e) => { observer.error(e);}
+      xhr.upload.ontimeout = (e) => { observer.error(e);}
+
+      xhr.send(file);
+    });
+  }
 
 function errorHandler(err){ logger.error(err) }

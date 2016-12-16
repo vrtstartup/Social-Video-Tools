@@ -1,9 +1,6 @@
-d:
-cd videoTemplater
-cd build
-cd uploader
+cd /d D:\videoTemplater\Social-Video-tools-master\build\uploader 
 
-node -v
-node uploader.js %*
+node -v 
+node uploader.js %* 
 
 pause

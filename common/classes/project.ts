@@ -65,7 +65,7 @@ export class Project {
         const obj = {};
 
         // append some variable props
-        obj['id'] = key;
+        obj['id'] = `${key}---${this.generateId(16)}`; // add a random element so templater bot doesn't skip
         obj['output'] = key;
 
         // append templater bot fields
@@ -99,7 +99,7 @@ export class Project {
         const projectName = this.data.id;
 
         const fileName = resolver.isUniqueFile(type) ? false : key;
-        const filePath = resolver.isSharedFile(type) ? resolver.getSharedFilePath(type, overlay['data']['name']) : resolver.getProjectFilePath(type, projectName, true, fileName);
+        const filePath = resolver.isSharedFile(type) ? resolver.storageUrl(type, projectName, key) : resolver.storageUrl(type, projectName);
 
         const pushObject = {
           type: overlay['data']['type'],
@@ -133,6 +133,15 @@ export class Project {
       duration: data.duration,
       transitionDuration: data.transitionDuration
     };
-    
   }
+
+  generateId(length: number){
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < length; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+  } 
 }
