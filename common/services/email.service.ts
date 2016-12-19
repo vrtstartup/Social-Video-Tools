@@ -8,6 +8,7 @@ export class Email {
     const client = new postmark.Client(config.mail.postmark.secret);
 
     return new Promise((resolve, reject) => {
+      config.logger.verbose('Sending email...');
       client.sendEmail({
         "From": `${config.mail.from}`,
         "To": targetAddress,
