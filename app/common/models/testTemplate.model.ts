@@ -212,11 +212,12 @@ export default {
     },
 
     bumper: {
-        name: 'bumper', 
+        name: 'Bumper De Redactie 1', 
         imageUrl: 'http://placehold.it/250x250',
         duration: 7,
         transitionDuration: 3,
         type: 'outro',
+        fileName: 'deredactie_1'
     },
     logo: {
         name:'logo1',

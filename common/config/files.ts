@@ -40,13 +40,13 @@ export const fileConfig = {
       mime: 'video/quicktime',
     },
     outro: {
-      directory: 'assets',
+      directory: 'assets/bumper',
       extension: 'mov',
       mime: 'video/quicktime',
       shared: true
     },
     logo: {
-      directory: 'assets',
+      directory: 'assets/logo',
       extension: 'mov',
       mime: 'video/quicktime',
       shared: true,
