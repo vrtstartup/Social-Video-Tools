@@ -208,7 +208,7 @@ export function stitch(project, job, messageHandler) {
             outputName = inputName.replace(':v', '_scaled');
             const overlayWidth = input['data'].width;
             const desiredScale = input['data'].scale;
-            const scaleWidth = desiredScale ? width * (width / (overlayWidth * desiredScale)) : width;
+            const scaleWidth = desiredScale ? overlayWidth * (width / (overlayWidth * desiredScale)) : width;
             line = `[${input['name']}]setpts=PTS-STARTPTS+${input['data']['start']}/TB,scale=${scaleWidth}:-1[${outputName}]`
         };
        
