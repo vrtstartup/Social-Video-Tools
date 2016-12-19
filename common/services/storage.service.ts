@@ -17,21 +17,24 @@ export function uploadFile(project, fileType: string){
   
   return new Promise((resolve, reject) => {
     fs.readFile(filePath,(err, fileBuffer) => {
-      if(err) logger.error(`could not read ${fileType} file.`);
-      
-      s3.putObject({
-        ACL: 'public-read',
-        Bucket: storage.bucket,
-        Key: resolver.getProjectFileKey(fileType,project['data']['id']),
-        Body: fileBuffer,
-        ContentType: fileConfig.files[fileType]['mime']
-      }, (err, resp) => {
-        if(err) logger.error(err);
-        
+      if(err){
+        logger.warn(`${fileType} file seems to be empty. Aborting upload`);
         resolve(project);
-      }).on('httpUploadProgress', progress => {
-        logger.info(progress.loaded + " of " + progress.total + " bytes: ", (progress.loaded / progress.total)*100 + '%');
-      });
+      }else{
+        s3.putObject({
+          ACL: 'public-read',
+          Bucket: storage.bucket,
+          Key: resolver.getProjectFileKey(fileType,project['data']['id']),
+          Body: fileBuffer,
+          ContentType: fileConfig.files[fileType]['mime']
+        }, (err, resp) => {
+          if(err) logger.error(err);
+          
+          resolve(project);
+        }).on('httpUploadProgress', progress => {
+          logger.info(progress.loaded + " of " + progress.total + " bytes: ", (progress.loaded / progress.total)*100 + '%');
+        });
+      }
     })
   });
 }
