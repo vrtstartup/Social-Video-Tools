@@ -90,10 +90,12 @@ export class Project {
     }
 
     return arrReturn;
-  }
+  } 
 
   overlayArray(type:string) {  
     // returns overlay in a format suitable for the stitching operation
+    const config = fileConfig['files'][type];
+    const isSharedAsset = config.hasOwnProperty('shared') && config['shared'] === true;
     const overlays = this.getAnnotations(type);
     const keys = Object.keys(overlays); 
     let arrReturn = [];
@@ -102,8 +104,9 @@ export class Project {
       if(overlays.hasOwnProperty(key) && overlays[key] !== null && overlays[key] !== undefined ){
         const overlay = overlays[key];
         const projectName = this.data.id;
-        const filename = `${key}.${fileConfig.files.overlay.extension}`;
-        const filePath = resolver.storageUrl(type, projectName, filename);
+
+        const filename = isSharedAsset ? overlay['data']['fileName'] : `${key}.${fileConfig.files.overlay.extension}`;
+        const filePath = isSharedAsset ? resolver.assetUrl(type, filename) : resolver.storageUrl(type, projectName, filename);
 
         const pushObject = {
           type: overlay['data']['type'],

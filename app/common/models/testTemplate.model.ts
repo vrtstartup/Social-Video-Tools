@@ -211,7 +211,7 @@ export default {
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
     },
 
-    bumper: {
+    bumper_redactie_1: {
         name: 'Bumper De Redactie 1', 
         imageUrl: 'http://placehold.it/250x250',
         duration: 7,
@@ -219,12 +219,13 @@ export default {
         type: 'outro',
         fileName: 'deredactie_1'
     },
-    logo: {
-        name:'logo1',
+    logo_redactie_1: {
+        name:'logo De Redactie 1',
         imageUrl: 'http://placehold.it/250x250',
-        scale: 1,
+        scale: 6,
         width: 266,
         height: 130,
         type: 'logo',
+        fileName: 'deredactie_1'
     },
 }
