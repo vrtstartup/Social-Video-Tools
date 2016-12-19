@@ -114,7 +114,8 @@ export class Project {
           start: overlay['start'],
           end: overlay['end']
         };
-
+        
+        if(overlay['data'].hasOwnProperty('offset')) pushObject['offset'] = overlay['data']['offset'];
         if(overlay['data'].hasOwnProperty('scale')) pushObject['scale'] = overlay['data']['scale'];
         if(overlay['data'].hasOwnProperty('width')) pushObject['width'] = overlay['data']['width'];
         if(overlay['data'].hasOwnProperty('height')) pushObject['height'] = overlay['data']['height'];

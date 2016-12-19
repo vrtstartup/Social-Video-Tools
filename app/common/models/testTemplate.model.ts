@@ -223,6 +223,10 @@ export default {
         name:'logo De Redactie 1',
         imageUrl: 'http://placehold.it/250x250',
         scale: 6,
+        offset:{
+            x: 20,
+            y: 20,
+        },
         width: 266,
         height: 130,
         type: 'logo',

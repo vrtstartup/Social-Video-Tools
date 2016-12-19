@@ -218,10 +218,15 @@ export function stitch(project, job, messageHandler) {
     }
 
     function overlayFilter(output:string, input:Object){
+        const offset = (input['data'].hasOwnProperty('offset')) ? input['data']['offset'] : false;
+        const offsetX = offset ? offset.x : 0;
+        const offsetY = offset ? offset.y : 0;
+        
         const newOutputName = input['name'] + '_' + output;
         arrOutputs.push(newOutputName);
 
-        return `[${output}][${input['name']}]overlay=x=0:y=0[${newOutputName}]`;
+
+        return `[${output}][${input['name']}]overlay=x=${offsetX}:y=${offsetY}[${newOutputName}]`;
     }
 }
 
