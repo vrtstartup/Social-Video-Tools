@@ -56,7 +56,7 @@ export default {
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleThree: {
-        name: 'subtitDeredactieMarkeringle',
+        name: 'DeredactieMarkering',
         ass: {
             fontname: 'arial',
             fontsize: 28,
