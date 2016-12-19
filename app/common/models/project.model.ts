@@ -13,8 +13,6 @@ export class Project {
         delete project['$key'];
         delete project['$exists'];
         this.data = project;
-
-        //this.getLastStatus();
     }
 
     getAnnotations() {

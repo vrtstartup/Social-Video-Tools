@@ -2,6 +2,7 @@ export default {
     subtitle: {
         key: 'subtitle',
         imageUrl: './assets/overlay/title_01.gif',
+        name: 'defaultSubtitle',
         ass: {
             fontname: 'arial',
             fontsize: 24,
@@ -24,8 +25,8 @@ export default {
         },
         aeTemplate: './testTemplate.aep',
         type: 'subtitle',
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:green; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
+        templateCss: '<style>#defaultSubtitle.wrapper{ background: rgba(0,0,0,0); color:white; }</style>',
+        templateHtml: '<div id="defaultSubtitle" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleTwo: {
         key: 'subtitleTwo',
@@ -53,8 +54,8 @@ export default {
         },
         aeTemplate: './testTemplate.aep',
         type: 'subtitle',
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:yellow; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
+        templateCss: '<style>#DeredactieBackdrop.wrapper{ background: rgba(0,0,0,0); color:yellow; }</style>',
+        templateHtml: '<div id="DeredactieBackdrop" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleThree: {
         key: 'subtitleThree',
@@ -82,11 +83,12 @@ export default {
         },
         aeTemplate: './testTemplate.aep',
         type: 'subtitle',
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:blue; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
+        templateCss: '<style>#subtitDeredactieMarkeringle.wrapper{ background: rgba(0,0,0,0); color:blue; }</style>',
+        templateHtml: '<div id="subtitDeredactieMarkeringle" class="wrapper"><div>%textInpt01%</div></div>',
     },
     overlayKetnet: { 
         key: 'overlayKetnet',
+        name: 'overlayKetnet',
         imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
         duration: 5,
@@ -125,6 +127,7 @@ export default {
     },
     overlayStubru: { 
         key: 'overlayStubru',
+        name: 'overlayStubru',
         imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
         duration: 7,
@@ -158,13 +161,14 @@ export default {
                 key: 'layer02'
             }
         },
-        templateCss: '<style>.wrapper{ background: rgba(0,0,0,0); color:pink; }</style>',
+        templateCss: '<style>#overlayStubru.wrapper{ background: rgba(0,0,0,0); color:pink; }</style>',
         templateHtml: '<div id="overlayStubru" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',        
     },  
 
     testTemplate: { 
+        key: 'testTemplate',
         name: 'testTemplate',
-        imageUrl: 'http://placehold.it/250x250',
+        imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
         duration: 5,
         bot: {
@@ -204,8 +208,8 @@ export default {
                 key: 'layer02'
             }
         },
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
+        templateCss: '<style>#testTemplate.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
+        templateHtml: '<div id="testTemplate" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
     },
 
     bumper: {

@@ -28,20 +28,20 @@ export class ProjectComponent implements OnInit, OnDestroy {
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
   templaterQueueRef: FirebaseListObservable<any[]>;
-  projectsRef: FirebaseListObservable<any[]>;
-  projects: any[];
   projectRefOnce: Observable<any[]>;
   projectRef: FirebaseObjectObservable<any[]>;
   project: any;
+  selectedAnnotationKey: any = '';
   selectedAnnotation: any;
   templatesRef: FirebaseObjectObservable<any[]>;
   stylesRef: FirebaseObjectObservable<any[]>;
   templates: any[];
   selectedTemplate: any;
   projectId: string;
-
-  //showOpenDialog: boolean;
-  userSubscribtion: any;
+  // subscribtions
+  userSub: any;
+  templatesSub: any;
+  uploadServiceSub: any;
 
   constructor(
     af: AngularFire,
@@ -50,72 +50,61 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private uploadService: UploadService,
-    public userService: UserService) {
+    private userService: UserService) {
 
     this.af = af;
-
+    this.projectId =  this.route.snapshot.params['id'];
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
     this.templaterQueueRef = af.database.list('/templater-queue');
-    this.projectsRef = af.database.list('/projects');
-    this.projectsRef.subscribe((s: any) => this.projects = s);
     this.templatesRef = af.database.object('/templates');
-    this.templatesRef.subscribe((s: any) => this.templates = s);
-
-
-    // interface
-    //this.showOpenDialog = false;
-
-    // TODO remove | only for test purposes | 
-    // should only be set once => when server restarts
-    this.templatesRef.set(testTemplate);
-  }
-
-  ngOnInit() {
-    this.projectId =  this.route.snapshot.params['id'];
-    console.log(this.projectId);
-    if(this.projectId) { this.openProject(this.projectId)}
-
-    // subscribe to service observable
-    this.uploadService.progress$
-      .subscribe(data => {
-        // force to trigger change
-        this.zone.run(() => this.uploadProgress = data);
-      }, err => console.log(err));
-
-    this.userSubscribtion = this.userService.user$.subscribe( 
-      data => this.userId = data.userID ,
-      err => console.log('authserviceErr', err)
-     );
-
     this.projectRef = this.af.database.object(`/projects/${this.projectId}`);
   }
 
-  ngOnDestroy(){
-    this.userSubscribtion.unsubscribe();
+  ngOnInit() {
+    // TODO remove | only for test purposes | move to server
+    this.templatesRef.set(testTemplate);
+
+    this.templatesSub = this.templatesRef.subscribe(
+      data => this.templates = data
+    );
+
+    this.userSub = this.userService.user$.subscribe(
+      data => this.userId = data.userID ,
+      err => console.log('authserviceErr', err)
+    );
+    
+    this.uploadServiceSub = this.uploadService.progress$.subscribe(data => {
+        this.zone.run(() => this.uploadProgress = data); // force to trigger change
+      }, err => console.log(err));
+
+    // only firstTime when project is loaded set 
+    let onlyOnce = true;
+    // project subscribtion
+    this.projectRef.subscribe( s => { 
+      this.project = new Project(s);
+      if(onlyOnce) { this.setSelectedAnno(this.project.getSortedAnnoKey('last')), onlyOnce = false;};
+    });
+
   }
 
-  openProject(id: string){
-    this.projectRefOnce = this.af.database.object(`/projects/${id}`, { preserveSnapshot: true}).take(1);
-    this.projectRefOnce.subscribe( snapshot => {
-      this.project = new Project( snapshot['val']() );
-      this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
-    }) ;
+  ngOnDestroy(){
+    this.userSub.unsubscribe();;
+    this.templatesSub.unsubscribe();
+    this.uploadServiceSub.unsubscribe();
   }
 
   updateProject() {
-    this.projectRef.update(this.project.data);
-    this.projectRef.subscribe( s => {
-      this.project = new Project(s);
-    });
+    if(this.project && this.project.data){
+      this.projectRef.update(this.project.data);
+    }
   }
 
-  /* upload ------- */
   uploadSource($event) {
     // file-ref to upload
     let sourceFile = $event.target.files[0];
     // upload video
-    this.uploadService.getSignedRequest(sourceFile, this.projectId)
+     this.uploadService.getSignedRequest(sourceFile, this.projectId)
       .then((data: Object) => {
         this.uploadService.uploadFile(data['file'], data['response']['signedRequest'])
           .subscribe(
@@ -137,11 +126,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
       });
   }
 
-  updateSource($event) {
-    this.uploadSource($event);
-  }
-
-  /* annotations -- */
   addAnnotation(annotationName: string) {
     let newAnno = this.project.addAnnotation( this.templates[annotationName]);
     this.updateProject();
@@ -150,19 +134,20 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   setSelectedAnno(key) {
     this.toggleTemplateSelector();
-    this.selectedAnnotation = this.project.getAnnotation(key);
+    this.selectedAnnotationKey = key;
+    //console.log('setSelectedAnno()', this.selectedAnnotationKey);
+    //this.selectedAnnotation = this.project.getAnnotation(key);
   }
 
   updateAnnotation(key, obj) {
     this.project.updateAnnotation(key, obj);
     this.updateProject();
-    //this.setSelectedAnno(key);
   }
 
   deleteAnnotation(key) {
     // when you delete the selected
-    if (this.selectedAnnotation.key === key) {
-      this.selectedAnnotation = false;
+    if (this.selectedAnnotationKey === key) {
+      this.selectedAnnotationKey = false;
     }
     delete this.project.data['annotations'][`${key}`];
     this.updateProject();
@@ -170,9 +155,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   updateTemplate(template) {
     // only update if you select a different template for the annotation
-    if (template.key != this.selectedAnnotation.data.key) {
+    if (template.key != this.selectedAnnotationKey) {
       // update selectedAnno with new template
-      this.selectedAnnotation.data = template;
+      this.project.data.annotations[this.selectedAnnotationKey].data = template;
       this.toggleTemplateSelector();
       
       // if (template.duration) {
@@ -183,7 +168,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
       //   this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
       // }
 
-      this.updateAnnotation(this.selectedAnnotation.key, this.selectedAnnotation);
+      //this.updateAnnotation(this.selectedAnnotationKey, this.selectedAnnotation);
       //this.setSelectedAnno(this.selectedAnnotation.key);
       this.updateProject();
     }
@@ -191,27 +176,30 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   // TODO
   onBlur(input) {
-    this.selectedAnnotation.data.text[input.key] = input;
-    this.updateAnnotation(this.selectedAnnotation.key, this.selectedAnnotation);
+    this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
+    //this.updateAnnotation(this.selectedAnnotationKey, this.selectedAnnotation);
     //this.setSelectedAnno(this.selectedAnnotation.key);
     this.updateProject();
   }
 
-  // onKey(input){
+  onKeyUp(input){
   //   this.selectedAnnotation.data.text[input.key] = input;
   //   this.setSelectedAnno(this.selectedAnnotation.key);
   //   // update project => dont push yet to db
-  //   this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
-  // }
+      this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
+      //console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] )
+      //this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
 
-  /* render ------- */
+      this.zone.run(() => {console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text) })
+      setTimeout(()=>console.log('run'));
+  }
+
   addToRenderQueue() {
     this.http.post('api/render/stitch', { projectId: this.projectId })
       .subscribe((data) => { });
   }
 
   toggleTemplateSelector(key?){
-    //console.log(key);
     if(key === 'undefined' || this.templateSelectorFlag === key) { 
       return this.templateSelectorFlag = ''; 
     }
