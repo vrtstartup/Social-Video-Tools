@@ -66,24 +66,24 @@ export class Project {
         const obj = {};
 
         // append some variable props
-        obj['"id"'] = `${key}---${this.generateId(16)}`; // add a random element so templater bot doesn't skip
-        obj['"output"'] = `${key}`;
+        obj['id'] = `${key}---${this.generateId(16)}`; // add a random element so templater bot doesn't skip
+        obj['output'] = `${key}`;
 
         // append templater bot fields
         const arrOverlayBotKeys = Object.keys(overlay['data']['bot']);
-        arrOverlayBotKeys.forEach( key => obj[`"${key}"`] = overlay['data']['bot'][key] );
+        arrOverlayBotKeys.forEach( key => obj[key] = overlay['data']['bot'][key] );
 
         // append layer information
         const arrLayerKeys = Object.keys(overlay['data']['layers']);
-        arrLayerKeys.forEach( key => obj[`"${key}"`] = overlay['data']['layers'][key] ? '' : '{{off}}');
+        arrLayerKeys.forEach( key => obj[key] = overlay['data']['layers'][key] ? '' : '{{off}}');
 
         // append text fields 
         const arrOverlayTextKeys = Object.keys(overlay['data']['text']);
-        arrOverlayTextKeys.forEach( key => obj[`"${key}"`] = overlay['data']['text'][key]['text'] );
+        arrOverlayTextKeys.forEach( key => obj[key] = overlay['data']['text'][key]['text'] );
 
         // append afterjob vars
-        obj['"projectId"'] = this.data.id;
-        obj['"overlayId"'] = key;
+        obj['projectId'] = this.data.id;
+        obj['overlayId'] = key;
 
         arrReturn.push(obj);
       });
