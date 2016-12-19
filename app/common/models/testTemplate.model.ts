@@ -82,86 +82,69 @@ export default {
         type: 'subtitle',
         templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:blue; }</style>',
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
-    },
-    overlayKetnet: { 
-        name: 'overlayKetnet',
+    }, 
+    lowText: { 
+        name: 'Low Text De Redactie',
         imageUrl: 'http://placehold.it/250x250',
         type: 'overlay',
         duration: 5,
         bot: {
             "render-status": 'ready',
-            aep: '/path/to/proper/aep/file.aep'
+            bot: 'render',
+            module: 'jpg2000',
+            color1: '1B2A36',
+            color2: '4CBF23',
         },
         text: {
-            textInpt01: {
-                label: 'overlayKetnet: Title',
-                text: 'overlayKetnet: Hier komt de title',
-                layerId: 'textInpt01',
-                key: 'textInpt01',
+            Text2DR: {
+                label: 'Title',
+                text: 'Hier komt de title',
+                layerId: 'Text2DR',
+                key: 'Text2DR',
             }, 
-            textInpt02: {
-                label: 'overlayKetnet: Subtitle',
-                text: 'overlayKetnet: Hier komt de subtitle',
-                layerId: 'textInpt02',
-                key: 'textInpt02',
-            } 
         },
-        layer: {            
-            layer01: { 
-                visible: 'false',
-                layerId: 'layer01',
-                key: 'layer01'
-            }, 
-            layer02: { 
-                visible: 'false',
-                layerId: 'layer02',
-                key: 'layer02'
-            }
+        layers: {
+            HighlightText: false,
+            LowText: true,
+            HighText: false,
+            BigText: false
         },
         templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
     },
-    overlayStubru: { 
-        name: 'overlayStubru',
+
+    highText: { 
+        name: 'High Text De Redactie',
         imageUrl: 'http://placehold.it/250x250',
         type: 'overlay',
-        duration: 7,
+        duration: 5,
         bot: {
             "render-status": 'ready',
-            aep: '/path/to/proper/aep/file.aep'
+            bot: 'render',
+            module: 'jpg2000',
+            color1: '1B2A36',
+            color2: '4CBF23',
         },
         text: {
-            textInpt01: {
-                label: 'overlayStubru: Title',
-                text: 'overlayStubru: Hier komt de title',
-                layerId: 'textInpt01',
-                key: 'textInpt01',
+            Text2DR: {
+                label: 'Title',
+                text: 'Hier komt de title',
+                layerId: 'Text2DR',
+                key: 'Text2DR',
             }, 
-            textInpt02: {
-                label: 'overlayStubru: Subtitle',
-                text: 'overlayStubru: Hier komt de subtitle',
-                layerId: 'textInpt02',
-                key: 'textInpt02',
-            } 
         },
-        layer: {            
-            layer01: { 
-                visible: 'false',
-                layerId: 'layer01',
-                key: 'layer01'
-            }, 
-            layer02: { 
-                visible: 'false',
-                layerId: 'layer02',
-                key: 'layer02'
-            }
+        layers: {
+            HighlightText: false,
+            LowText: false,
+            HighText: true,
+            BigText: false
         },
-        templateCss: '<style>.wrapper{ background: rgba(0,0,0,0); color:pink; }</style>',
-        templateHtml: '<div id="overlayStubru" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',        
-    },  
+        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
+        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
+    },
 
-    testTemplate: { 
-        name: 'testTemplate',
+    bigText: { 
+        name: 'Big Text De Redactie',
         imageUrl: 'http://placehold.it/250x250',
         type: 'overlay',
         duration: 5,
@@ -172,14 +155,6 @@ export default {
             module: 'jpg2000',
             color1: '1B2A36',
             color2: '4CBF23',
-            Text1:' {{off}}',
-            LowText:' {{off}}',
-            HighText:' {{off}}',
-            BigText:' {{off}}',
-            HighlightText:' {{off}}',
-            Text2AK:' {{off}}',
-            Text4AK:' {{off}}',
-            Text5:' {{off}}',
         },
         text: {
             Text2DR: {
@@ -189,17 +164,48 @@ export default {
                 key: 'Text2DR',
             }, 
         },
-        layer: {            
-            layer01: { 
-                visible: 'false',
-                layerId: 'layer01',
-                key: 'layer01'
+        layers: {
+            HighlightText: false,
+            LowText: false,
+            HighText: false,
+            BigText: true
+        },
+        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
+        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
+    },
+
+    highlightText: { 
+        name: 'Highlight Text De Redactie',
+        imageUrl: 'http://placehold.it/250x250',
+        type: 'overlay',
+        duration: 5,
+        bot: {
+            "render-status": 'ready',
+            aep: 'D:\\videoTemplater\\dropbox\\ae\\Templater\\template.aep',
+            bot: 'render',
+            module: 'jpg2000',
+            color1: '1B2A36',
+            color2: '4CBF23',
+        },
+        text: {
+            Text2DR: {
+                label: 'Title',
+                text: 'Hier komt de title',
+                layerId: 'Text2DR',
+                key: 'Text2DR',
             }, 
-            layer02: { 
-                visible: 'false',
-                layerId: 'layer02',
-                key: 'layer02'
-            }
+            Text3: {
+                label: 'Subtitle',
+                text: 'Hier komt de ondertitel',
+                layerId: 'Text2DR',
+                key: 'Text3',
+            }, 
+        },
+        layers: {
+            HighlightText: true,
+            LowText: false,
+            HighText: false,
+            BigText: false
         },
         templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
         templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
