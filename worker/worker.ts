@@ -94,7 +94,6 @@ function handleJob(job, project) {
       case 'render':
         logger.verbose('processing render operation...');
         processRenderJob(project, job)
-          .then((project:Project) => stateService.updateState(project, 'render', true))
           .then(resolve, reject);
         break;
 

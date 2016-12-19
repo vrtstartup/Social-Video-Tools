@@ -66,9 +66,20 @@ export function getProjectFileKey(fileType: string, projectId: string, fileName?
 
 export function storageUrl(fileType:string, baseDirectory:string, annotationId?: any){
   // return public url to file in s3 bucket
+  // this function returns project-specific files (source, render, overlays, ASS etc...)
   const parentProp = getParentPropertyByFileType(fileType);
   const file =  config.filesystem.files[fileType];
   const fileName = annotationId ?  annotationId : getFileNameByType(fileType);
 
   return `https://s3.${config.storage.region}.amazonaws.com/${config.storage.bucket}/${parentProp}/${baseDirectory}/${fileName}`;
+}
+
+export function assetUrl(fileType: string, fileName: string): string{ 
+  // return public url to file in s3 bucket
+  // this function returns files shared across multiple projects. e.g. logos and bumpers
+  const parentProp = getParentPropertyByFileType(fileType);
+  const fileConfig =getFileConfigByType(fileType);
+  const ext = fileConfig['extension'];
+
+  return `https://s3.${config.storage.region}.amazonaws.com/${config.storage.bucket}/${parentProp}/${fileName}.${ext}`;
 }

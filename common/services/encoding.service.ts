@@ -206,8 +206,9 @@ export function stitch(project, job, messageHandler) {
         if(blacklist.indexOf(input['name']) === -1){
             const inputName = input['name'];
             outputName = inputName.replace(':v', '_scaled');
-            const scaleWidth = input['data'].scale ? input['data'].width * input['data'].scale : width;
-
+            const overlayWidth = input['data'].width;
+            const desiredScale = input['data'].scale;
+            const scaleWidth = desiredScale ? width * (width / (overlayWidth * desiredScale)) : width;
             line = `[${input['name']}]setpts=PTS-STARTPTS+${input['data']['start']}/TB,scale=${scaleWidth}:-1[${outputName}]`
         };
        
@@ -217,10 +218,15 @@ export function stitch(project, job, messageHandler) {
     }
 
     function overlayFilter(output:string, input:Object){
+        const offset = (input['data'].hasOwnProperty('offset')) ? input['data']['offset'] : false;
+        const offsetX = offset ? offset.x : 0;
+        const offsetY = offset ? offset.y : 0;
+        
         const newOutputName = input['name'] + '_' + output;
         arrOutputs.push(newOutputName);
 
-        return `[${output}][${input['name']}]overlay=x=0:y=0[${newOutputName}]`;
+
+        return `[${output}][${input['name']}]overlay=x=${offsetX}:y=${offsetY}[${newOutputName}]`;
     }
 }
 
