@@ -16,12 +16,6 @@ export const fileConfig = {
       extension: 'mp4',
       mime: 'video/mp4',
     },
-    srt: {
-      directory: 'projects',
-      name: 'subtitles',
-      extension: 'srt',
-      mime: 'text/plain',
-    },
     ass: {
       directory: 'projects',
       name: 'subtitles',
