@@ -9,14 +9,18 @@ export class Projects {
     const refProject = db.ref(`projects/${job.id}`);
 
     // return the project.  
-    // #todo return value, wth?
-    return refProject.once('value')
-      .then( snapshot => {
-        // for conveniece sake, append the project ID to the return object
-        const projectData = snapshot.val();
-        projectData.id=snapshot.key;
-        return new Project(projectData, logger);
-      }, err => logger.error(err) )
+    return new Promise((resolve, reject) => {
+      if(!job) reject('no jobs available');
+      
+      refProject.once('value')
+        .then( snapshot => {
+          // for conveniece sake, append the project ID to the return object
+          const projectData = snapshot.val();
+          if (projectData) projectData.id=snapshot.key;
+          resolve(new Project(projectData, logger));
+        }, reject)
+    });
+
   }
 
   getProjectById(id:string) {

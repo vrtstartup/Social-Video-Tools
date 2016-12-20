@@ -1,6 +1,7 @@
 import {spawn, spawnSync, execFile} from 'child_process';
 import * as resolver from '../../common/services/resolver.service';
 import { config } from '../../common/config';
+import { Project } from '../../common/classes/project';
 
 var FfmpegCommand = require('fluent-ffmpeg');
 const path = require('path');
@@ -89,6 +90,30 @@ export function scaleDown(project, messageHandler, job) {
         .run();
     });
 };
+
+export function generateThumb(project): Promise<Project>{
+  const input = resolver.storageUrl('source', project.data.id);
+  const fileName = resolver.getFileNameByType('thumb', project.data.id);
+
+  return new Promise((resolve, reject) => {
+    const thumbCommand = new FfmpegCommand(input, {logger: logger})
+      .screenshots({
+          timestamps: [5],
+          filename: project.data.id + fileName,
+          folder: resolver.getWorkingDir()
+      })
+
+      .on('error', (err) => { 
+          logger.error(err);
+          reject(err);
+        })
+        .on('start', (commandLine) => {logger.verbose('Spawned Ffmpeg with command: ' + commandLine)})
+        .on('end', () => {
+          logger.verbose("Done processing")
+          resolve(project);
+        })
+  })
+}
 
 export function stitch(project, job, messageHandler) {
     // project data
@@ -206,8 +231,9 @@ export function stitch(project, job, messageHandler) {
         if(blacklist.indexOf(input['name']) === -1){
             const inputName = input['name'];
             outputName = inputName.replace(':v', '_scaled');
-            const scaleWidth = input['data'].scale ? input['data'].width * input['data'].scale : width;
-
+            const overlayWidth = input['data'].width;
+            const desiredScale = input['data'].scale;
+            const scaleWidth = desiredScale ? overlayWidth * (width / (overlayWidth * desiredScale)) : width;
             line = `[${input['name']}]setpts=PTS-STARTPTS+${input['data']['start']}/TB,scale=${scaleWidth}:-1[${outputName}]`
         };
        
@@ -217,10 +243,15 @@ export function stitch(project, job, messageHandler) {
     }
 
     function overlayFilter(output:string, input:Object){
+        const offset = (input['data'].hasOwnProperty('offset')) ? input['data']['offset'] : false;
+        const offsetX = offset ? offset.x : 0;
+        const offsetY = offset ? offset.y : 0;
+        
         const newOutputName = input['name'] + '_' + output;
         arrOutputs.push(newOutputName);
 
-        return `[${output}][${input['name']}]overlay=x=0:y=0[${newOutputName}]`;
+
+        return `[${output}][${input['name']}]overlay=x=${offsetX}:y=${offsetY}[${newOutputName}]`;
     }
 }
 

@@ -17,30 +17,33 @@ export function uploadFile(project, fileType: string){
   
   return new Promise((resolve, reject) => {
     fs.readFile(filePath,(err, fileBuffer) => {
-      if(err) logger.error(`could not read ${fileType} file.`);
-      
-      s3.putObject({
-        ACL: 'public-read',
-        Bucket: storage.bucket,
-        Key: resolver.getProjectFileKey(fileType,project['data']['id']),
-        Body: fileBuffer,
-        ContentType: fileConfig.files[fileType]['mime']
-      }, (err, resp) => {
-        if(err) logger.error(err);
-        
+      if(err){
+        logger.warn(`${fileType} file at path ${filePath} seems to be empty. Aborting upload`);
         resolve(project);
-      }).on('httpUploadProgress', progress => {
-        logger.info(progress.loaded + " of " + progress.total + " bytes: ", (progress.loaded / progress.total)*100 + '%');
-      });
+      }else{
+        s3.putObject({
+          ACL: 'public-read',
+          Bucket: storage.bucket,
+          Key: resolver.getProjectFileKey(fileType,project['data']['id']),
+          Body: fileBuffer,
+          ContentType: fileConfig.files[fileType]['mime']
+        }, (err, resp) => {
+          if(err) logger.error(err);
+          
+          resolve(project);
+        }).on('httpUploadProgress', progress => {
+          logger.info(progress.loaded + " of " + progress.total + " bytes: ", (progress.loaded / progress.total)*100 + '%');
+        });
+      }
     })
   });
 }
 
-export function signUrl(fileType:string, fileExtension: string, projectId: string) {
+export function signUrl(fileType:string, fileExtension: string, projectId: string, annotationId?: string) {
   /*
   * sign an url so a client can make a call directly to S3
   */
-  const fileKey = resolver.getProjectFileKey(fileType, projectId);
+  const fileKey = (fileType === 'overlay') ? resolver.getProjectFileKey(fileType, projectId, annotationId) : resolver.getProjectFileKey(fileType, projectId);
   const mimeType = resolver.getMimeTypeByFileType(fileType);
 
   const s3Params = {

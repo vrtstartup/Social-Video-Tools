@@ -33,16 +33,6 @@ export class State {
     return new Promise((resolve, reject) => {
       switch (type) {
         case 'uploaded':
-          // const proms = [];
-
-          // proms.push(resolver.makeProjectDirectories(project.data.id));
-          // proms.push(this.projectService.updateProject(project, {
-          //   files: {
-          //     'baseDir': project.data.id
-          //   }
-          // }));
-
-
           this.projectService.updateProject(project, {
             files: {
               'baseDir': project.data.id
@@ -51,13 +41,6 @@ export class State {
             this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres')
                .then(this.updateState(project, 'downscaled', false))
           });
-
-          // Promise.all(proms).then(arrData => {
-          //   const project = arrData[1];
-
-          //   this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres')
-          //      .then(this.updateState(project, 'downscaled', false))
-          // });
         break;
 
         case 'storingDownScaled':
@@ -94,6 +77,11 @@ export class State {
           resolve(project);
         break;
 
+        case 'thumb': 
+          const thumbUrl = resolver.storageUrl('thumb', project.data.id);
+          this.projectService.setProjectProperty(project.data.id, 'clip/thumbUrl', thumbUrl)
+            .then(resolve);
+          break;
         case 'subtitles':
           // additional hooks for the subtitles event go here
           resolve(project);
@@ -108,8 +96,8 @@ export class State {
           // send email 
           this.projectService.removeProjectProperty(project.data.id, 'status/stitchingProgress')
             .then( status => this.projectService.setProjectProperty(project.data.id, 'clip/renderUrl', renderUrl))
-            // .then( status => this.projectService.getEmailByProject(project))
-            // .then( address =>  this.emailService.notify(address, type, project.data.id))
+            .then( status => this.projectService.getEmailByProject(project))
+            .then( address => this.emailService.notify(address, type, project.data.id))
             .catch(this.errorHandler.bind(this))
             .then( info => resolve(project));
         break;

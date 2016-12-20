@@ -1,4 +1,5 @@
 import * as resolver from '../../common/services/resolver.service';
+import { fileConfig } from '../config/files';
 
 export class Project {
   public data;
@@ -65,12 +66,16 @@ export class Project {
         const obj = {};
 
         // append some variable props
-        obj['id'] = key;
-        obj['output'] = key;
+        obj['id'] = `${key}---${this.generateId(16)}`; // add a random element so templater bot doesn't skip
+        obj['output'] = `${key}`;
 
         // append templater bot fields
         const arrOverlayBotKeys = Object.keys(overlay['data']['bot']);
         arrOverlayBotKeys.forEach( key => obj[key] = overlay['data']['bot'][key] );
+
+        // append layer information
+        const arrLayerKeys = Object.keys(overlay['data']['layers']);
+        arrLayerKeys.forEach( key => obj[key] = overlay['data']['layers'][key] ? '' : '{{off}}');
 
         // append text fields 
         const arrOverlayTextKeys = Object.keys(overlay['data']['text']);
@@ -85,10 +90,12 @@ export class Project {
     }
 
     return arrReturn;
-  }
+  } 
 
   overlayArray(type:string) {  
     // returns overlay in a format suitable for the stitching operation
+    const config = fileConfig['files'][type];
+    const isSharedAsset = config.hasOwnProperty('shared') && config['shared'] === true;
     const overlays = this.getAnnotations(type);
     const keys = Object.keys(overlays); 
     let arrReturn = [];
@@ -98,8 +105,8 @@ export class Project {
         const overlay = overlays[key];
         const projectName = this.data.id;
 
-        const fileName = resolver.isUniqueFile(type) ? false : key;
-        const filePath = resolver.isSharedFile(type) ? resolver.getSharedFilePath(type, overlay['data']['name']) : resolver.getProjectFilePath(type, projectName, true, fileName);
+        const filename = isSharedAsset ? overlay['data']['fileName'] : `${key}.${fileConfig.files.overlay.extension}`;
+        const filePath = isSharedAsset ? resolver.assetUrl(type, filename) : resolver.storageUrl(type, projectName, filename);
 
         const pushObject = {
           type: overlay['data']['type'],
@@ -107,7 +114,8 @@ export class Project {
           start: overlay['start'],
           end: overlay['end']
         };
-
+        
+        if(overlay['data'].hasOwnProperty('offset')) pushObject['offset'] = overlay['data']['offset'];
         if(overlay['data'].hasOwnProperty('scale')) pushObject['scale'] = overlay['data']['scale'];
         if(overlay['data'].hasOwnProperty('width')) pushObject['width'] = overlay['data']['width'];
         if(overlay['data'].hasOwnProperty('height')) pushObject['height'] = overlay['data']['height'];
@@ -128,11 +136,20 @@ export class Project {
     
     return {
       type: 'outro',
-      filePath: resolver.getSharedFilePath('outro', data['name']),
+      filePath: resolver.assetUrl('outro', data['fileName']),
       start: Number(this.data.clip.movieLength) - Number(data.transitionDuration),
       duration: data.duration,
       transitionDuration: data.transitionDuration
     };
-    
   }
+
+  generateId(length: number){
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < length; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+  } 
 }

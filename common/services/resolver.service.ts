@@ -15,6 +15,8 @@ export function isUniqueFile(type: string) {
   return fileConfig.hasOwnProperty('name');
 }
 
+export function getWorkingDir(): string{ return config.filesystem.workingDirectory }
+
 export function getMimeTypeByFileType(type: string): string{ return config.filesystem.files[type]['mime']}
 function getFileConfigByType(type: string): Object{ return config.filesystem.files[type] }
 
@@ -28,20 +30,17 @@ export function getFileNameByType(fileType:string, fileId?:string) {
   return fileName;
 }
 
-export function getSharedFilePath(type: string, fileName: string) {
-  // get configuration 
-  const fileConfig = getFileConfigByType(type);
-  const workingDir = config.filesystem.workingDirectory;
-  const sharedDir = config.filesystem.sharedDirectory;
-  const subDir = fileConfig['directory'];
-  const ext = fileConfig['extension'];
-
-  return resolve(workingDir, sharedDir, subDir, `${fileName}.${ext}`);
+function getParentPropertyByFileType(fileType: string): string{
+  const file = config.filesystem.files[fileType];
+  return file['directory'];
 }
 
 export function getProjectFilePath(type: string, projectName: string, includeExt?: boolean, fileName?: any){
-  //  return a fully resolved path to a project file
-  // i.e. /app/data/-xfdgjlksjd234source.mp4
+  // return a fully resolved path to a LOCAL (temporary) project file:
+  //    i.e. /app/data/-xfdgjlksjd234source.mp4
+  //
+  // this function is used to temporarily store ffmpeg output (lowres, render) and ASS subtitle files
+  // before uploading them to S3
   const fileConfig = getFileConfigByType(type);
   const workingDir = config.filesystem.workingDirectory;
   const fName = fileName ? fileName : fileConfig['name']; // if fileName is not explicitly set, it's a unique file whose name has been set in the config 
@@ -57,19 +56,32 @@ export function getProjectFilePath(type: string, projectName: string, includeExt
 * S3 related stuff 
 *
 */ 
-export function getProjectFileKey(type: string, projectId: string, fileName?: any): string{
+export function getProjectFileKey(fileType: string, projectId: string, fileName?: any): string{
   // return the key of an object stored in a remote s3 bucket
-  const fileConfig = getFileConfigByType(type);
+  const fileConfig = getFileConfigByType(fileType);
+  const parentProp = getParentPropertyByFileType(fileType);
   const fName = fileName ? fileName : fileConfig['name']; // if fileName is not explicitly set (overlay), it's a unique file whose name has been set in the config 
   const ext = fileConfig['extension'];
 
-  return `${projectId}/${fName}.${ext}`;
+  return `${parentProp}/${projectId}/${fName}.${ext}`;
 }
 
-export function storageUrl(fileType:string, baseDirectory:string){
+export function storageUrl(fileType:string, baseDirectory:string, annotationId?: any){
   // return public url to file in s3 bucket
-  const file =  config.filesystem.files[fileType]; //config
-  const fileName = this.getFileNameByType(fileType);
+  // this function returns project-specific files (source, render, overlays, ASS etc...)
+  const parentProp = getParentPropertyByFileType(fileType);
+  const file =  config.filesystem.files[fileType];
+  const fileName = annotationId ?  annotationId : getFileNameByType(fileType);
 
-  return `https://s3.${config.storage.region}.amazonaws.com/${config.storage.bucket}/${baseDirectory}/${fileName}`;
+  return `https://s3.${config.storage.region}.amazonaws.com/${config.storage.bucket}/${parentProp}/${baseDirectory}/${fileName}`;
+}
+
+export function assetUrl(fileType: string, fileName: string): string{ 
+  // return public url to file in s3 bucket
+  // this function returns files shared across multiple projects. e.g. logos and bumpers
+  const parentProp = getParentPropertyByFileType(fileType);
+  const fileConfig =getFileConfigByType(fileType);
+  const ext = fileConfig['extension'];
+
+  return `https://s3.${config.storage.region}.amazonaws.com/${config.storage.bucket}/${parentProp}/${fileName}.${ext}`;
 }
