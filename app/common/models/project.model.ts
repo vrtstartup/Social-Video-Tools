@@ -1,3 +1,4 @@
+import { ExcludePipe } from '../pipes/exclude.pipe';
 import { ListPipe } from '../pipes/list.pipe';
 import { SortByPropPipe } from '../pipes/sortByProp.pipe';
 import possibleStatuses from './statusMessage.model';
@@ -22,12 +23,15 @@ export class Project {
     getSortedAnnoKey(sortVal) {
         // sorted by end-value
         // optional parms: '' (returns default first) or 'last'
-        let returnVal;
 
-        if (this.data.hasOwnProperty('annotations')) { // there's annotations available
+        // filter annotations
+        let returnVal;
+        let filteredAnnoArray = new ExcludePipe().transform(this.data['annotations'], 'outro');
+
+        if (this.data.hasOwnProperty('annotations') && Object.keys(filteredAnnoArray).length > 0) { // there's annotations available
 
             let arIndex;
-            let annoArray = new ListPipe().transform(this.data['annotations']);
+            let annoArray = new ListPipe().transform(filteredAnnoArray);
             let annoSorted = new SortByPropPipe().transform(annoArray, 'end');
 
             (sortVal === 'last') ? arIndex = annoSorted.length - 1 : arIndex = 0;
@@ -36,23 +40,21 @@ export class Project {
         } else {
             returnVal = null;
         }
+        console.log('returnVal', returnVal);
         return returnVal;
     }
 
-
-    addBumper(template) {
+    addOutro(template) {
+        // create annotation object if none
+        if (!this.data['annotations']) {
+            this.data['annotations'] = {};
+        };
 
         let newKey = this.makeKey();
 
-        console.log('tempalate is bumper')
-
         // IF BUMPER add bumper to end
-
         let strtTm = this.data['clip']['movieLength'] - template.transitionDuration;
         let endTm = this.data['clip']['movieLength'] - template.transitionDuration + template.duration;
-
-        console.log('strtTm', strtTm)
-        console.log('endTm', endTm)
 
         let newAnno = {
             key: newKey,
@@ -62,20 +64,29 @@ export class Project {
         };
 
         this.updateAnnotation(newKey, newAnno);
-        //this.data['annotations'][newKey] = newAnno;
 
         return newAnno;
     }
 
-    addAnnotation(template) {
+    updateOutro(key, obj){
+        this.data['annotations'][`${key}`]['data'] = obj;
+    }
 
+    getOutroKey(){
+        if( this.data.annotations ) {
+            for(let i in this.data.annotations){
+                if ( this.data.annotations[i]['data']['type'] === 'outro'){
+                    return this.data.annotations[i]['key'];
+                }
+            }
+        }
+        return false;
+    }    
+
+    addAnnotation(template) {
         // create annotation object if none
         if (!this.data['annotations']) {
             this.data['annotations'] = {};
-        }
-
-        if (template.name === 'bumper') {
-            return this.addBumper(template);
         }
 
         let newKey = this.makeKey();
@@ -83,12 +94,14 @@ export class Project {
         // ADD new annotation
         let strtTm = 0;
         let spanTm = 4; // default spanTm if none provided
+
+        let filteredAnnoArray = new ExcludePipe().transform(this.data['annotations'], 'outro');
         if (template.duration) { spanTm = template.duration; }
 
         // if min one annotation
-        if (Object.keys(this.data['annotations']).length > 0) {
+        if ( Object.keys(filteredAnnoArray).length > 0) {
             // object to array => sort => get one with highest end-value
-            let annoArray = new ListPipe().transform(this.data['annotations']);
+            let annoArray = new ListPipe().transform(filteredAnnoArray);
             let annoSorted = new SortByPropPipe().transform(annoArray, 'end');
             let annoLastEndtime = annoSorted[annoSorted.length - 1]['end'];
 
@@ -107,7 +120,7 @@ export class Project {
             end: endTm,
             data: template,
         };
-
+        
         this.updateAnnotation(newKey, newAnno);
 
         return newAnno;
@@ -116,7 +129,7 @@ export class Project {
     getAnnotation(key) {
         return this.data.hasOwnProperty('annotations') ? this.data['annotations'][`${key}`] : null;
     }
-
+    
     updateAnnotation(key, obj) {
         // update project | if key doesn't exists, its created this way
         this.data['annotations'][`${key}`] = obj;

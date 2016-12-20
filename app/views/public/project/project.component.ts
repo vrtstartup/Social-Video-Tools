@@ -24,6 +24,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   uploadProgress: any;
   downScaleProgress: any;
   templateSelectorFlag: any;
+  defaultAnnotationTemplate: string;
 
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
@@ -35,11 +36,17 @@ export class ProjectComponent implements OnInit, OnDestroy {
   selectedAnnotation: any;
   templatesRef: FirebaseObjectObservable<any[]>;
   stylesRef: FirebaseObjectObservable<any[]>;
-  templates: any[];
+  //templastes
+  templates: any;
+  logoTemplates: any;
+  outroTemplates: any;
   selectedTemplate: any;
+  defaultOutroTemplate: any;
+  selectedOutroKey: any;
   projectId: string;
   // subscribtions
   userSub: any;
+  projectSub: any;
   templatesSub: any;
   uploadServiceSub: any;
 
@@ -51,9 +58,11 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private uploadService: UploadService,
     private userService: UserService) {
-
+    
     this.af = af;
     this.projectId =  this.route.snapshot.params['id'];
+    this.defaultAnnotationTemplate = 'defaultSubtitle';
+    this.defaultOutroTemplate = 'bumper'; // default selected
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
     this.templaterQueueRef = af.database.list('/templater-queue');
@@ -65,9 +74,26 @@ export class ProjectComponent implements OnInit, OnDestroy {
     // TODO remove | only for test purposes | move to server
     this.templatesRef.set(testTemplate);
 
-    this.templatesSub = this.templatesRef.subscribe(
-      data => this.templates = data
-    );
+    this.templatesSub = this.templatesRef
+      .subscribe((data) => { 
+          // remove Firebase properties
+          delete data['$key'];
+          delete data['$exists'];
+          // split data in outro | logo | annotation templateLists
+          const newAnnoList:any = {};
+          const newLogoTempList:any = {};
+          const newOutroTempList:any = {};
+
+          for (let key in data){
+            if( data[key]['type'] === 'logo') newLogoTempList[key] = data[key] 
+            else if( data[key]['type'] === 'outro' ) newOutroTempList[key] = data[key]
+            else if( data[key]['type'] !== 'logo' && data[key]['type'] !== 'outro') newAnnoList[key] = data[key];
+          }
+          this.templates = newAnnoList;
+          this.outroTemplates = newOutroTempList;
+          this.logoTemplates = newLogoTempList;
+        }
+      );
 
     this.userSub = this.userService.user$.subscribe(
       data => this.userId = data.userID ,
@@ -80,16 +106,30 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
     // only firstTime when project is loaded set 
     let onlyOnce = true;
-    // project subscribtion
-    this.projectRef.subscribe( s => { 
-      this.project = new Project(s);
-      if(onlyOnce) { this.setSelectedAnno(this.project.getSortedAnnoKey('last')), onlyOnce = false;};
-    });
 
+    // project subscribtion
+    this.projectSub = this.projectRef.subscribe( data => { 
+      this.project = new Project(data);
+      
+      if(this.project.data.status && this.project.data.status.downscaled && !this.project.getOutroKey() ) {
+        // add default outro if no annotations yet
+        this.project.addOutro( this.outroTemplates[this.defaultOutroTemplate]);
+        this.selectedOutroKey = this.project.getOutroKey();
+        this.updateProject();
+      }
+
+      if(onlyOnce) { 
+        // else get annotation with type outro
+        this.selectedOutroKey = this.project.getOutroKey();
+        this.setSelectedAnno(this.project.getSortedAnnoKey('last')), onlyOnce = false;
+      };
+
+    });
   }
 
   ngOnDestroy(){
-    this.userSub.unsubscribe();;
+    this.userSub.unsubscribe();
+    this.projectSub.unsubscribe();
     this.templatesSub.unsubscribe();
     this.uploadServiceSub.unsubscribe();
   }
@@ -126,23 +166,26 @@ export class ProjectComponent implements OnInit, OnDestroy {
       });
   }
 
-  addAnnotation(annotationName: string) {
-    let newAnno = this.project.addAnnotation( this.templates[annotationName]);
+  addAnnotation() {
+    let newAnno = this.project.addAnnotation( this.templates[this.defaultAnnotationTemplate]);
     this.updateProject();
     this.setSelectedAnno(newAnno.key);
+  }
+
+  updateOutro(event) {
+    this.project.updateOutro(this.selectedOutroKey, this.outroTemplates[event.target.value])
+    this.updateProject();
   }
 
   setSelectedAnno(key) {
     this.toggleTemplateSelector();
     this.selectedAnnotationKey = key;
-    //console.log('setSelectedAnno()', this.selectedAnnotationKey);
-    //this.selectedAnnotation = this.project.getAnnotation(key);
   }
 
-  updateAnnotation(key, obj) {
-    this.project.updateAnnotation(key, obj);
-    this.updateProject();
-  }
+  // updateAnnotation(key, obj) {
+  //   this.project.updateAnnotation(key, obj);
+  //   this.updateProject();
+  // }
 
   deleteAnnotation(key) {
     // when you delete the selected
@@ -177,21 +220,19 @@ export class ProjectComponent implements OnInit, OnDestroy {
   // TODO
   onBlur(input) {
     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
-    //this.updateAnnotation(this.selectedAnnotationKey, this.selectedAnnotation);
-    //this.setSelectedAnno(this.selectedAnnotation.key);
     this.updateProject();
   }
 
   onKeyUp(input){
-  //   this.selectedAnnotation.data.text[input.key] = input;
-  //   this.setSelectedAnno(this.selectedAnnotation.key);
-  //   // update project => dont push yet to db
-      this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
-      //console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] )
-      //this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
+  // //   this.selectedAnnotation.data.text[input.key] = input;
+  // //   this.setSelectedAnno(this.selectedAnnotation.key);
+  // //   // update project => dont push yet to db
+  //     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
+  //     //console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] )
+  //     //this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
 
-      this.zone.run(() => {console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text) })
-      setTimeout(()=>console.log('run'));
+  //     this.zone.run(() => {console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text) })
+  //     setTimeout(()=>console.log('run'));
   }
 
   addToRenderQueue() {

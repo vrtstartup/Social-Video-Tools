@@ -1,6 +1,6 @@
 export default {
-    subtitle: {
-        key: 'subtitle',
+    defaultSubtitle: {
+        key: 'defaultSubtitle',
         imageUrl: './assets/overlay/title_01.gif',
         name: 'defaultSubtitle',
         ass: {
@@ -54,7 +54,7 @@ export default {
         },
         aeTemplate: './testTemplate.aep',
         type: 'subtitle',
-        templateCss: '<style>#DeredactieBackdrop.wrapper{ background: rgba(0,0,0,0); color:yellow; }</style>',
+        templateCss: '<style>#DeredactieBackdrop.wrapper{ background: rgba(0,0,0,0); color:white; }</style>',
         templateHtml: '<div id="DeredactieBackdrop" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleThree: {
@@ -83,7 +83,7 @@ export default {
         },
         aeTemplate: './testTemplate.aep',
         type: 'subtitle',
-        templateCss: '<style>#subtitDeredactieMarkeringle.wrapper{ background: rgba(0,0,0,0); color:blue; }</style>',
+        templateCss: '<style>#subtitDeredactieMarkeringle.wrapper{ background: rgba(0,0,0,0); color:white; }</style>',
         templateHtml: '<div id="subtitDeredactieMarkeringle" class="wrapper"><div>%textInpt01%</div></div>',
     },
     overlayKetnet: { 
@@ -161,7 +161,7 @@ export default {
                 key: 'layer02'
             }
         },
-        templateCss: '<style>#overlayStubru.wrapper{ background: rgba(0,0,0,0); color:pink; }</style>',
+        templateCss: '<style>#overlayStubru.wrapper{ background: rgba(0,0,0,0); color:white; }</style>',
         templateHtml: '<div id="overlayStubru" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',        
     },  
 
@@ -219,8 +219,23 @@ export default {
         transitionDuration: 3,
         type: 'outro',
     },
+    bumper2: {
+        key: 'bumper2', 
+        imageUrl: './assets/bumper/deredactie_01.gif',
+        duration: 7,
+        transitionDuration: 3,
+        type: 'outro',
+    },
     logo: {
         key:'logo',
+        imageUrl: './assets/logo/deredactie_01.gif',
+        scale: 1,
+        width: 266,
+        height: 130,
+        type: 'logo',
+    },
+    logo2: {
+        key:'logo2',
         imageUrl: './assets/logo/deredactie_01.gif',
         scale: 1,
         width: 266,

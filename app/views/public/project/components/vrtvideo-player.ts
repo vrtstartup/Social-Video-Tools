@@ -41,12 +41,11 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
 
     ngOnChanges(changes: SimpleChanges) {
         console.log('change detected');
-        this.selectedAnnotation = this.annotations[this.selectedAnnotationKey];
 
-        // if(this.selectedAnnotationKey){
-        //     this.selectedAnnotation = this.annotations[this.selectedAnnotationKey];
-        //     console.log(changes);
-        // }
+        if(this.selectedAnnotationKey && this.annotations){
+            this.selectedAnnotation = this.annotations[this.selectedAnnotationKey];
+            //console.log(changes);
+        }
 
         this.setSeekTime()
 
