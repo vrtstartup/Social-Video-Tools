@@ -16,13 +16,15 @@ import { UserService } from '../../common/services/user.service';
 })
 
 export class ProjectListComponent implements OnInit {
-  @Input() role: number;
-
-  public projectsByUser: any;
+  
+  private role: number;
+  private projectsByUser: any;
+  private userEmail = '';
   private projects: Array<Project>;
-  public userEmail = '';
   private activeExtra: any;
-  private userSubscribtion: any;
+  private userSub: any;
+  private projectsByUserSub: any;
+  private projectsSub: any;
 
   constructor(
     private http: Http,
@@ -30,31 +32,51 @@ export class ProjectListComponent implements OnInit {
     private _el: ElementRef,
     private router: Router,
     private projectService: ProjectService,
-    public userService: UserService
+    private userService: UserService
   ) {
     this.af = af;
     this.userEmail = '';
   }
 
   ngOnInit() {
-    // get user email
-    this.userSubscribtion = this.userService.user$.subscribe( user => {
+    // subscribe to user$
+    this.userSub = this.userService.user$.subscribe( user => {
         if(user){
           this.userEmail = user['email'];
-          this.setUserByEmail({email: this.userEmail});
+          this.queryUserByEmail({email: this.userEmail});
+          this.role = user['role'];
         }  
       }, err => console.log('authserviceErr', err)
      );
 
-    // query by userId
-    this.projectService.projectsByUser$.subscribe(projectsbyuser => {
+    // subsribe to projects$
+    this.projectsSub = this.projectService.projects$.subscribe(projects => {
+      this.projects = projects;
+    })
+
+    // subsribe to projectsByUser$
+    this.projectsByUserSub = this.projectService.projectsByUser$.subscribe(projectsbyuser => {
+      // check TODO in projectService: .map triggers multiple times
       this.projects = projectsbyuser;
     });
+  }
 
-    const userQuery = {
-      email: this.userEmail,
-      last: 10,
-    };
+  ngOnDestroy() {
+    this.userSub.unsubscribe();
+    this.projectsByUserSub.unsubscribe();
+    this.projectsSub.unsubscribe();
+  }
+
+  queryUserByEmail(formdata) {
+    // if email input is 'empty' => return all projects 
+    if (formdata.email === '') {
+      // query projects
+      const projectsQuery = { last: 30};
+      this.projectService.setUsersQuerySubject(projectsQuery);
+      return
+    }
+    // query projectsByUser
+    const userQuery = { email: formdata.email, last: 10};
     this.projectService.setUserQuerySubject(userQuery);
   }
 
@@ -63,32 +85,13 @@ export class ProjectListComponent implements OnInit {
   }
 
   open(projectId: string) {
-    //this.selectionUpdated.emit(projectId);
     this.router.navigateByUrl(`/projects/${projectId}`);
   }
 
   deleteProject(projectKey: string) {
-    this.activeExtra = false;
     const userId = this.projects.find(i => i.key == projectKey).data.user
     this.projectService.deleteProject(projectKey, userId);
-  }
-
-  setUserByEmail(formdata) {
-    // TODO check if email exists and inform user
-    if (formdata.email === '') {
-      // query all project if no email adress provided
-      this.projectService.projects$.subscribe(projects => this.projects = projects)
-      const usersQuery = { last: 30 };
-      this.projectService.setUsersQuerySubject(usersQuery);
-      return
-    }
-
-    const userQuery = {
-      email: formdata.email,
-      last: 10,
-    };
-
-    this.projectService.setUserQuerySubject(userQuery);
+    this.activeExtra = false;
   }
 
   showExtra(key) {
