@@ -233,5 +233,14 @@ export default {
         height: 130,
         type: 'logo',
         fileName: 'deredactie_1'
-    }
+    },
+    logo2: {
+        key:'logo2',
+        imageUrl: './assets/logo/deredactie_01.gif',
+        scale: 6,
+        width: 266,
+        height: 130,
+        type: 'logo',
+        fileName: 'deredactie_1'
+    }    
 }

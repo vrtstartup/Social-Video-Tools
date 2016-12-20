@@ -28,24 +28,30 @@
 
 	<progress-dialog *ngIf="project && project.isRendering()" [project]="project"></progress-dialog>
 
-	<div class="s-submenu" *ngIf="project && !project.isRendering()">
+	<div class="s-submenu" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
 		<!--once downscaled show controls-->
-		<div *ngIf="project?.data?.status?.downscaled">
+		<div>
 			<button type="button" class="s-btn" (click)="addAnnotation()">Add Annotation(U)</button>
 		</div>
-		<div *ngIf="project?.data?.status?.downscaled && outroTemplates">
+
+		<div *ngIf="outroTemplates">
 			<select class="form-control" [(ngModel)]="defaultOutroTemplate" (change)="updateOutro($event)">
-				<option *ngFor="let outro of outroTemplates | list" 
-				[value]="outro.key">
+				<option *ngFor="let outro of outroTemplates | list" [value]="outro.key">
 					{{ outro.key }}
 				</option>
 			</select>
+			<small> {{ project.data.annotations[selectedOutroKey]?.data?.key }} | {{ selectedOutroKey}} </small>
 		</div>
-	</div>
 
-	<!--outros-->
-	<div class="s-anno-item" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">            
-		<small> {{ project.data.annotations[selectedOutroKey]?.data?.key }} | {{ selectedOutroKey}} </small>
+		<div *ngIf="outroTemplates">
+			<select class="form-control" [(ngModel)]="defaultLogoTemplate" (change)="updateLogo($event)">
+				<option *ngFor="let logo of logoTemplates | list" [value]="logo.key">
+					{{ logo.key }}
+				</option>
+			</select>
+			<small> {{ project.data.annotations[selectedLogoKey]?.data?.key }} | {{ selectedLogoKey}} </small>
+		</div>		
+
 	</div>
 
 	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
@@ -56,7 +62,7 @@
 			<div class="s-anno-items">
 				<!--Annos-->
 				<div *ngIf="project.data.annotations">
-					<div *ngFor="let annotation of (project.data.annotations | exclude:'outro' | list | sortByProp:'end') " 
+					<div *ngFor="let annotation of (project.data.annotations | exclude:'outro' | exclude:'logo' | list | sortByProp:'end') " 
 						(click)="selectedAnnotationKey !== annotation.key && setSelectedAnno(annotation.key)"
 						[class.active]="selectedAnnotationKey === annotation.key"
 						class="s-anno-item">
@@ -126,14 +132,14 @@
 		<div class="s-video_wrapper">
 			<div class="s-video">
 				<vrtvideo-player
-					[clip]="project.data.clip"
+					[clip]="project.data?.clip"
 					[annotations]="project.data?.annotations"
 					[selectedAnnotationKey]="selectedAnnotationKey">
 				</vrtvideo-player>
 
 				<range-slider *ngIf="selectedAnnotationKey"
 					[selectedAnnotation]="project.data.annotations[selectedAnnotationKey]" 
-					[clip]="project.data.clip" 
+					[clip]="project.data?.clip" 
 					(changeAnno)="updateAnnotation( selectedAnnotationKey, $event)">
 				</range-slider>
 			</div>
