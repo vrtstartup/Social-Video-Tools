@@ -40,7 +40,7 @@ export class Project {
         } else {
             returnVal = null;
         }
-        console.log('returnVal', returnVal);
+
         return returnVal;
     }
 

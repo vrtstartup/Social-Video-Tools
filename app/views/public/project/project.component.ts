@@ -172,6 +172,11 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.setSelectedAnno(newAnno.key);
   }
 
+  updateAnnotation(key, event) {
+    this.project.updateAnnotation(key, event)
+    this.updateProject();
+  }
+
   updateOutro(event) {
     this.project.updateOutro(this.selectedOutroKey, this.outroTemplates[event.target.value])
     this.updateProject();
