@@ -133,7 +133,8 @@
 
 				<range-slider *ngIf="selectedAnnotationKey"
 					[selectedAnnotation]="project.data.annotations[selectedAnnotationKey]" 
-					[clip]="project.data.clip" (changeAnno)="updateAnnotation( selectedAnnotationKey, $event)">
+					[clip]="project.data.clip" 
+					(changeAnno)="updateAnnotation( selectedAnnotationKey, $event)">
 				</range-slider>
 			</div>
 		</div>
