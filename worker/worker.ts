@@ -7,7 +7,7 @@ import { Projects } from '../common/services/projects.service';
 import { Project } from '../common/classes/project';
 import { State } from '../common/services/state.service';
 import * as storage from '../common/services/storage.service';
-import { ffprobe, scaleDown, stitch } from '../common/services/encoding.service';
+import { ffprobe, scaleDown, stitch, generateThumb } from '../common/services/encoding.service';
 import { Subtitle } from '../common/services/subtitle.service';
 import { logger } from '../common/config/winston';
 import { config } from '../common/config';
@@ -127,6 +127,9 @@ function processLowResJob(project, job) {
         .then(project => storage.uploadFile(project, 'lowres'))
         .then((project:Project) => stateService.updateState(project, 'storingDownScaled', false))
         .then((project:Project) => stateService.updateState(project, 'downscaled', true))
+        .then(project => generateThumb(project))
+        .then(project => storage.uploadFile(project, 'thumb'))
+        .then((project:Project) => stateService.updateState(project, 'thumb', true))
         .catch(err => jobService.kill(job.id, err))
         .then(resolve);
     });

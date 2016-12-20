@@ -28,6 +28,12 @@ export const fileConfig = {
       extension: 'ass',
       mime: 'text/plain',
     },
+    thumb: {
+      directory: 'projects',
+      name: 'thumb',
+      extension: 'png',
+      mime: 'image/png',
+    },
     render: {
       directory: 'projects',
       name: 'render',

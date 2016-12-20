@@ -16,8 +16,8 @@
 
   <div class="s-project-item" *ngFor="let project of projects">
     <!--image-->
-    <div class="s-project-item__image">
-      <img src="http://placehold.it/160x90/cccccc" alt="">
+    <div *ngIf="project.data.clip?.hasOwnProperty('thumbUrl')" class="s-project-item__image">
+      <img src="{{project.data.clip.thumbUrl}}" alt="">
       <div class="s-project-item__previewbtn">
         <md-icon svgSrc="assets/icons/icon-play.svg"></md-icon>
       </div>
