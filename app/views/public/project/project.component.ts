@@ -96,24 +96,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
     // project subscribtion
     this.projectSub = this.projectRef.subscribe(data => {
       this.project = new Project(data);
-      
-      // set default logo & outro
-      if (this.project.data.status && this.project.data.status.downscaled) {
-        if (!this.project.getAnnoKeyOfType('outro')) {
-          this.project.addOutro(this.outroTemplates[this.defaultOutroTemplate]);
-          this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
-          
-        } else if (!this.project.getAnnoKeyOfType('logo')) {
-          this.project.addLogo(this.logoTemplates[this.defaultLogoTemplate]);
-          this.selectedLogoKey = this.project.getAnnoKeyOfType('logo');
-        }
-        this.updateProject();
-      }
 
-      if (onlyOnce) {
+      if (this.project.data.annotations && onlyOnce) {
         // else get annotation with type outro
-        this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
-        this.selectedLogoKey = this.project.getAnnoKeyOfType('logo');
         this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
         onlyOnce = false;
       };
@@ -179,7 +164,23 @@ export class ProjectComponent implements OnInit, OnDestroy {
       });
   }
 
+  initOutroLogo(){
+    if (!this.project.getAnnoKeyOfType('outro')) {
+      const newAnno = this.project.addOutro(this.outroTemplates[this.defaultOutroTemplate]);
+      this.selectedOutroKey = newAnno.key;
+    } else {
+      this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
+    }
+    if (!this.project.getAnnoKeyOfType('logo')) {
+      const newAnno = this.project.addLogo(this.logoTemplates[this.defaultLogoTemplate]);
+      this.selectedLogoKey = newAnno.key;
+    } else {
+      this.selectedLogoKey = this.project.getAnnoKeyOfType('logo');
+    }
+  }
+
   addAnnotation() {
+    this.initOutroLogo();
     let newAnno = this.project.addAnnotation(this.templates[this.defaultAnnotationTemplate]);
     this.updateProject();
     this.setSelectedAnno(newAnno.key);
@@ -191,13 +192,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   updateOutro(event) {
+    this.initOutroLogo();
+    console.log('this.selectedOutroKey', this.selectedOutroKey)
     this.project.updateOutro(this.selectedOutroKey, this.outroTemplates[event.target.value])
     this.updateProject();
   }
 
   updateLogo(event) {
+    this.initOutroLogo();
     console.log('this.selectedLogoKey', this.selectedLogoKey)
-    console.log('this.logoTemplates[event.target.value]', this.logoTemplates[event.target.value])
     this.project.updateLogo(this.selectedLogoKey, this.logoTemplates[event.target.value])
     this.updateProject();
   }
@@ -205,6 +208,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   setSelectedAnno(key) {
     this.toggleTemplateSelector();
     this.selectedAnnotationKey = key;
+    console.log('this.selectedAnnotationKey', this.selectedAnnotationKey);
   }
 
   deleteAnnotation(key) {
