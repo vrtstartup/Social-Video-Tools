@@ -3,11 +3,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
+import 'rxjs/add/operator/take';
 import { UploadService } from '../../../common/services/upload.service';
 import { Project } from '../../../common/models/project.model';
 import { UserService } from '../../../common/services/user.service';
-
-import './project.component.scss';
 
 // TODO remove | only for test purposes
 import testTemplate from '../../../common/models/testTemplate.model';
@@ -24,23 +23,32 @@ export class ProjectComponent implements OnInit, OnDestroy {
   userMessage: string = '';
   uploadProgress: any;
   downScaleProgress: any;
+  templateSelectorFlag: any;
+  defaultAnnotationTemplate: string;
 
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
   templaterQueueRef: FirebaseListObservable<any[]>;
-  projectsRef: FirebaseListObservable<any[]>;
-  projects: any[];
+  projectRefOnce: Observable<any[]>;
   projectRef: FirebaseObjectObservable<any[]>;
   project: any;
+  selectedAnnotationKey: any = '';
   selectedAnnotation: any;
   templatesRef: FirebaseObjectObservable<any[]>;
   stylesRef: FirebaseObjectObservable<any[]>;
-  templates: any[];
+  //templastes
+  templates: any;
+  logoTemplates: any;
+  outroTemplates: any;
   selectedTemplate: any;
+  defaultOutroTemplate: any;
+  selectedOutroKey: any;
   projectId: string;
-
-  //showOpenDialog: boolean;
-  userSubscribtion: any;
+  // subscribtions
+  userSub: any;
+  projectSub: any;
+  templatesSub: any;
+  uploadServiceSub: any;
 
   constructor(
     af: AngularFire,
@@ -49,69 +57,94 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private uploadService: UploadService,
-    public userService: UserService) {
-
+    private userService: UserService) {
+    
     this.af = af;
-
+    this.projectId =  this.route.snapshot.params['id'];
+    this.defaultAnnotationTemplate = 'defaultSubtitle';
+    this.defaultOutroTemplate = 'bumper'; // default selected
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
     this.templaterQueueRef = af.database.list('/templater-queue');
-    this.projectsRef = af.database.list('/projects');
-    this.projectsRef.subscribe((s: any) => this.projects = s);
     this.templatesRef = af.database.object('/templates');
-    this.templatesRef.subscribe((s: any) => this.templates = s);
-
-
-    // interface
-    //this.showOpenDialog = false;
-
-    // TODO remove | only for test purposes | 
-    // should only be set once => when server restarts
-    this.templatesRef.set(testTemplate);
+    this.projectRef = this.af.database.object(`/projects/${this.projectId}`);
   }
 
   ngOnInit() {
-    this.userSubscribtion = this.userService.user$.subscribe( 
+    // TODO remove | only for test purposes | move to server
+    this.templatesRef.set(testTemplate);
+
+    this.templatesSub = this.templatesRef
+      .subscribe((data) => { 
+          // remove Firebase properties
+          delete data['$key'];
+          delete data['$exists'];
+          // split data in outro | logo | annotation templateLists
+          const newAnnoList:any = {};
+          const newLogoTempList:any = {};
+          const newOutroTempList:any = {};
+
+          for (let key in data){
+            if( data[key]['type'] === 'logo') newLogoTempList[key] = data[key] 
+            else if( data[key]['type'] === 'outro' ) newOutroTempList[key] = data[key]
+            else if( data[key]['type'] !== 'logo' && data[key]['type'] !== 'outro') newAnnoList[key] = data[key];
+          }
+          this.templates = newAnnoList;
+          this.outroTemplates = newOutroTempList;
+          this.logoTemplates = newLogoTempList;
+        }
+      );
+
+    this.userSub = this.userService.user$.subscribe(
       data => this.userId = data.userID ,
       err => console.log('authserviceErr', err)
-     );
+    );
     
-    // subscribe to service observable
-    this.uploadService.progress$
-      .subscribe(data => {
-        // force to trigger change
-        this.zone.run(() => this.uploadProgress = data);
+    this.uploadServiceSub = this.uploadService.progress$.subscribe(data => {
+        this.zone.run(() => this.uploadProgress = data); // force to trigger change
       }, err => console.log(err));
 
-    this.projectId =  this.route.snapshot.params['id'];
-    if(this.projectId) {
-      this.openProject(this.projectId);
-    }
-  }
+    // only firstTime when project is loaded set 
+    let onlyOnce = true;
 
-  ngOnDestroy(){
-    this.userSubscribtion.unsubscribe();
-  }
+    // project subscribtion
+    this.projectSub = this.projectRef.subscribe( data => { 
+      this.project = new Project(data);
+      
+      if(this.project.data.status && this.project.data.status.downscaled && !this.project.getOutroKey() ) {
+        // add default outro if no annotations yet
+        this.project.addOutro( this.outroTemplates[this.defaultOutroTemplate]);
+        this.selectedOutroKey = this.project.getOutroKey();
+        this.updateProject();
+      }
 
-  openProject(id: string){
-    //this.showOpenDialog = false;
-    this.projectRef = this.af.database.object(`/projects/${id}`);
-    this.projectRef.subscribe( s => {
-      this.project = new Project(s);
-      this.setSelectedAnno(this.project.getFirstAnnotationKey());
+      if(onlyOnce) { 
+        // else get annotation with type outro
+        this.selectedOutroKey = this.project.getOutroKey();
+        this.setSelectedAnno(this.project.getSortedAnnoKey('last')), onlyOnce = false;
+      };
+
     });
   }
 
-  updateProject() {
-    this.projectRef.update(this.project.data);
+  ngOnDestroy(){
+    this.userSub.unsubscribe();
+    this.projectSub.unsubscribe();
+    this.templatesSub.unsubscribe();
+    this.uploadServiceSub.unsubscribe();
   }
 
-  /* upload ------- */
+  updateProject() {
+    if(this.project && this.project.data){
+      this.projectRef.update(this.project.data);
+    }
+  }
+
   uploadSource($event) {
     // file-ref to upload
     let sourceFile = $event.target.files[0];
     // upload video
-    this.uploadService.getSignedRequest(sourceFile, this.projectId)
+     this.uploadService.getSignedRequest(sourceFile, this.projectId)
       .then((data: Object) => {
         this.uploadService.uploadFile(data['file'], data['response']['signedRequest'])
           .subscribe(
@@ -133,73 +166,85 @@ export class ProjectComponent implements OnInit, OnDestroy {
       });
   }
 
-  updateSource($event) {
-    this.uploadSource($event);
+  addAnnotation() {
+    let newAnno = this.project.addAnnotation( this.templates[this.defaultAnnotationTemplate]);
+    this.updateProject();
+    this.setSelectedAnno(newAnno.key);
   }
 
-  /* annotations -- */
-  addAnnotation(annotationName: string) {
-    let newAnno = this.project.addAnnotation( this.templates[annotationName]);
-    this.updateSelectedAnno(newAnno.key, newAnno);
+  updateAnnotation(key, event) {
+    this.project.updateAnnotation(key, event)
+    this.updateProject();
+  }
+
+  updateOutro(event) {
+    this.project.updateOutro(this.selectedOutroKey, this.outroTemplates[event.target.value])
+    this.updateProject();
   }
 
   setSelectedAnno(key) {
-    this.selectedAnnotation = this.project.getAnnotation(key);
-  }
-
-  updateSelectedAnno(key, obj) {
-    this.project.updateSelectedAnno(key, obj);
-    this.setSelectedAnno(key);
-    this.updateProject();
+    this.toggleTemplateSelector();
+    this.selectedAnnotationKey = key;
   }
 
   deleteAnnotation(key) {
     // when you delete the selected
-    if (this.selectedAnnotation.key === key) {
-      this.selectedAnnotation = false;
+    if (this.selectedAnnotationKey === key) {
+      this.selectedAnnotationKey = false;
     }
     delete this.project.data['annotations'][`${key}`];
     this.updateProject();
   }
 
-  updateSelectedAnnoTemplate(template) {
+  updateTemplate(template) {
     // only update if you select a different template for the annotation
-    if (template.name != this.selectedAnnotation.data.name) {
+    if (template.key != this.selectedAnnotationKey) {
       // update selectedAnno with new template
-      this.selectedAnnotation.data = template;
-      if (template.duration) {
-        // if duration exceeds movieLength
-        if (this.selectedAnnotation.start + template.duration > this.project.data.clip.movieLength) {
-          this.selectedAnnotation.start = this.project.data.clip.movieLength - template.duration;
-        }
-        this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
-      }
+      this.project.data.annotations[this.selectedAnnotationKey].data = template;
+      this.toggleTemplateSelector();
+      
+      // if (template.duration) {
+      //   // if duration exceeds movieLength
+      //   if (this.selectedAnnotation.start + template.duration > this.project.data.clip.movieLength) {
+      //     this.selectedAnnotation.start = this.project.data.clip.movieLength - template.duration;
+      //   }
+      //   this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
+      // }
 
-      this.updateSelectedAnno(this.selectedAnnotation.key, this.selectedAnnotation);
-      this.setSelectedAnno(this.selectedAnnotation.key);
+      //this.updateAnnotation(this.selectedAnnotationKey, this.selectedAnnotation);
+      //this.setSelectedAnno(this.selectedAnnotation.key);
       this.updateProject();
     }
   }
-  
-  //toggleOpenDialog() { this.showOpenDialog = !this.showOpenDialog; }
-  //hideOpenDialog() { this.showOpenDialog = false; }
 
   // TODO
-  onBlur() {
+  onBlur(input) {
+    this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
     this.updateProject();
   }
 
-  onKey(input){
-    this.selectedAnnotation.data.text[input.key] = input;
-    this.setSelectedAnno(this.selectedAnnotation.key);
-    // update project => dont push yet to db
-    this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
+  onKeyUp(input){
+  // //   this.selectedAnnotation.data.text[input.key] = input;
+  // //   this.setSelectedAnno(this.selectedAnnotation.key);
+  // //   // update project => dont push yet to db
+  //     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
+  //     //console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] )
+  //     //this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
+
+  //     this.zone.run(() => {console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text) })
+  //     setTimeout(()=>console.log('run'));
   }
 
-  /* render ------- */
   addToRenderQueue() {
     this.http.post('api/render/stitch', { projectId: this.projectId })
       .subscribe((data) => { });
+  }
+
+  toggleTemplateSelector(key?){
+    if(key === 'undefined' || this.templateSelectorFlag === key) { 
+      return this.templateSelectorFlag = ''; 
+    }
+    this.templateSelectorFlag = key;
   }
 
 }

@@ -18,7 +18,7 @@ export function uploadFile(project, fileType: string){
   return new Promise((resolve, reject) => {
     fs.readFile(filePath,(err, fileBuffer) => {
       if(err){
-        logger.warn(`${fileType} file seems to be empty. Aborting upload`);
+        logger.warn(`${fileType} file at path ${filePath} seems to be empty. Aborting upload`);
         resolve(project);
       }else{
         s3.putObject({

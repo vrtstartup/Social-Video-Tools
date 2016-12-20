@@ -16,25 +16,24 @@ export class ProjectService {
     public projectsByUser$: Observable<any>;
 
     constructor(private af:AngularFire) {
-
+      
       this.usersQuerySubject = new Subject();
       this.userQuerySubject = new Subject();
 
-      // get all projects
+      // get ALL projects
       this.projects$ = af.database.list('/projects', {
         query: { 
           limitToLast: this.usersQuerySubject.map(d => {return d.last}),
         }
       })
       .map(projectsData => {
-        let arrProjects: Array<Project> = [];
+        const arrProjects: Array<Project> = [];
         projectsData.sort((a,b) => b.created - a.created ); // sort on creationdate
         projectsData.forEach(projectData => arrProjects.push(new Project(projectData)));
-
         return arrProjects;
       });
 
-      // filter projects by user
+      // filter projects by USER
       this.projectsByUser$ = af.database.list(`/projects`, { 
         query: { 
           limitToLast: this.userQuerySubject.map(d => {return d.last}),
@@ -43,17 +42,18 @@ export class ProjectService {
         }
       })
       .map(projectsData => {
-        let arrProjects: Array<Project> = [];
+        // TODO check why map function returns value for every found item (on second request)
+        const arrProjects: Array<Project> = [];
         projectsData.sort((a,b) => b.created - a.created );
-        projectsData.forEach(projectData => arrProjects.push(new Project(projectData)));
-
+        projectsData.forEach(projectData => {
+          arrProjects.push(new Project(projectData))
+        });
         return arrProjects;
-      })
-
+      });
     }
 
     setUsersQuerySubject(usersQuery){
-      this.usersQuerySubject.next(usersQuery);
+      this.usersQuerySubject.next(usersQuery);      
     }
     
     setUserQuerySubject(userQuery){
@@ -61,10 +61,7 @@ export class ProjectService {
     }
 
     deleteProject(key, userId){
-      const projectsList = this.af.database.list('/projects') 
-      projectsList.remove(key);
-
-      const projectsUserList = this.af.database.list(`/users/${userId}/projects`)
-      projectsUserList.remove(key);
+      const projectsList = this.af.database.list(`/projects/${key}`).remove();
+      const projectsUserList = this.af.database.list(`/users/${userId}/projects/${key}`).remove();
     }
 }

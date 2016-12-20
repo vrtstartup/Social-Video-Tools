@@ -1,5 +1,5 @@
 <div class="s-project-filter" style="padding:1rem;">
-  <form #f="ngForm" (ngSubmit)="setUserByEmail(f.value, f.valid)" novalidate>
+  <form #f="ngForm" (ngSubmit)="queryUserByEmail(f.value, f.valid)" novalidate>
       <!-- we will place our fields here -->
       <div class="s-formrow">
         <div class="s-formitem s-formitem--block">
@@ -16,8 +16,8 @@
 
   <div class="s-project-item" *ngFor="let project of projects">
     <!--image-->
-    <div class="s-project-item__image">
-      <img src="http://placehold.it/160x90/cccccc" alt="">
+    <div *ngIf="project.data.clip?.hasOwnProperty('thumbUrl')" class="s-project-item__image">
+      <img src="{{project.data.clip.thumbUrl}}" alt="">
       <div class="s-project-item__previewbtn">
         <md-icon svgSrc="assets/icons/icon-play.svg"></md-icon>
       </div>
@@ -74,10 +74,10 @@
       <button class="s-btn s-btn--secondary" type="button" (click)="open(project.key)">Edit</button>
     </div>
 
-    <div id="{{project.key}}" *ngIf="role > 1">
+    <div id="{{project.key}}" *ngIf="role && role > 1">
       <div class="s-project-item__morebtn" (click)="showExtra(project.key)">...</div>
       <ul class="s-project-item__more s-slideIn" *ngIf="activeExtra === project.key">
-        <li *ngIf="role > 1" class=""(click)="deleteProject(project.key)">Delete</li>
+        <li *ngIf="role > 1" class="" (click)="deleteProject(project.key)">Delete</li>
       </ul>
     </div>
 

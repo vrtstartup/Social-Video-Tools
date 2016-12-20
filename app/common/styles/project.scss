@@ -1,5 +1,3 @@
-@import '../../../common/styles/variables.scss';
-
 project-component {
     display: flex;
     flex-direction: column;
@@ -47,66 +45,94 @@ project-component {
     padding: .5rem 0;
 }
 
-.s-sub-controls {
+.s-anno-controls {
     display: flex; 
     flex: 1;
     flex-direction: row;
-    .s-sub__wrapper {
+    .s-anno__wrapper {
         flex: 0 0 50%; display:flex;
     }
-    .s-sub-items {
-        border: 1px solid #f2f2f2;
-        flex: 1 0 120px;
+    .s-anno-items {
+        border-right: 1px solid #f2f2f2;
         flex-direction: column;
         overflow: auto;
-    }
-    .s-sub-item {
-        border-bottom: 1px solid #f2f2f2;
-        display: flex;
-        flex-direction: row;
-        flex: 0;
-        padding: .4rem;
-        &.highlight, &:hover {
-            cursor: pointer;
-            background: #2a7dd0;
-            color: #a3d1ff;
-        }
-        &:hover .s-sub-item__delete {
-            opacity: 1;
-        }
-    }
-    .s-sub-item__info {
         flex: 1 1 auto;
     }
-    .s-sub-item__delete {
+    .s-anno-item {
+        border-bottom: 1px solid #f2f2f2;
+        display: flex;
+        flex-direction: column; 
+        position: relative;
+        &:hover:after {
+            content: '';
+            width: 4px;
+            height: 100%;
+            background: $s-link;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        &.active {
+            cursor: pointer;
+            background: #f2f2f2;
+            color: #a3d1ff;
+            box-shadow: 0 4px 12px 0 hsla(0,0%,59%,.5);
+        }
+        .s-anno-item__delete {
+            &:hover {
+                opacity: 1;
+            } 
+            cursor: pointer;
+            flex: 0 1 40px;
+            margin-right: -.5rem;
+            text-align: center;
+            md-icon { 
+                width: 20px;
+                height: 20px;
+                fill: $s-link;
+            }
+        }
+    }
+    .s-anno-item__controls {
+        display: flex;
+        flex-direction: row;
+        padding: .5rem;
+    }
+    .s-anno-item__info {
+        flex: 0 0 90px;
+        padding: .5rem;
+    }
+    .s-anno-item__delete {
         opacity: 0;
     }
-    .s-sub-templates {
+    .s-anno-templates {
+        @include s-gradient-vertical(#e0e0e0, #fff);
+
         border: 1px solid #f2f2f2;
         display: flex;
-        flex: 1 0 120px;
-        flex-direction: column;
+        flex: 1 1 auto;
+        flex-direction: row;
+        overflow-y: scroll;
+        //padding: .5rem;
     }
-    .s-sub-template {
-        border: 1px solid #f2f2f2;
-        flex: 0;
-        padding: .4rem;
-        &.highlight, &:hover {
+    .s-anno-template {
+        flex: 0 0 100px;
+        &.active img, &:hover img {
             cursor: pointer;
-            background: #2a7dd0;
+            border-bottom: 2px solid $s-link;
             color: #a3d1ff;
         }
         &__thumb { 
-            width: 30px;
+            width: 100%;
+            padding: 1rem;
         }
         &__name { 
             font-size: .8rem;
         }
     }
-    .s-sub-inputs {
-        border: 1px solid #f2f2f2;        
+    .s-anno-inputs {      
         display: flex;
-        flex: 1 0 120px;
+        flex: 1 1 auto;
         flex-direction: column;
         padding: 0.5rem;
         &__label {
@@ -117,7 +143,7 @@ project-component {
             font-size: .8rem;
         }
     }
-    .s-sub-input {
+    .s-anno-input {
         border: 1px solid #f2f2f2;
         flex: 0;
     }

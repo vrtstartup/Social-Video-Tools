@@ -1,34 +1,7 @@
 export default {
-    subtitle: {
-        name: 'subtitle',
-        ass: {
-            fontname: 'arial',
-            fontsize: 24,
-            primaryColour: '0xFFFFFF',
-            secondaryColour: '0xFFFFFF',
-            outlineColour: '0xFFFFFF',
-            backColour: '0x000000',
-            bold: true,
-            italic: true,
-            underline: true,
-            strikeout: true,
-        },
-        text: {
-            textInpt01: {
-                label: 'Title',
-                text: 'Hier komt de subtitle',
-                layerId: 'textInpt01',
-                key: 'textInpt01',
-            }, 
-        },
-        aeTemplate: './testTemplate.aep',
-        imageUrl: 'http://placehold.it/250x250',
-        type: 'subtitle',
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:green; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
-    },
-    subtitleTwo: {
-        name: 'DeredactieBackdrop',
+    defaultSubtitle: {
+        key: 'defaultSubtitle',
+        imageUrl: './assets/overlay/title_01.gif',
         ass: {
             fontname: 'arial',
             fontsize: 24,
@@ -44,19 +17,47 @@ export default {
         text: {
             textInpt01: {
                 label: 'Title',
-                text: 'Hier komt de subtitle',
+                text: 'defaultSubtitle',
                 layerId: 'textInpt01',
                 key: 'textInpt01',
             }, 
         },
         aeTemplate: './testTemplate.aep',
-        imageUrl: 'http://placehold.it/250x250',
         type: 'subtitle',
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:yellow; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
+        templateCss: '<style>#defaultSubtitle.wrapper{ background: rgba(0,0,0,0); color:white; }</style>',
+        templateHtml: '<div id="defaultSubtitle" class="wrapper"><div>%textInpt01%</div></div>',
+    },
+    subtitleTwo: {
+        key: 'subtitleTwo',
+        imageUrl: './assets/overlay/title_01.gif',
+        ass: {
+            fontname: 'arial',
+            fontsize: 24,
+            primaryColour: '0xFFFFFF',
+            secondaryColour: '0xFFFFFF',
+            outlineColour: '0xFFFFFF',
+            backColour: '0x000000',
+            bold: false,
+            italic: false,
+            underline: false,
+            strikeout: false,
+        },
+        text: {
+            textInpt01: {
+                label: 'Title',
+                text: 'subtitleTwo',
+                layerId: 'textInpt01',
+                key: 'textInpt01',
+            }, 
+        },
+        aeTemplate: './testTemplate.aep',
+        type: 'subtitle',
+        templateCss: '<style>#subtitleTwo.wrapper{ background: rgba(0,0,0,0); color:white; }</style>',
+        templateHtml: '<div id="subtitleTwo" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleThree: {
-        name: 'DeredactieMarkering',
+        key: 'subtitleThree',
+        imageUrl: './assets/overlay/title_01.gif',
         ass: {
             fontname: 'arial',
             fontsize: 28,
@@ -72,20 +73,19 @@ export default {
         text: {
             textInpt01: {
                 label: 'Title',
-                text: 'Hier komt de subtitle',
+                text: 'subtitleThree',
                 layerId: 'textInpt01',
                 key: 'textInpt01',
             }, 
         },
         aeTemplate: './testTemplate.aep',
-        imageUrl: 'http://placehold.it/250x250',
         type: 'subtitle',
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0); color:blue; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div></div>',
-    }, 
+        templateCss: '<style>#subtitleThree.wrapper{ background: rgba(0,0,0,0); color:white; }</style>',
+        templateHtml: '<div id="subtitleThree" class="wrapper"><div>%textInpt01%</div></div>',
+    },
     lowText: { 
-        name: 'Low Text De Redactie',
-        imageUrl: 'http://placehold.it/250x250',
+        key: 'lowText',
+        imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
         duration: 5,
         bot: {
@@ -98,7 +98,7 @@ export default {
         text: {
             Text2DR: {
                 label: 'Title',
-                text: 'Hier komt de title',
+                text: 'lowText',
                 layerId: 'Text2DR',
                 key: 'Text2DR',
             }, 
@@ -109,15 +109,14 @@ export default {
             HighText: false,
             BigText: false
         },
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
+        templateCss: '<style>#lowText.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
+        templateHtml: '<div id="lowText" class="wrapper"><div>%Text2DR%</div>></div>',
     },
-
     highText: { 
-        name: 'High Text De Redactie',
-        imageUrl: 'http://placehold.it/250x250',
+        key: 'highText',
+        imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
-        duration: 5,
+        duration: 7,
         bot: {
             "render-status": 'ready',
             bot: 'render',
@@ -128,7 +127,7 @@ export default {
         text: {
             Text2DR: {
                 label: 'Title',
-                text: 'Hier komt de title',
+                text: 'highText',
                 layerId: 'Text2DR',
                 key: 'Text2DR',
             }, 
@@ -139,18 +138,17 @@ export default {
             HighText: true,
             BigText: false
         },
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
-    },
+        templateCss: '<style>#highText.wrapper{ background: rgba(0,0,0,0); color:white; }</style>',
+        templateHtml: '<div id="highText" class="wrapper"><div>%Text2DR%</div></div>',        
+    },  
 
     bigText: { 
-        name: 'Big Text De Redactie',
-        imageUrl: 'http://placehold.it/250x250',
+        key: 'bigText',
+        imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
-        duration: 5,
+        duration: 7,
         bot: {
             "render-status": 'ready',
-            aep: 'D:\\videoTemplater\\dropbox\\ae\\Templater\\template.aep',
             bot: 'render',
             module: 'jpg2000',
             color1: '1B2A36',
@@ -159,7 +157,7 @@ export default {
         text: {
             Text2DR: {
                 label: 'Title',
-                text: 'Hier komt de title',
+                text: 'bigText',
                 layerId: 'Text2DR',
                 key: 'Text2DR',
             }, 
@@ -170,15 +168,15 @@ export default {
             HighText: false,
             BigText: true
         },
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
-    },
+        templateCss: '<style>#bigText.wrapper{ background: rgba(0,0,0,0); color:white; }</style>',
+        templateHtml: '<div id="bigText" class="wrapper"><div>%Text2DR%</div></div>',        
+    }, 
 
     highlightText: { 
-        name: 'Highlight Text De Redactie',
-        imageUrl: 'http://placehold.it/250x250',
+        key: 'highlightText',
+        imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
-        duration: 5,
+        duration: 7,
         bot: {
             "render-status": 'ready',
             aep: 'D:\\videoTemplater\\dropbox\\ae\\Templater\\template.aep',
@@ -190,13 +188,13 @@ export default {
         text: {
             Text2DR: {
                 label: 'Title',
-                text: 'Hier komt de title',
+                text: 'highlightText',
                 layerId: 'Text2DR',
                 key: 'Text2DR',
             }, 
             Text3: {
                 label: 'Subtitle',
-                text: 'Hier komt de ondertitel',
+                text: 'highlightText',
                 layerId: 'Text2DR',
                 key: 'Text3',
             }, 
@@ -207,29 +205,33 @@ export default {
             HighText: false,
             BigText: false
         },
-        templateCss: '<style>#overlayKetnet.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>',
-        templateHtml: '<div id="overlayKetnet" class="wrapper"><div>%textInpt01%</div><div>%textInpt02%</div></div>',
-    },
-
-    bumper_redactie_1: {
-        name: 'Bumper De Redactie 1', 
-        imageUrl: 'http://placehold.it/250x250',
+        templateCss: '<style>#bigText.wrapper{ background: rgba(0,0,0,0); color:white; }</style>',
+        templateHtml: '<div id="bigText" class="wrapper"><div>%Text2DR%</div><div>%Text3%</div></div>',        
+    }, 
+    
+    bumper: {
+        key: 'bumper', 
+        imageUrl: './assets/bumper/deredactie_01.gif',
         duration: 7,
         transitionDuration: 3,
         type: 'outro',
         fileName: 'deredactie_1'
     },
-    logo_redactie_1: {
-        name:'logo De Redactie 1',
-        imageUrl: 'http://placehold.it/250x250',
+    bumper2: {
+        key: 'bumper2', 
+        imageUrl: './assets/bumper/deredactie_01.gif',
+        duration: 7,
+        transitionDuration: 3,
+        type: 'outro',
+        fileName: 'deredactie_1'
+    },
+    logo: {
+        key:'logo',
+        imageUrl: './assets/logo/deredactie_01.gif',
         scale: 6,
-        offset:{
-            x: 20,
-            y: 20,
-        },
         width: 266,
         height: 130,
         type: 'logo',
         fileName: 'deredactie_1'
-    },
+    }
 }

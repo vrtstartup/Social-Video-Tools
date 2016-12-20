@@ -15,6 +15,8 @@ export function isUniqueFile(type: string) {
   return fileConfig.hasOwnProperty('name');
 }
 
+export function getWorkingDir(): string{ return config.filesystem.workingDirectory }
+
 export function getMimeTypeByFileType(type: string): string{ return config.filesystem.files[type]['mime']}
 function getFileConfigByType(type: string): Object{ return config.filesystem.files[type] }
 

@@ -37,6 +37,7 @@ import { MenuComponent } from './views/common/menu.component';
 import { MaterialModule } from '@angular/material';
 import 'hammerjs';
 
+import { ExcludePipe } from './common/pipes/exclude.pipe';
 import { ListPipe } from './common/pipes/list.pipe';
 import { SortByPropPipe } from './common/pipes/sortByProp.pipe';
 import { KeysPipe } from './common/pipes/keys.pipe';
@@ -67,6 +68,7 @@ const firebaseAuthConfig = {
         MenuComponent,
         RangeSliderComponent,
         LoginComponent,
+        ExcludePipe,
         ListPipe,
         SortByPropPipe,
         KeysPipe,

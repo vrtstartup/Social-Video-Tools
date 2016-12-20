@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { VgAPI, VgFullscreenAPI } from 'videogular2/core';
 
 import * as $ from 'jquery';
@@ -7,9 +7,9 @@ import * as $ from 'jquery';
     selector: 'vrtvideo-player',
     templateUrl: './vrtvideo-player.html'
 })
-export class VrtVideoPlayer implements OnChanges {
+export class VrtVideoPlayer implements OnChanges, OnInit {
     @Input() clip;
-    @Input() selectedAnnotation;
+    @Input() selectedAnnotationKey;
     @Input() annotations;
 
     sources: Array<Object>;
@@ -20,6 +20,7 @@ export class VrtVideoPlayer implements OnChanges {
     apiLoaded: boolean;
     fsAPI: VgFullscreenAPI;
     currentTime: number;
+    selectedAnnotation: any;
 
     constructor() {
         this.fsAPI = VgFullscreenAPI;
@@ -34,7 +35,18 @@ export class VrtVideoPlayer implements OnChanges {
         this.setSeekTime();
     }
 
+    ngOnInit(){
+        
+    }
+
     ngOnChanges(changes: SimpleChanges) {
+
+        if(this.selectedAnnotationKey && this.annotations){
+            this.selectedAnnotation = this.annotations[this.selectedAnnotationKey];
+        }
+
+        this.setSeekTime();
+
         if(changes.hasOwnProperty('clip')) { // input 'clip' changed
             const prev = changes['clip']['previousValue'];
             const curr = changes['clip']['currentValue'];
@@ -49,25 +61,30 @@ export class VrtVideoPlayer implements OnChanges {
             const curr = changes['selectedAnnotation']['currentValue'];
 
             if(prev != null && curr !=null && prev['key'] != curr['key']) this.setSeekTime();
-        }
+        } 
+
     }
 
     setSeekTime(){
         // position the seek time according to the selected annotation
         //  subscribe to seek time to reset seek position whenever it goes out of the bounds defined by the scrub handles 
-        if(this.selectedAnnotation) {
+        if(this.selectedAnnotation && this.apiLoaded) {
             let seekTime = Number(this.selectedAnnotation['start']);
             this.api.seekTime(seekTime);
 
             // loop between scrub handles
             this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(() => {
                 this.currentTime = Number(this.api.currentTime);
+
+                this.api.play();
+
                 if (this.api.currentTime >= parseFloat(this.selectedAnnotation.end)) {
                     this.api.seekTime(parseFloat(this.selectedAnnotation.start));
                     this.api.play();
                 }
             });
         }
+
     }
 
     parseHtml(annotation) {

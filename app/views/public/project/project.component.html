@@ -11,7 +11,7 @@
 			<div *ngIf="project?.data?.status?.downscaled">
 				<div class="s-btn">brand selector ></div>
 				<label class="s-btn s-btn--outline btn-upload">
-					<input type="file" name="video" (change)="updateSource($event)">Update Source
+					<input type="file" name="video" (change)="uploadSource($event)">Update Source
 				</label>
 				<button class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
 				<button class="s-btn" type="button" (click)="addToRenderQueue()">Render Movie</button>
@@ -23,6 +23,7 @@
 	<div *ngIf="project?.data">
 		<progress-bar *ngIf="uploadProgress > 0 && uploadProgress < 100" [task]="'uploading'" [progress]="uploadProgress"></progress-bar>
 		<progress-bar *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100" [task]="'downscaling'" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
+		<span *ngIf="project.data?.status?.storingDownScaled">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
 	</div>
 
 	<progress-dialog *ngIf="project && project.isRendering()" [project]="project"></progress-dialog>
@@ -30,73 +31,109 @@
 	<div class="s-submenu" *ngIf="project && !project.isRendering()">
 		<!--once downscaled show controls-->
 		<div *ngIf="project?.data?.status?.downscaled">
-			<button type="button" class="s-btn" (click)="addAnnotation('subtitle')">Add Annotation(U)</button>
-			<button type="button" class="s-btn" (click)="addAnnotation('subtitleTwo')">Add Annotation Two(U)</button>
-			<button type="button" class="s-btn" (click)="addAnnotation('subtitleThree')">Add Annotation Three(U)</button>
+			<button type="button" class="s-btn" (click)="addAnnotation()">Add Annotation(U)</button>
+		</div>
+		<div *ngIf="project?.data?.status?.downscaled && outroTemplates">
+			<select class="form-control" [(ngModel)]="defaultOutroTemplate" (change)="updateOutro($event)">
+				<option *ngFor="let outro of outroTemplates | list" 
+				[value]="outro.key">
+					{{ outro.key }}
+				</option>
+			</select>
 		</div>
 	</div>
 
-	<div class="s-sub-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
+	<!--outros-->
+	<div class="s-anno-item" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">            
+		<small> {{ project.data.annotations[selectedOutroKey]?.data?.key }} | {{ selectedOutroKey}} </small>
+	</div>
+
+	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
 		
 		<!--annotations-->
-		<div class="s-sub__wrapper">
+		<div class="s-anno__wrapper">
 			<!--annotations column-->
-			<div class="s-sub-items">
+			<div class="s-anno-items">
+				<!--Annos-->
 				<div *ngIf="project.data.annotations">
-					<div *ngFor="let annotation of project.data.annotations | list | sortByProp:'end' " 
-						(click)="setSelectedAnno(annotation.key)"
-						[class.highlight]="selectedAnnotation.key === annotation.key"
-						class="s-sub-item">
-						<div class="s-sub-item__info">
-							<small>{{annotation.start | json}}-{{annotation.end | json}} </small><br>
-							<small>{{annotation.data.name}}</small>
+					<div *ngFor="let annotation of (project.data.annotations | exclude:'outro' | list | sortByProp:'end') " 
+						(click)="selectedAnnotationKey !== annotation.key && setSelectedAnno(annotation.key)"
+						[class.active]="selectedAnnotationKey === annotation.key"
+						class="s-anno-item">
+
+						<div class="s-anno-item__controls">
+							
+							<div class="s-anno-item__info">
+								<label class="s-anno-inputs__label">{{annotation.start | json}}-{{annotation.end | json}} </label>
+								<div *ngIf="selectedAnnotationKey === annotation.key">
+									<img (click)="toggleTemplateSelector(annotation.key)" 
+										*ngIf="annotation.data.imageUrl"
+										[src]="templates[annotation.data.key].imageUrl.slice(0, -4) + '_static' + '.gif'" >
+								</div>
+							</div>
+
+							<div class="s-anno-inputs">
+								<!--inputs preview-->
+								<div *ngIf="selectedAnnotationKey != annotation.key">
+									<div *ngIf="annotation.data.text">
+										<small *ngFor="let input of (annotation.data.text | list); let i = index">
+											{{input.text}} 
+										</small>
+									</div>
+								</div>
+
+								<!--inputs column-->
+								<div *ngIf="selectedAnnotationKey === annotation.key">
+									<form  *ngIf="project.data.annotations[selectedAnnotationKey].data.text">
+										<div *ngFor="let input of (project.data.annotations[selectedAnnotationKey].data.text | list); let i = index">
+											<label class="s-anno-inputs__label" for="">{{i}}-{{input.label}}</label>
+											<input class="s-anno-inputs__input" type="text" [(ngModel)]="input.text"
+												(keyup)="onKeyUp(input)" 
+												(blur)="onBlur(input)" [ngModelOptions]="{standalone: true}">
+										</div>
+									</form>
+								</div>
+							</div>
+
+							<div class="s-anno-item__delete">
+								<md-icon svgSrc="assets/icons/icon-cross.svg" (click)="deleteAnnotation(annotation.key)"></md-icon>
+							</div>
+
 						</div>
-						<div class="s-sub-item__delete" (click)="deleteAnnotation(annotation.key)">
-							<span>x</span>
+						
+						<!--template column-->
+						<div class="s-anno-templates" *ngIf="annotation.key === templateSelectorFlag">
+							<div *ngFor="let template of (templates | list)"
+								(click)="updateTemplate(template)"
+								[class.active]="template.key === selectedAnnotationKey"
+								class="s-anno-template">
+									<div (mouseover)="template.preview=true" (mouseout)="template.preview=false">
+										<img *ngIf="!template.preview" class="s-anno-template__thumb" [src]="template.imageUrl.slice(0, -4) + '_static' + '.gif'" >
+										<img *ngIf="template.preview" class="s-anno-template__thumb" [src]="template.imageUrl">
+									</div>
+							
+							</div>
 						</div>
+						
+						
 					</div>
 				</div>
-			</div>
-			
-			<!--template column-->
-			<div class="s-sub-templates" *ngIf="selectedAnnotation">
-				<div *ngFor="let template of (templates | list)"
-					(click)="updateSelectedAnnoTemplate(template)"
-					[class.highlight]="template.name === selectedAnnotation.data.name"
-					class="s-sub-template">
-						<img class="s-sub-template__thumb" [src]="template.imageUrl">
-						<small class="s-sub-template__name">{{template.name}}</small>
-				</div><hr>
-			</div>
+			</div>			
 
-			<!--inputs column-->
-			<div class="s-sub-inputs">
-				<div *ngIf="selectedAnnotation">
-					<form  *ngIf="selectedAnnotation.data.text">
-						<div *ngFor="let input of (selectedAnnotation.data.text | list); let i = index">
-							<label class="s-sub-inputs__label" for="">{{i}}-{{input.label}}</label>
-							<input class="s-sub-inputs__input" type="text" [(ngModel)]="input.text" 
-								(keyup)="onKey(input)"
-								(blur)="onBlur()" [ngModelOptions]="{standalone: true}">
-						</div>
-					</form>
-				</div>
-			</div>
 		</div>
 
 		<!--video-->
 		<div class="s-video_wrapper">
-
 			<div class="s-video">
-				<vrtvideo-player 
+				<vrtvideo-player
 					[clip]="project.data.clip"
-					[annotations]="project.data.annotations"
-					[selectedAnnotation]="selectedAnnotation">
+					[annotations]="project.data?.annotations"
+					[selectedAnnotationKey]="selectedAnnotationKey">
 				</vrtvideo-player>
 
-				<range-slider *ngIf="selectedAnnotation"
-					[selectedAnnotation]="selectedAnnotation" 
-					[clip]="project.data.clip" (changeAnno)="updateSelectedAnno( selectedAnnotation.key, $event)">
+				<range-slider *ngIf="selectedAnnotationKey"
+					[selectedAnnotation]="project.data.annotations[selectedAnnotationKey]" 
+					[clip]="project.data.clip" (changeAnno)="updateAnnotation( selectedAnnotationKey, $event)">
 				</range-slider>
 			</div>
 		</div>

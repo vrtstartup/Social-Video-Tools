@@ -1,6 +1,7 @@
 import {spawn, spawnSync, execFile} from 'child_process';
 import * as resolver from '../../common/services/resolver.service';
 import { config } from '../../common/config';
+import { Project } from '../../common/classes/project';
 
 var FfmpegCommand = require('fluent-ffmpeg');
 const path = require('path');
@@ -89,6 +90,30 @@ export function scaleDown(project, messageHandler, job) {
         .run();
     });
 };
+
+export function generateThumb(project): Promise<Project>{
+  const input = resolver.storageUrl('source', project.data.id);
+  const fileName = resolver.getFileNameByType('thumb', project.data.id);
+
+  return new Promise((resolve, reject) => {
+    const thumbCommand = new FfmpegCommand(input, {logger: logger})
+      .screenshots({
+          timestamps: [5],
+          filename: project.data.id + fileName,
+          folder: resolver.getWorkingDir()
+      })
+
+      .on('error', (err) => { 
+          logger.error(err);
+          reject(err);
+        })
+        .on('start', (commandLine) => {logger.verbose('Spawned Ffmpeg with command: ' + commandLine)})
+        .on('end', () => {
+          logger.verbose("Done processing")
+          resolve(project);
+        })
+  })
+}
 
 export function stitch(project, job, messageHandler) {
     // project data
@@ -208,7 +233,7 @@ export function stitch(project, job, messageHandler) {
             outputName = inputName.replace(':v', '_scaled');
             const overlayWidth = input['data'].width;
             const desiredScale = input['data'].scale;
-            const scaleWidth = desiredScale ? width * (width / (overlayWidth * desiredScale)) : width;
+            const scaleWidth = desiredScale ? overlayWidth * (width / (overlayWidth * desiredScale)) : width;
             line = `[${input['name']}]setpts=PTS-STARTPTS+${input['data']['start']}/TB,scale=${scaleWidth}:-1[${outputName}]`
         };
        
