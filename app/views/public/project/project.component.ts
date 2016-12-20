@@ -182,11 +182,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.selectedAnnotationKey = key;
   }
 
-  // updateAnnotation(key, obj) {
-  //   this.project.updateAnnotation(key, obj);
-  //   this.updateProject();
-  // }
-
   deleteAnnotation(key) {
     // when you delete the selected
     if (this.selectedAnnotationKey === key) {
