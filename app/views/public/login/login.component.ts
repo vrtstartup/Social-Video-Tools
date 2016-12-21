@@ -2,8 +2,11 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFire, FirebaseApp, FirebaseAuth, FirebaseAuthState } from 'angularfire2';
+import { BrandService} from '../../../common/services/brands.service'
+import { Brand } from '../../../common/models/brand.model';
 
 @Component({
+  providers: [BrandService],
   selector: 'login',
   templateUrl: './login.component.html',
 })
@@ -18,15 +21,20 @@ export class LoginComponent implements OnInit {
   private registerForm: FormGroup;
   private requestPassForm: FormGroup;
   private registerFlag: Boolean = false;
+  private possibleBrands: Array<Brand>;
+    brandSub: any;
 
   constructor(
     af: AngularFire,
     public auth: FirebaseAuth,
     private fb: FormBuilder,
     private router: Router,
+    private BrandService: BrandService,
     @Inject(FirebaseApp) firebaseApp: any) {
     this.af = af;
     this.fbAuth = firebaseApp.auth();
+
+    this.possibleBrands = [];    
   }
 
   ngOnInit() { 
@@ -47,6 +55,8 @@ export class LoginComponent implements OnInit {
       
     // optinally subscribe on changes
     this.loginForm.valueChanges.subscribe(value => {});
+
+    this.brandSub = this.BrandService.brands$.subscribe(this.brandsHandler.bind(this), this.errorHandler);
   }
 
   onSetActiveFromGroup(formGroupName) {
@@ -81,8 +91,16 @@ export class LoginComponent implements OnInit {
 
       this.auth.createUser(credentials)
         .then(user => {
+          console.log('setting additional data');
           this.af.database.object(`/users/${user.uid}/role`).set('0'); // set user role
           this.af.database.object(`/users/${user.uid}/email`).set(user.auth.email); //set user email
+          
+          if(this.possibleBrands.length > 0){
+            this.af.database.object(`/users/${user.uid}/defaultBrand`).set(this.possibleBrands[0]['key']); 
+          }else{
+            console.log('No brands have been fetched, registering user without default brand');
+          }
+
           this.router.navigate(['projects'])
         })
         .catch(err => this.errorHandler(err));
@@ -101,6 +119,8 @@ export class LoginComponent implements OnInit {
         .catch( err => this.errorHandler(err))
     }
   }
+
+  brandsHandler(brands: Array<Brand>){ this.possibleBrands = brands }
 
   errorHandler(err) {
     if (err.code === 'auth/user-not-found') {
