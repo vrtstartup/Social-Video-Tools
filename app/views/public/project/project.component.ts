@@ -34,6 +34,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   templaterQueueRef: FirebaseListObservable<any[]>;
   projectRefOnce: Observable<any[]>;
   projectRef: FirebaseObjectObservable<any[]>;
+  userRef: FirebaseObjectObservable<any[]>;
   project: any;
   selectedAnnotationKey: any = '';
   selectedAnnotation: any;
@@ -77,6 +78,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.templaterQueueRef = af.database.list('/templater-queue');
     this.templatesRef = af.database.object('/templates');
     this.projectRef = this.af.database.object(`/projects/${this.projectId}`);
+    
   }
 
   ngOnInit() {
@@ -105,7 +107,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
       );
 
     this.userSub = this.userService.user$.subscribe(
-      data => this.user = data,
+      data =>{ 
+      this.user = data;
+      this.userRef = this.af.database.object(`/users/${this.user['$key']}`);
+    },
       err => console.log('authserviceErr', err)
     );
     
@@ -148,6 +153,16 @@ export class ProjectComponent implements OnInit, OnDestroy {
   updateProject() {
     if(this.project && this.project.data){
       this.projectRef.update(this.project.data);
+    }
+  }
+
+  updateUser(){
+    //#todo delete statements can be avoided by implementing User() class objects
+    if(this.userRef && this.user){
+      const user = this.user;
+      delete user['$exists'];
+      delete user['$key'];
+      this.userRef.update(user);
     }
   }
 
@@ -232,7 +247,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   changeBrand(brand){
     this.project.data.brand = brand;
+    this.user['defaultBrand'] = brand;
+
     this.updateProject();
+    this.updateUser(); 
   }
 
   // TODO
