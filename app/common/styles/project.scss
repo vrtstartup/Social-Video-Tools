@@ -34,10 +34,13 @@ project-component {
 }
 
 .s-submenu {
-    border: 1px solid #f2f2f2;
-    flex: 0 1 auto;
+    display: flex;
     flex-direction: row; 
+    background: #477DDF;
+    //border: 1px solid #f2f2f2;
+    flex: 0 1 auto;
     padding: .5rem;
+
 }
 
 .s-status-error {

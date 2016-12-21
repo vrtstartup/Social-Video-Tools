@@ -44,18 +44,21 @@ export class Project {
     }
 
     addOutro(template) {
-        // create annotation object if none
-        if (!this.data['annotations']) this.data['annotations'] = {};
+        if( this.data.clip && this.data.clip['movieLength']) {
+            // create annotation object if none
+            if (!this.data['annotations']) this.data['annotations'] = {};
 
-        let newKey = this.makeKey();
-        let strtTm = this.data['clip']['movieLength'] - template.transitionDuration;
-        let endTm = this.data['clip']['movieLength'] - template.transitionDuration + template.duration;
+            let newKey = this.makeKey();
+            let strtTm = this.data['clip']['movieLength'] - template.transitionDuration;
+            let endTm = this.data['clip']['movieLength'] - template.transitionDuration + template.duration;
 
-        let newAnno = { key: newKey, start: strtTm, end: endTm, data: template, };
+            let newAnno = { key: newKey, start: strtTm, end: endTm, data: template, };
 
-        this.updateAnnotation(newKey, newAnno);
+            this.updateAnnotation(newKey, newAnno);
 
-        return newAnno;
+            return newAnno;
+        }
+        return null;
     }
 
     updateOutro(key, obj){
@@ -63,17 +66,20 @@ export class Project {
     }
 
     addLogo(template){
-        if (!this.data['annotations']) this.data['annotations'] = {};
+        if( this.data.clip && this.data.clip['movieLength']) {
+            if (!this.data['annotations']) this.data['annotations'] = {};
 
-        let newKey = this.makeKey();
-        let strtTm = 0;
-        let endTm = this.data['clip']['movieLength'];
+            let newKey = this.makeKey();
+            let strtTm = 0;
+            let endTm = this.data['clip']['movieLength'];
 
-        let newAnno = { key: newKey, start: strtTm, end: endTm, data: template, };
+            let newAnno = { key: newKey, start: strtTm, end: endTm, data: template, };
 
-        this.updateAnnotation(newKey, newAnno);
+            this.updateAnnotation(newKey, newAnno);
 
-        return newAnno;        
+            return newAnno;
+        }        
+        return null;
     }
 
     updateLogo(key, obj){
