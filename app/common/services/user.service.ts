@@ -19,6 +19,7 @@ export class UserService {
                 });            
             }
 
+            // #todo ideally this returns a User object
             return this.af.database.object(`/users/${auth['uid']}`).map(userData => {
                 userData.userID = auth.uid;
                 userData.email = auth.auth.email;

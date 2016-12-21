@@ -13,6 +13,7 @@ export class ProjectsComponent implements OnInit {
   userId: string;
   userEmail: string;
   userRole: number;
+  userBrand: string;
   userSubscribtion: any;
 
   af: AngularFire;
@@ -29,7 +30,10 @@ export class ProjectsComponent implements OnInit {
   ngOnInit() {
     this.userSubscribtion = this.userService.user$.subscribe(
       userData => {
-        this.userId = userData.userID; this.userEmail = userData.email; this.userRole = userData.role;
+        this.userId = userData.userID; 
+        this.userEmail = userData.email; 
+        this.userRole = userData.role;
+        this.userBrand = userData.defaultBrand;
       },
       err => console.log('authserviceErr', err)
     );
@@ -41,7 +45,12 @@ export class ProjectsComponent implements OnInit {
 
   createNewProject($event) {
     // create new empty project
-    this.projectsRef.push({ user: this.userId, created: Date.now(), createdBy: this.userEmail })
+    this.projectsRef.push({ 
+      user: this.userId, 
+      brand: this.userBrand,
+      created: Date.now(), 
+      createdBy: this.userEmail
+    })
       .then((ref) => {
         // attach project id to user 
         this.af.database.object(`/users/${this.userId}/projects/${ref.key}`).set(true);
