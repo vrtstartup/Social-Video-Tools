@@ -1,9 +1,36 @@
 vg-player { 
 
   vg-controls {
+    height: 60px !important;
     left: 0;
     position: fixed !important;
-    background: $drd-main-bg-color !important;
+    //background: $drd-main-bg-color !important;
+    background: white !important;
+
+    vg-scrub-bar-current-time {
+      height: initial !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      .background {
+        //background: $s-link !important;
+        background: #e4e4e4 !important;
+        height: 1rem;
+      }
+    }
+
+    vg-scrub-bar-buffering-time {
+      height: initial !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      .background {
+        background: rgba($s-gray, .2) !important;
+        height: 1rem;
+      }
+    }    
+  }
+
+  vg-controls * {  
+    color: $s-link !important;
   }
 
 }

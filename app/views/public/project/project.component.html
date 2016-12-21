@@ -2,24 +2,29 @@
 
 <div class="socialvideotool">
 	<div class="s-menu-project">
-		<div>
-			<div *ngIf="!project?.data?.status?.downscaled">
-				<label class="s-btn btn-upload">
-					<input type="file" name="video" (change)="uploadSource($event)">uploadSource
-				</label>
-			</div>
-			<div *ngIf="project?.data?.status?.downscaled">
-				<div class="s-btn">brand selector ></div>
-				<label class="s-btn s-btn--outline btn-upload">
-					<input type="file" name="video" (change)="uploadSource($event)">Update Source
-				</label>
-				<button class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
-				<button class="s-btn" type="button" (click)="addToRenderQueue()">Render Movie</button>
-			</div>
+		<div *ngIf="!project?.data?.status?.downscaled">
+			<label class="s-btn btn-upload">
+				<input type="file" name="video" (change)="uploadSource($event)">uploadSource
+			</label>
+		</div>
 
+		<div class="s-menu-project__left" *ngIf="project?.data?.status?.downscaled">
+			<div class="s-brand-selector">
+				<span style="color:#7E94BC; display:block; font-size:.5rem;">Select brand</span> 
+				<span style="color:white;">Brand selector</span> 
+				<md-icon style="fill:white; width:20px; height:20px; vertical-align: middle; position:relative; top: 1px;" svgSrc="assets/icons/icon-arrow-down.svg"></md-icon>
+			</div>
+		</div>
+
+		<div class="s-menu-project__right" *ngIf="project?.data?.status?.downscaled">
+			<label class="s-btn s-btn--outline btn-upload">
+				<input type="file" name="video" (change)="uploadSource($event)">Update Source
+			</label>
+			<button class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
+			<button class="s-btn" type="button" (click)="addToRenderQueue()">Render Movie</button>
 		</div>
 	</div>
-
+	
 	<div *ngIf="project?.data">
 		<progress-bar *ngIf="uploadProgress > 0 && uploadProgress < 100" [task]="'uploading'" [progress]="uploadProgress"></progress-bar>
 		<progress-bar *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100" [task]="'downscaling'" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
@@ -28,55 +33,63 @@
 
 	<progress-dialog *ngIf="project && project.isRendering()" [project]="project"></progress-dialog>
 
-	<div class="s-submenu" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
-		<!--once downscaled show controls-->
-		<div>
-			<button type="button" class="s-btn" (click)="addAnnotation()">Add Annotation(U)</button>
-		</div>
-		<div *ngIf="outroTemplates && selectedOutroKey" style="position:relative;" 
-			(click)="showOutroList ? showOutroList = false : showOutroList = true">
-			<button type="button" class="s-btn s-btn--outline" style="max-height:80px; display:flex; align-items: center;">
-				<div style="max-width:70px; margin-right:1rem" *ngIf="project.getAnnoKeyOfType('outro') && selectedOutroKey" (mouseover)="outroPreview=true" (mouseout)="outroPreview=false">
-					<img *ngIf="!outroPreview" [src]="project.data.annotations[selectedOutroKey].data.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="" style="width:100%;">
-					<img *ngIf="outroPreview" [src]="project.data.annotations[selectedOutroKey].data.imageUrl" alt="" style="width:100%;">
-				</div>
-				<small style="color:white;"> {{ project.data.annotations[selectedOutroKey].data.key }} </small>
-			</button>
-			<ul *ngIf="showOutroList" style="position:absolute; bottom:0; transform: translateY(100%); background:#f2f2f2; list-style:none; z-index:100;">
-				<li *ngFor="let outro of outroTemplates | list" (click)="updateOutro(outro.key)" style="pointer:cursor;">
-					<div (mouseover)="outro.preview=true" (mouseout)="outro.preview=false">
-						<img style="width:100%; border:1px solid #f2f2f2;" *ngIf="!outro.preview" [src]="outro.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
-						<img style="width:100%; border:1px solid #f2f2f2;" *ngIf="outro.preview" [src]="outro.imageUrl" alt="">						
-					</div>
-				</li>
-			</ul>
-		</div>
-		
-		<div *ngIf="logoTemplates && selectedOutroKey" style="position:relative;" 
-			(click)="showLogoList ? showLogoList = false : showLogoList = true">
-			<button type="button" class="s-btn s-btn--outline" style="max-height:80px; display:flex; align-items: center;">
-				<div style="max-width:70px; margin-right:1rem" *ngIf="project.getAnnoKeyOfType('logo') && selectedLogoKey" (mouseover)="logoPreview=true" (mouseout)="logoPreview=false">
-					<img style="width:100%;" *ngIf="!logoPreview" [src]="project.data.annotations[selectedLogoKey].data.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="" >
-					<img style="width:100%;" *ngIf="logoPreview" [src]="project.data.annotations[selectedLogoKey].data.imageUrl" alt="" >
-				</div>
-				<small style="color:white;"> {{ project.data.annotations[selectedLogoKey].data.key }} </small>
-			</button>
-			<ul *ngIf="showLogoList" style="position:absolute; bottom:0; transform: translateY(100%); background:#f2f2f2; list-style:none;">
-				<li *ngFor="let logo of logoTemplates | list" (click)="updateLogo(logo.key)" style="pointer:cursor;">
-					<div style="max-width:70px; margin-right:1rem" (mouseover)="logo.preview=true" (mouseout)="logo.preview=false">
-						<img style="width:100%; border:1px solid #f2f2f2;" *ngIf="!logo.preview" [src]="logo.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
-						<img style="width:100%; border:1px solid #f2f2f2;" *ngIf="logo.preview" [src]="logo.imageUrl" alt="">						
-					</div>
-				</li>
-			</ul>
-		</div>
-
-	</div>
 
 	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
 		
 		<!--annotations-->
 		<div class="s-anno__wrapper">
+
+			<div class="s-submenu" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
+				<!--once downscaled show controls-->
+				<div class="s-submenu__left">
+					<div>
+						<button type="button" class="s-btn" (click)="addAnnotation()">Add Annotation(U)</button>
+					</div>
+				</div>
+
+				<div class="s-submenu__right">
+					<div class="s-templateSelector" *ngIf="outroTemplates && selectedOutroKey" 
+						(click)="showOutroList ? showOutroList = false : showOutroList = true">
+						<button type="button" class="s-templateSelector__button">
+							<div class="s-templateSelector__button-img" *ngIf="project.getAnnoKeyOfType('outro') && selectedOutroKey" (mouseover)="outroPreview=true" (mouseout)="outroPreview=false">
+								<img *ngIf="!outroPreview" [src]="project.data.annotations[selectedOutroKey].data.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
+								<img *ngIf="outroPreview" [src]="project.data.annotations[selectedOutroKey].data.imageUrl" alt="">
+							</div>
+							<div class="s-templateSelector__button-label"> Bumper <md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon> </div>
+							
+						</button>
+						<ul class="s-templateSelector__dropdown-list s-slideIn" *ngIf="showOutroList">
+							<li class="s-templateSelector__dropdown-item" *ngFor="let outro of outroTemplates | list" (click)="updateOutro(outro.key)">
+								<div (mouseover)="outro.preview=true" (mouseout)="outro.preview=false">
+									<img *ngIf="!outro.preview" [src]="outro.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
+									<img *ngIf="outro.preview" [src]="outro.imageUrl" alt="">						
+								</div>
+							</li>
+						</ul>
+					</div>
+				
+					<div class="s-templateSelector" *ngIf="logoTemplates && selectedOutroKey" 
+						(click)="showLogoList ? showLogoList = false : showLogoList = true">
+						<button type="button" class="s-templateSelector__button">
+							<div class="s-templateSelector__button-img" *ngIf="project.getAnnoKeyOfType('logo') && selectedLogoKey" (mouseover)="logoPreview=true" (mouseout)="logoPreview=false">
+								<img style="width:100%;" *ngIf="!logoPreview" [src]="project.data.annotations[selectedLogoKey].data.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="" >
+								<img style="width:100%;" *ngIf="logoPreview" [src]="project.data.annotations[selectedLogoKey].data.imageUrl" alt="" >
+							</div>
+							<div class="s-templateSelector__button-label"> Logo <md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon></div>
+						</button>
+						<ul class="s-templateSelector__dropdown-list s-slideIn" *ngIf="showLogoList">
+							<li class="s-templateSelector__dropdown-item" *ngFor="let logo of logoTemplates | list" (click)="updateLogo(logo.key)">
+								<div (mouseover)="logo.preview=true" (mouseout)="logo.preview=false">
+									<img *ngIf="!logo.preview" [src]="logo.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
+									<img *ngIf="logo.preview" [src]="logo.imageUrl" alt="">						
+								</div>
+							</li>
+						</ul>
+					</div>
+
+				</div>
+			</div>
+
 			<!--annotations column-->
 			<div class="s-anno-items">
 				<!--Annos-->
@@ -164,6 +177,7 @@
 					[annotations]="project.data?.annotations"
 					[selectedAnnotationKey]="selectedAnnotationKey">
 				</vrtvideo-player>
+				<div style="padding:1rem;font-size:10px;text-align:right;text-transform:uppercase; color:#999;">Shortcuts:</div>
 
 				<range-slider *ngIf="selectedAnnotationKey"
 					[selectedAnnotation]="project.data.annotations[selectedAnnotationKey]" 

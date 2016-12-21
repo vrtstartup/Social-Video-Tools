@@ -51,6 +51,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   projectSub: any;
   templatesSub: any;
   uploadServiceSub: any;
+  i: number;
 
   constructor(
     af: AngularFire,
@@ -244,15 +245,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   onKeyUp(input) {
-    // //   this.selectedAnnotation.data.text[input.key] = input;
-    // //   this.setSelectedAnno(this.selectedAnnotation.key);
-    // //   // update project => dont push yet to db
-    //     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
-    //     //console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] )
-    //     //this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
-
-    //     this.zone.run(() => {console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text) })
-    //     setTimeout(()=>console.log('run'));
+    // TODO trigger update in annotations on vrt-videoplayer  
+    // this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
+    // this.updateProject();
   }
 
   addToRenderQueue() {
