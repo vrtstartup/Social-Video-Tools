@@ -7,19 +7,22 @@ import 'rxjs/add/operator/take';
 import { UploadService } from '../../../common/services/upload.service';
 import { Project } from '../../../common/models/project.model';
 import { UserService } from '../../../common/services/user.service';
+import { BrandService} from '../../../common/services/brands.service'
+import { Brand } from '../../../common/models/brand.model';
+import { User } from '../../../common/models/user.model';
 
 // TODO remove | only for test purposes
 import testTemplate from '../../../common/models/testTemplate.model';
 
 @Component({
-  providers: [UploadService],
+  providers: [UploadService, BrandService],
   selector: 'project-component',
   templateUrl: './project.component.html',
 })
 
 export class ProjectComponent implements OnInit, OnDestroy {
 
-  userId: string;
+  user: User;
   userMessage: string = '';
   uploadProgress: any;
   downScaleProgress: any;
@@ -36,7 +39,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
   selectedAnnotation: any;
   templatesRef: FirebaseObjectObservable<any[]>;
   stylesRef: FirebaseObjectObservable<any[]>;
-  //templastes
+  possibleBrands: Array<Brand>;
+
+  //templates
   templates: any;
   logoTemplates: any;
   outroTemplates: any;
@@ -44,8 +49,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
   defaultOutroTemplate: any;
   selectedOutroKey: any;
   projectId: string;
+
   // subscribtions
   userSub: any;
+  brandSub: any;
   projectSub: any;
   templatesSub: any;
   uploadServiceSub: any;
@@ -57,12 +64,14 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private uploadService: UploadService,
-    private userService: UserService) {
+    private userService: UserService,
+    private BrandService: BrandService) {
     
     this.af = af;
     this.projectId =  this.route.snapshot.params['id'];
     this.defaultAnnotationTemplate = 'defaultSubtitle';
     this.defaultOutroTemplate = 'bumper'; // default selected
+
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
     this.templaterQueueRef = af.database.list('/templater-queue');
@@ -96,10 +105,12 @@ export class ProjectComponent implements OnInit, OnDestroy {
       );
 
     this.userSub = this.userService.user$.subscribe(
-      data => this.userId = data.userID ,
+      data => this.user = data,
       err => console.log('authserviceErr', err)
     );
     
+    this.brandSub = this.BrandService.brands$.subscribe(this.brandsHandler.bind(this), console.log);
+
     this.uploadServiceSub = this.uploadService.progress$.subscribe(data => {
         this.zone.run(() => this.uploadProgress = data); // force to trigger change
       }, err => console.log(err));
@@ -215,6 +226,13 @@ export class ProjectComponent implements OnInit, OnDestroy {
       //this.setSelectedAnno(this.selectedAnnotation.key);
       this.updateProject();
     }
+  }
+
+  brandsHandler(brands: Array<Brand>){ this.possibleBrands = brands }
+
+  changeBrand(brand){
+    this.project.data.brand = brand;
+    this.updateProject();
   }
 
   // TODO

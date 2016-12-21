@@ -33,7 +33,12 @@
 		<div *ngIf="project?.data?.status?.downscaled">
 			<button type="button" class="s-btn" (click)="addAnnotation()">Add Annotation(U)</button>
 		</div>
+
 		<div *ngIf="project?.data?.status?.downscaled && outroTemplates">
+			<select class="right" [ngModel]="project?.data.brand" (ngModelChange)="changeBrand($event)">
+				<option *ngFor="let brand of possibleBrands" [ngValue]="brand.key">{{brand.data.name}}</option>
+			</select>
+
 			<select class="form-control" [(ngModel)]="defaultOutroTemplate" (change)="updateOutro($event)">
 				<option *ngFor="let outro of outroTemplates | list" 
 				[value]="outro.key">
