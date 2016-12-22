@@ -253,8 +253,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
       //   this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
       // }
 
-      //this.updateAnnotation(this.selectedAnnotationKey, this.selectedAnnotation);
-      //this.setSelectedAnno(this.selectedAnnotation.key);
       this.updateProject();
     }
   }
@@ -290,18 +288,21 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   onClick(event) {
+    if( this.project && this.project['data']['annotations']) {
+  
+      if (!this._el.nativeElement.querySelector('#s-brand-dropdown').contains(event.target)) {
+        this.showBrandList = false;
+      }
 
-    if (!this._el.nativeElement.querySelector('#s-brand-dropdown').contains(event.target)) {
-      this.showBrandList = false;
+      if (!this._el.nativeElement.querySelector('#s-outro-dropdown').contains(event.target)) {
+        this.showOutroList = false;
+      }
+
+      if (!this._el.nativeElement.querySelector('#s-logo-dropdown').contains(event.target)) {
+        this.showLogoList = false;
+      }
     }
 
-    if (!this._el.nativeElement.querySelector('#s-outro-dropdown').contains(event.target)) {
-      this.showOutroList = false;
-    }
-
-    if (!this._el.nativeElement.querySelector('#s-logo-dropdown').contains(event.target)) {
-      this.showLogoList = false;
-    }
   }
 
 }
