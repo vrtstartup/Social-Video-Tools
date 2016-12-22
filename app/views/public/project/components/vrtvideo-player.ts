@@ -43,7 +43,11 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
 
         if(this.apiLoaded && this.selectedAnnotationKey && this.annotations){
             this.selectedAnnotation = this.annotations[this.selectedAnnotationKey];
-            this.setSeekTime();
+            if(changes.hasOwnProperty('selectedAnnotationKey')){
+                this.setSeekTime();
+                return
+            } 
+            this.api.pause();
         }
 
         if(changes.hasOwnProperty('clip')) { // input 'clip' changed
@@ -90,10 +94,10 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
                 parsedHtml = parsedHtml.replace(`%${i}%`, input);
             }
             
-            let templateHtml = annotation.data.templateCss + parsedHtml;
+            let templateHtml = `<div>${annotation.data.templateCss}${parsedHtml}</div>`;
             
             // inject it
-            $(`#${annotation.key}`).replaceWith(templateHtml);
+            $(`#${annotation.key} > div`).replaceWith(templateHtml);
         }
         
         // TODO for layers: replace html string with text values
