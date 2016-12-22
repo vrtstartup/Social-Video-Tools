@@ -6,7 +6,7 @@ project-component {
 .socialvideotool { 
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: calc(100vh - 40px); // minus menu-height
     width: 100%;
     .btn-upload {
         margin-bottom: 0;
@@ -35,7 +35,50 @@ project-component {
         }
     }
 }
+.s-brand {
+    &__selector { 
+        position: relative;
+        cursor: pointer;
+        md-icon {
+            fill:white; 
+            width:20px; 
+            height:20px; 
+            vertical-align: middle; 
+            position:relative; 
+            top: 1px;
+        }
+    }
+    &__trigger { 
+        //
+    }
+    &__label { 
+        color:#7E94BC; 
+        display: block; 
+        font-size:.5rem;
+    }
+    &__selected {
+        color: white;
+    }
 
+    &__dropdown-list {
+        background:white; 
+        border-bottom: 1px solid $s-link;
+        border-radius: 3px;
+        box-shadow: 0 7px 10px 0 rgba(42,50,66,.3);
+        margin: 0;
+        min-width: 120px;
+        list-style: none;
+        padding: .5rem 1rem; 
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 999;
+    }
+    &__dropdown-item {
+        cursor: pointer;
+        margin-bottom: .5rem; 
+    }        
+}
 .s-status {
     display: flex;
     flex-direction: column;
@@ -71,10 +114,17 @@ project-component {
     display: flex; 
     flex: 1;
     flex-direction: row;
+    @media screen and (max-width: 767px) {
+        flex-direction: column-reverse;
+        justify-content: flex-end;
+    }
     .s-anno__wrapper { 
         display: flex;
         flex-direction: column;
         flex: 0 0 50%;
+        @media screen and (max-width:767px) {
+            flex: 0 0 100%;
+        }
     }
     .s-anno-items {
         //border-right: 1px solid #f2f2f2;
@@ -83,6 +133,9 @@ project-component {
         overflow: auto;
         flex: 1 1 auto;
         margin-bottom: 130px;
+        @media screen and (max-width:767px) {
+            flex: 1 1 0;
+        }
     }
     .s-anno-item {
         background: white;
@@ -104,6 +157,32 @@ project-component {
             background: #f2f2f2;
             color: #a3d1ff;
             box-shadow: 0 4px 12px 0 hsla(0,0%,59%,.5);
+        }
+        .s-anno-item__preview {
+            position: relative;
+            img { 
+                box-shadow: 0 2px 0px 0 $s-link;
+            }
+            span {
+                background: $s-link;
+                bottom: -15px;
+                border-radius: 100px;
+                height: 24px;
+                left: 50%;
+                position: absolute;
+                text-align: center;
+                transform: translateX(-50%);                
+                width: 24px;
+            }
+            md-icon {
+                fill: white;
+                height: 16px;
+                left: 50%;                
+                position: absolute;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 16px;
+            } 
         }
         .s-anno-item__delete {
             &:hover {
@@ -223,10 +302,22 @@ project-component {
         border-bottom: 1px solid $s-link;
     }
 }
-    
+.s-shortcuts__wrapper {
+    color:#999;
+    font-size: 10px;
+    text-align: right;
+    text-transform: uppercase;
+    padding: 1rem;
+    @media screen and (max-width:767px){
+        display: none;
+    }
+}
 .s-video_wrapper {
     flex: 0 0 50%;
     background: #f6f6f6;
+    @media screen and (max-width: 767px){
+        flex: 0 0 0;
+    }
 }
 
 .s-video {
