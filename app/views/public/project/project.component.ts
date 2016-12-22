@@ -264,10 +264,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   onKeyUp(input) {
-    // TODO trigger update in annotations on vrt-videoplayer  
     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
     this.project.data.annotations = Object.assign({}, this.project.data.annotations);
-    //this.updateProject();
   }
 
   preview() {
