@@ -11,11 +11,14 @@ import { BrandService} from '../../../common/services/brands.service'
 import { Brand } from '../../../common/models/brand.model';
 import { User } from '../../../common/models/user.model';
 
+import { HotkeysService } from '../../../../node_modules/angular2-hotkeys/src/services/hotkeys.service';
+import { Hotkey } from '../../../../node_modules/angular2-hotkeys/src/models/hotkey.model';
+
 // TODO remove | only for test purposes
 import testTemplate from '../../../common/models/testTemplate.model';
 
 @Component({
-  providers: [UploadService, BrandService],
+  providers: [UploadService, BrandService, HotkeysService],
   selector: 'project-component',
   templateUrl: './project.component.html',
 })
@@ -48,7 +51,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
   outroTemplates: any;
   selectedTemplate: any;
   selectedOutroName: any;
+  defaultLogoTemplate: any;
   selectedOutroKey: any;
+  selectedLogoKey: any;
   projectId: string;
   templateFilter: Object;
 
@@ -58,6 +63,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
   projectSub: any;
   templatesSub: any;
   uploadServiceSub: any;
+  pausePlayTrigger: any;
+  previewTrigger: any;
 
   constructor(
     af: AngularFire,
@@ -67,13 +74,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private uploadService: UploadService,
     private userService: UserService,
-    private BrandService: BrandService) {
+    private BrandService: BrandService,
+    private _hotkeysService: HotkeysService) {
     this.af = af;
     this.projectId =  this.route.snapshot.params['id'];
     this.selectedAnnotationKey = '';
     this.selectedOutroKey = '';
     this.defaultAnnotationTemplateName = '';
     this.selectedOutroName = '';
+    this.defaultLogoTemplate = 'logo'; // default selected
 
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
@@ -81,6 +90,14 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.templatesRef = af.database.object('/templates');
     this.projectRef = this.af.database.object(`/projects/${this.projectId}`);
     
+    this._hotkeysService.add(new Hotkey('ctrl+u', (event: KeyboardEvent): boolean => {
+      this.addAnnotation(); 
+      return false; // Prevent bubbling
+    }));
+    this._hotkeysService.add(new Hotkey('space', (event: KeyboardEvent): boolean => {
+      this.pausePlayTrigger = Object.assign({}, this.pausePlayTrigger);
+      return false; // Prevent bubbling
+    }));
   }
 
   ngOnInit() {
@@ -123,6 +140,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
           this.outroTemplates = newOutroTempList;
           this.logoTemplates = newLogoTempList;
 
+          // #todo when selecting a different brand and opening another project this is faulty
           const arrOutroKeys = Object.keys(this.outroTemplates);
           const outroKey = arrOutroKeys[0];
           this.selectedOutroName = this.outroTemplates[outroKey]['name']; // what if no outros are set to this brand? 
@@ -130,9 +148,11 @@ export class ProjectComponent implements OnInit, OnDestroy {
           const arrTemplateKeys = Object.keys(this.templates);
           this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name']; // what if no templates are set to this brand? 
 
-          if(this.project.data.status && this.project.data.status.downscaled && !this.project.getOutroKey() ) {
-            this.setProjectOutro();
-          }
+          // if(this.project.data.status && this.project.data.status.downscaled && !this.project.getOutroKey() ) {
+          //   // this.setProjectOutro();
+          // }
+
+          this.initOutroAndLogo();
         }
       );
   }
@@ -140,11 +160,11 @@ export class ProjectComponent implements OnInit, OnDestroy {
   loadUser(){
     this.userSub = this.userService.user$.subscribe(
       data =>{ 
-      this.user = data;
-      this.userRef = this.af.database.object(`/users/${this.user['$key']}`);
+        this.user = data;
+        this.userRef = this.af.database.object(`/users/${this.user['$key']}`);
       
-      // loadproject() depends on user data
-      this.loadProject();
+        // loadproject() depends on user data
+        this.loadProject();
     },
       err => console.log('authserviceErr', err)
     );
@@ -166,20 +186,18 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   setProjectOutro(){
     // add default outro if no annotations yet
-      console.log('adding outro ', this.selectedOutroName);
       this.project.addOutro( this.outroTemplates[this.selectedOutroName]);
-      this.selectedOutroKey = this.project.getOutroKey();
+      this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
       this.updateProject();
   }
 
   setSelectedTemplates() {
-    this.selectedOutroKey = this.project.getOutroKey();
-    console.log('setting selected anno to ', this.project.getSortedAnnoKey('last'));
+    this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
     this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
   }
 
   updateProject() {
-    if(this.project && this.project.data){
+    if (this.project && this.project.data) {
       this.projectRef.update(this.project.data);
     }
   }
@@ -198,26 +216,41 @@ export class ProjectComponent implements OnInit, OnDestroy {
     // file-ref to upload
     let sourceFile = $event.target.files[0];
     // upload video
-     this.uploadService.getSignedRequest(sourceFile, this.projectId)
+    this.uploadService.getSignedRequest(sourceFile, this.projectId)
       .then((data: Object) => {
         this.uploadService.uploadFile(data['file'], data['response']['signedRequest'])
           .subscribe(
-            data => {
-              // done uploading to s3
-              this.userMessage ='';
-              // update state 
-              this.http.post('api/state/update', { 
-                projectId: this.projectId,
-                state: 'uploaded',
-                value: true
-              }).subscribe((data) => { });
-            },
-            err => {
-              console.log('error: makeFileRequest:', err);
-              this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
-            }
+          data => {
+            // done uploading to s3
+            this.userMessage = '';
+            // update state 
+            this.http.post('api/state/update', {
+              projectId: this.projectId,
+              state: 'uploaded',
+              value: true
+            }).subscribe((data) => { });
+          },
+          err => {
+            console.log('error: makeFileRequest:', err);
+            this.userMessage = 'your video has not been uploaded, contact the admin & grab a coffee';
+          }
           );
       });
+  }
+
+  initOutroAndLogo(){
+    if (!this.project.getAnnoKeyOfType('outro')) {
+      const newAnno = this.project.addOutro(this.outroTemplates[this.selectedOutroName]);
+      if(newAnno) { this.selectedOutroKey = newAnno.key, this.updateProject()}
+    } else {
+      this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
+    }
+    if (!this.project.getAnnoKeyOfType('logo')) {
+      const newAnno = this.project.addLogo(this.logoTemplates[this.defaultLogoTemplate]);
+      if(newAnno) { this.selectedLogoKey = newAnno.key, this.updateProject()}
+    } else {
+      this.selectedLogoKey = this.project.getAnnoKeyOfType('logo');
+    }
   }
 
   addAnnotation() {
@@ -231,8 +264,13 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.updateProject();
   }
 
-  updateOutro(event) {
-    this.project.updateOutro(this.selectedOutroKey, this.outroTemplates[event.target.value])
+  updateOutro(outroKey) {
+    this.project.updateOutro(this.selectedOutroKey, this.outroTemplates[outroKey])
+    this.updateProject();
+  }
+
+  updateLogo(logoData) {
+    this.project.updateLogo(this.selectedLogoKey, this.logoTemplates[logoData])
     this.updateProject();
   }
 
@@ -256,7 +294,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
       // update selectedAnno with new template
       this.project.data.annotations[this.selectedAnnotationKey].data = template;
       this.toggleTemplateSelector();
-      
+
       // if (template.duration) {
       //   // if duration exceeds movieLength
       //   if (this.selectedAnnotation.start + template.duration > this.project.data.clip.movieLength) {
@@ -287,16 +325,16 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.updateProject();
   }
 
-  onKeyUp(input){
-  // //   this.selectedAnnotation.data.text[input.key] = input;
-  // //   this.setSelectedAnno(this.selectedAnnotation.key);
-  // //   // update project => dont push yet to db
-  //     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
-  //     //console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] )
-  //     //this.project.data['annotations'][`${this.selectedAnnotation.key}`] = this.selectedAnnotation;
+  onKeyUp(input) {
+    // TODO trigger update in annotations on vrt-videoplayer  
+    this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
+    this.project.data.annotations = Object.assign({}, this.project.data.annotations);
+    //this.updateProject();
+  }
 
-  //     this.zone.run(() => {console.log(this.project.data.annotations[this.selectedAnnotationKey].data.text) })
-  //     setTimeout(()=>console.log('run'));
+  preview(){
+    this.selectedAnnotationKey = '';
+    this.previewTrigger = Object.assign({}, this.previewTrigger); 
   }
 
   addToRenderQueue() {
@@ -304,9 +342,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
       .subscribe((data) => { });
   }
 
-  toggleTemplateSelector(key?){
-    if(key === 'undefined' || this.templateSelectorFlag === key) { 
-      return this.templateSelectorFlag = ''; 
+  toggleTemplateSelector(key?) {
+    if (key === 'undefined' || this.templateSelectorFlag === key) {
+      return this.templateSelectorFlag = '';
     }
     this.templateSelectorFlag = key;
   }

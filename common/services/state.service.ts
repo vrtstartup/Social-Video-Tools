@@ -81,7 +81,8 @@ export class State {
           const thumbUrl = resolver.storageUrl('thumb', project.data.id);
           this.projectService.setProjectProperty(project.data.id, 'clip/thumbUrl', thumbUrl)
             .then(resolve);
-          break;
+        break;
+        
         case 'subtitles':
           // additional hooks for the subtitles event go here
           resolve(project);
