@@ -8,11 +8,14 @@ import { UploadService } from '../../../common/services/upload.service';
 import { Project } from '../../../common/models/project.model';
 import { UserService } from '../../../common/services/user.service';
 
+import { HotkeysService } from '../../../../node_modules/angular2-hotkeys/src/services/hotkeys.service';
+import { Hotkey } from '../../../../node_modules/angular2-hotkeys/src/models/hotkey.model';
+
 // TODO remove | only for test purposes
 import testTemplate from '../../../common/models/testTemplate.model';
 
 @Component({
-  providers: [UploadService],
+  providers: [UploadService, HotkeysService],
   selector: 'project-component',
   templateUrl: './project.component.html',
 })
@@ -51,7 +54,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   projectSub: any;
   templatesSub: any;
   uploadServiceSub: any;
-  i: number;
+  play: boolean;
 
   constructor(
     af: AngularFire,
@@ -60,9 +63,11 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private uploadService: UploadService,
-    private userService: UserService) {
+    private userService: UserService,
+    private _hotkeysService: HotkeysService) {
 
     this.af = af;
+    this.play = false;
     this.projectId = this.route.snapshot.params['id'];
     this.defaultAnnotationTemplate = 'defaultSubtitle';
     this.defaultOutroTemplate = 'bumper'; // default selected
@@ -72,6 +77,18 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.templaterQueueRef = af.database.list('/templater-queue');
     this.templatesRef = af.database.object('/templates');
     this.projectRef = this.af.database.object(`/projects/${this.projectId}`);
+
+    this._hotkeysService.add(new Hotkey('u', (event: KeyboardEvent): boolean => {
+      this.addAnnotation(); return false; // Prevent bubbling
+    }));
+    this._hotkeysService.add(new Hotkey('space', (event: KeyboardEvent): boolean => {
+      this.togglePlay();
+      return false; // Prevent bubbling
+    }));
+  }
+
+  togglePlay(){
+    this.play = !this.play;
   }
 
   ngOnInit() {
