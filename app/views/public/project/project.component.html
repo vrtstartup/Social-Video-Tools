@@ -174,12 +174,17 @@
 			
 			<div class="s-video">
 				<vrtvideo-player
-					[pausePlay]="pausePlay"
+					[previewTrigger]="previewTrigger"
+					[pausePlayTrigger]="pausePlayTrigger"
 					[clip]="project.data?.clip"
 					[annotations]="project.data?.annotations"
 					[selectedAnnotationKey]="selectedAnnotationKey">
 				</vrtvideo-player>
-				<div style="padding:1rem;font-size:10px;text-align:right;text-transform:uppercase; color:#999;">Shortcuts:</div>
+				<div style="padding:1rem;font-size:10px;text-align:right;text-transform:uppercase; color:#999;">
+					Shortcuts: <br>
+					<span>space : play/pause</span> <br>
+					<span>ctrl + U : Add annotation</span> 
+				</div>
 
 				<range-slider *ngIf="selectedAnnotationKey"
 					[selectedAnnotation]="project.data.annotations[selectedAnnotationKey]" 

@@ -55,6 +55,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   templatesSub: any;
   uploadServiceSub: any;
   pausePlayTrigger: any;
+  previewTrigger: any;
 
   constructor(
     af: AngularFire,
@@ -78,7 +79,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.projectRef = this.af.database.object(`/projects/${this.projectId}`);
 
     this._hotkeysService.add(new Hotkey('ctrl+u', (event: KeyboardEvent): boolean => {
-      console.log('triggered ctrl+u');
       this.addAnnotation(); 
       return false; // Prevent bubbling
     }));
@@ -255,19 +255,19 @@ export class ProjectComponent implements OnInit, OnDestroy {
   // TODO
   onBlur(input) {
     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
-    //this.updateProject();
+    this.updateProject();
   }
 
   onKeyUp(input) {
     // TODO trigger update in annotations on vrt-videoplayer  
     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
     this.project.data.annotations = Object.assign({}, this.project.data.annotations);
-    this.updateProject();
+    //this.updateProject();
   }
 
   preview(){
     this.selectedAnnotationKey = '';
-    // 
+    this.previewTrigger = Object.assign({}, this.previewTrigger); 
   }
 
   addToRenderQueue() {

@@ -8,7 +8,8 @@ import * as $ from 'jquery';
     templateUrl: './vrtvideo-player.html'
 })
 export class VrtVideoPlayer implements OnChanges, OnInit {
-    @Input() pausePlay;
+    @Input() previewTrigger;
+    @Input() pausePlayTrigger;
     @Input() clip;
     @Input() selectedAnnotationKey;
     @Input() annotations;
@@ -29,11 +30,10 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
         this.sources = [];
         this.currentTime = 1;
         this.apiLoaded = false;
-        this.play = false
+        this.play = false; // keeps playing-state
     }
 
-    ngOnInit() {
-    }
+    ngOnInit() { }
 
     onPlayerReady(api: VgAPI) {
         this.api = api;
@@ -42,12 +42,20 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
 
     ngOnChanges(changes: SimpleChanges) {
 
-        console.log('changes', changes);
+        //console.log('changes', changes);
+
         if (this.annotations && this.selectedAnnotationKey) {
             this.selectedAnnotation = this.annotations[this.selectedAnnotationKey];
         }
 
         if (this.apiLoaded) {
+
+            if (changes.hasOwnProperty('previewTrigger')) {
+                this.play = true ; //alway play on preview
+                // prevent play()-pause() race-condition issue
+                setTimeout(() => { this.api.seekTime(0), this.api.play() }, 200);
+            }
+
             if (changes.hasOwnProperty('selectedAnnotationKey')) {
                 this.togglePlay()
 
@@ -55,7 +63,8 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
                 this.startPlaying();
                 return
             }
-            if (changes.hasOwnProperty('pausePlay')) {
+
+            if (changes.hasOwnProperty('pausePlayTrigger')) {
                 
                 this.togglePlay()
 
@@ -68,7 +77,7 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
                         this.startPlaying(); 
                         return
                     } 
-                    // prevent play() pause() race-condition issue
+                    // prevent play()-pause() race-condition issue
                     setTimeout(() => this.api.play(), 200);
 
                 } else {
@@ -103,7 +112,7 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
 
         // loop between scrub handles
         this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(() => {
-            console.log('playing', this.api.playbackRate )
+            
             this.currentTime = Number(this.api.currentTime);
 
             if (this.selectedAnnotation) {
