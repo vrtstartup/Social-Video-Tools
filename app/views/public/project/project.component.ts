@@ -54,7 +54,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   projectSub: any;
   templatesSub: any;
   uploadServiceSub: any;
-  play: boolean;
+  pausePlayTrigger: any;
 
   constructor(
     af: AngularFire,
@@ -67,7 +67,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private _hotkeysService: HotkeysService) {
 
     this.af = af;
-    this.play = false;
     this.projectId = this.route.snapshot.params['id'];
     this.defaultAnnotationTemplate = 'defaultSubtitle';
     this.defaultOutroTemplate = 'bumper'; // default selected
@@ -78,17 +77,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.templatesRef = af.database.object('/templates');
     this.projectRef = this.af.database.object(`/projects/${this.projectId}`);
 
-    this._hotkeysService.add(new Hotkey('u', (event: KeyboardEvent): boolean => {
-      this.addAnnotation(); return false; // Prevent bubbling
-    }));
-    this._hotkeysService.add(new Hotkey('space', (event: KeyboardEvent): boolean => {
-      this.togglePlay();
+    this._hotkeysService.add(new Hotkey('ctrl+u', (event: KeyboardEvent): boolean => {
+      console.log('triggered ctrl+u');
+      this.addAnnotation(); 
       return false; // Prevent bubbling
     }));
-  }
-
-  togglePlay(){
-    this.play = !this.play;
+    this._hotkeysService.add(new Hotkey('space', (event: KeyboardEvent): boolean => {
+      this.pausePlayTrigger = Object.assign({}, this.pausePlayTrigger);
+      return false; // Prevent bubbling
+    }));
   }
 
   ngOnInit() {
@@ -258,14 +255,14 @@ export class ProjectComponent implements OnInit, OnDestroy {
   // TODO
   onBlur(input) {
     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
-    this.updateProject();
+    //this.updateProject();
   }
 
   onKeyUp(input) {
     // TODO trigger update in annotations on vrt-videoplayer  
     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
     this.project.data.annotations = Object.assign({}, this.project.data.annotations);
-    // this.updateProject();
+    this.updateProject();
   }
 
   preview(){

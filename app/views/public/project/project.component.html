@@ -171,8 +171,10 @@
 
 		<!--video-->
 		<div class="s-video_wrapper">
+			
 			<div class="s-video">
 				<vrtvideo-player
+					[pausePlay]="pausePlay"
 					[clip]="project.data?.clip"
 					[annotations]="project.data?.annotations"
 					[selectedAnnotationKey]="selectedAnnotationKey">
