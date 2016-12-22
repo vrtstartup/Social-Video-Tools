@@ -27,7 +27,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   uploadProgress: any;
   downScaleProgress: any;
   templateSelectorFlag: any;
-  defaultAnnotationTemplate: string;
+  defaultAnnotationTemplateName: string;
 
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
@@ -36,7 +36,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   projectRef: FirebaseObjectObservable<any[]>;
   userRef: FirebaseObjectObservable<any[]>;
   project: any;
-  selectedAnnotationKey: any = '';
+  selectedAnnotationKey: any;
   selectedAnnotation: any;
   templatesRef: FirebaseObjectObservable<any[]>;
   stylesRef: FirebaseObjectObservable<any[]>;
@@ -47,9 +47,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
   logoTemplates: any;
   outroTemplates: any;
   selectedTemplate: any;
-  defaultOutroTemplate: any;
+  selectedOutroName: any;
   selectedOutroKey: any;
   projectId: string;
+  templateFilter: Object;
 
   // subscribtions
   userSub: any;
@@ -67,11 +68,12 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private uploadService: UploadService,
     private userService: UserService,
     private BrandService: BrandService) {
-    
     this.af = af;
     this.projectId =  this.route.snapshot.params['id'];
-    this.defaultAnnotationTemplate = 'defaultSubtitle';
-    this.defaultOutroTemplate = 'bumper'; // default selected
+    this.selectedAnnotationKey = '';
+    this.selectedOutroKey = '';
+    this.defaultAnnotationTemplateName = '';
+    this.selectedOutroName = '';
 
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
@@ -82,65 +84,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // TODO remove | only for test purposes | move to server
+    // TODO remove | only for test purposes | admin
     this.templatesRef.set(testTemplate);
 
-    this.templatesSub = this.templatesRef
-      .subscribe((data) => { 
-          // remove Firebase properties
-          delete data['$key'];
-          delete data['$exists'];
-          // split data in outro | logo | annotation templateLists
-          const newAnnoList:any = {};
-          const newLogoTempList:any = {};
-          const newOutroTempList:any = {};
-
-          for (let key in data){
-            if( data[key]['type'] === 'logo') newLogoTempList[key] = data[key] 
-            else if( data[key]['type'] === 'outro' ) newOutroTempList[key] = data[key]
-            else if( data[key]['type'] !== 'logo' && data[key]['type'] !== 'outro') newAnnoList[key] = data[key];
-          }
-          this.templates = newAnnoList;
-          this.outroTemplates = newOutroTempList;
-          this.logoTemplates = newLogoTempList;
-        }
-      );
-
-    this.userSub = this.userService.user$.subscribe(
-      data =>{ 
-      this.user = data;
-      this.userRef = this.af.database.object(`/users/${this.user['$key']}`);
-    },
-      err => console.log('authserviceErr', err)
-    );
-    
-    this.brandSub = this.BrandService.brands$.subscribe(this.brandsHandler.bind(this), console.log);
+    this.loadUser();
+    this.loadBrands();
 
     this.uploadServiceSub = this.uploadService.progress$.subscribe(data => {
         this.zone.run(() => this.uploadProgress = data); // force to trigger change
-      }, err => console.log(err));
-
-    // only firstTime when project is loaded set 
-    let onlyOnce = true;
-
-    // project subscribtion
-    this.projectSub = this.projectRef.subscribe( data => { 
-      this.project = new Project(data);
-      
-      if(this.project.data.status && this.project.data.status.downscaled && !this.project.getOutroKey() ) {
-        // add default outro if no annotations yet
-        this.project.addOutro( this.outroTemplates[this.defaultOutroTemplate]);
-        this.selectedOutroKey = this.project.getOutroKey();
-        this.updateProject();
-      }
-
-      if(onlyOnce) { 
-        // else get annotation with type outro
-        this.selectedOutroKey = this.project.getOutroKey();
-        this.setSelectedAnno(this.project.getSortedAnnoKey('last')), onlyOnce = false;
-      };
-
-    });
+      }, console.log);
   }
 
   ngOnDestroy(){
@@ -148,6 +100,82 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.projectSub.unsubscribe();
     this.templatesSub.unsubscribe();
     this.uploadServiceSub.unsubscribe();
+  }
+
+  loadTemplates(){
+    this.templatesSub = this.templatesRef
+      .subscribe((templates) => { 
+          // remove Firebase properties
+          delete templates['$key'];
+          delete templates['$exists'];
+          // split templates in outro | logo | annotation templateLists
+          const newAnnoList:any = {};
+          const newLogoTempList:any = {};
+          const newOutroTempList:any = {};
+
+          for (let key in templates){
+            const template = templates[key];
+            if( template['type'] === 'logo') newLogoTempList[key] = template 
+            else if( template['type'] === 'outro' ) newOutroTempList[key] = template
+            else if( template['type'] !== 'logo' && template['type'] !== 'outro') newAnnoList[key] = template;
+          }
+          this.templates = newAnnoList;
+          this.outroTemplates = newOutroTempList;
+          this.logoTemplates = newLogoTempList;
+
+          const arrOutroKeys = Object.keys(this.outroTemplates);
+          const outroKey = arrOutroKeys[0];
+          this.selectedOutroName = this.outroTemplates[outroKey]['name']; // what if no outros are set to this brand? 
+
+          const arrTemplateKeys = Object.keys(this.templates);
+          this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name']; // what if no templates are set to this brand? 
+
+          if(this.project.data.status && this.project.data.status.downscaled && !this.project.getOutroKey() ) {
+            this.setProjectOutro();
+          }
+        }
+      );
+  }
+
+  loadUser(){
+    this.userSub = this.userService.user$.subscribe(
+      data =>{ 
+      this.user = data;
+      this.userRef = this.af.database.object(`/users/${this.user['$key']}`);
+      
+      // loadproject() depends on user data
+      this.loadProject();
+    },
+      err => console.log('authserviceErr', err)
+    );
+  }
+
+  loadBrands(){ this.brandSub = this.BrandService.brands$.subscribe(this.brandsHandler.bind(this), console.log) }
+
+  loadProject(){
+    this.projectSub = this.projectRef.subscribe( data => { 
+      this.project = new Project(data);
+      this.templateFilter = { brand:this.project.data.brand };
+
+      if(this.selectedAnnotationKey === '' && this.selectedOutroKey === '') { 
+        this.setSelectedTemplates();
+      };
+      this.loadTemplates(); // depends on project data
+    });
+  }
+
+  setProjectOutro(){
+    // add default outro if no annotations yet
+      console.log('adding outro ', this.selectedOutroName);
+      this.project.addOutro( this.outroTemplates[this.selectedOutroName]);
+      this.selectedOutroKey = this.project.getOutroKey();
+      this.updateProject();
+  }
+
+  setSelectedTemplates() {
+    this.selectedOutroKey = this.project.getOutroKey();
+    console.log('setting selected anno to ', this.project.getSortedAnnoKey('last'));
+    this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
   }
 
   updateProject() {
@@ -193,7 +221,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   addAnnotation() {
-    let newAnno = this.project.addAnnotation( this.templates[this.defaultAnnotationTemplate]);
+    let newAnno = this.project.addAnnotation( this.templates[this.defaultAnnotationTemplateName]);
     this.updateProject();
     this.setSelectedAnno(newAnno.key);
   }

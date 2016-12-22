@@ -1,7 +1,8 @@
 export default {
     defaultSubtitle: {
-        key: 'defaultSubtitle',
+        name: 'defaultSubtitle',
         imageUrl: './assets/overlay/title_01.gif',
+        brand: 'deredactie',
         ass: {
             fontname: 'arial',
             fontsize: 24,
@@ -28,8 +29,9 @@ export default {
         templateHtml: '<div id="defaultSubtitle" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleTwo: {
-        key: 'subtitleTwo',
+        name: 'subtitleTwo',
         imageUrl: './assets/overlay/title_01.gif',
+        brand: 'otherBrand',
         ass: {
             fontname: 'arial',
             fontsize: 24,
@@ -56,8 +58,9 @@ export default {
         templateHtml: '<div id="subtitleTwo" class="wrapper"><div>%textInpt01%</div></div>',
     },
     subtitleThree: {
-        key: 'subtitleThree',
+        name: 'subtitleThree',
         imageUrl: './assets/overlay/title_01.gif',
+        brand: 'otherBrand',
         ass: {
             fontname: 'arial',
             fontsize: 28,
@@ -84,10 +87,11 @@ export default {
         templateHtml: '<div id="subtitleThree" class="wrapper"><div>%textInpt01%</div></div>',
     },
     lowText: { 
-        key: 'lowText',
+        name: 'lowText',
         imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
         duration: 5,
+        brand: 'deredactie',
         bot: {
             "render-status": 'ready',
             bot: 'render',
@@ -113,10 +117,11 @@ export default {
         templateHtml: '<div id="lowText" class="wrapper"><div>%Text2DR%</div>></div>',
     },
     highText: { 
-        key: 'highText',
+        name: 'highText',
         imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
         duration: 7,
+        brand: 'deredactie',
         bot: {
             "render-status": 'ready',
             bot: 'render',
@@ -143,10 +148,11 @@ export default {
     },  
 
     bigText: { 
-        key: 'bigText',
+        name: 'bigText',
         imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
         duration: 7,
+        brand: 'deredactie',
         bot: {
             "render-status": 'ready',
             bot: 'render',
@@ -173,10 +179,11 @@ export default {
     }, 
 
     highlightText: { 
-        key: 'highlightText',
+        name: 'highlightText',
         imageUrl: './assets/overlay/title_01.gif',
         type: 'overlay',
         duration: 7,
+        brand: 'deredactie',
         bot: {
             "render-status": 'ready',
             aep: 'D:\\videoTemplater\\dropbox\\ae\\Templater\\template.aep',
@@ -210,28 +217,31 @@ export default {
     }, 
     
     bumper: {
-        key: 'bumper', 
+        name: 'bumper', 
         imageUrl: './assets/bumper/deredactie_01.gif',
         duration: 7,
         transitionDuration: 3,
         type: 'outro',
+        brand: 'deredactie',
         fileName: 'deredactie_1'
     },
     bumper2: {
-        key: 'bumper2', 
+        name: 'bumper2', 
         imageUrl: './assets/bumper/deredactie_01.gif',
-        duration: 7,
-        transitionDuration: 3,
+        duration: 10,
+        transitionDuration: 2,
         type: 'outro',
-        fileName: 'deredactie_1'
+        brand: 'otherBrand',
+        fileName: 'deredactie_2'
     },
     logo: {
-        key:'logo',
+        name:'logo',
         imageUrl: './assets/logo/deredactie_01.gif',
         scale: 6,
         width: 266,
         height: 130,
         type: 'logo',
+        brand: 'deredactie',
         fileName: 'deredactie_1'
     }
 }
