@@ -44,6 +44,8 @@ export class Project {
     }
 
     addOutro(template) {
+        if(!template) return; 
+    
         if( this.data.clip && this.data.clip['movieLength']) {
             // create annotation object if none
             if (!this.data['annotations']) this.data['annotations'] = {};
@@ -66,6 +68,8 @@ export class Project {
     }
 
     addLogo(template){
+        if(!template) return; 
+
         if( this.data.clip && this.data.clip['movieLength']) {
             if (!this.data['annotations']) this.data['annotations'] = {};
 

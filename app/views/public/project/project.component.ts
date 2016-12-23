@@ -58,10 +58,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
   outroTemplates: any;
   selectedTemplate: any;
   defaultOutroName: any;
-  defaultLogoTemplate: any;
+  defaultLogoName: any;
   defaultAnnotationTemplateName: any;
   OutroKey: any;
-  selectedLogoKey: any;
+  logoKey: any;
   projectId: string;
   templateFilter: Object;
 
@@ -92,7 +92,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.OutroKey = '';
     this.defaultAnnotationTemplateName = false;
     this.defaultOutroName = false;
-    this.defaultLogoTemplate = 'logo'; // #todo set by default
+    this.defaultLogoName = false;
     this.notification = false;
 
     // general Firebase-references
@@ -154,14 +154,14 @@ export class ProjectComponent implements OnInit, OnDestroy {
           // #todo when selecting a different brand and opening another project this is faulty
           const arrOutroKeys = Object.keys(this.outroTemplates);
           const outroKey = arrOutroKeys[0];
-          // this.defaultOutroName = this.outroTemplates[outroKey]['name']; // what if no outros are set to this brand? 
+          this.defaultOutroName = this.outroTemplates[outroKey]['name'];
+
+          const arrLogoKeys = Object.keys(this.logoTemplates);
+          const logoKey = arrLogoKeys[0];
+          this.defaultLogoName = this.logoTemplates[logoKey]['name'];
 
           const arrTemplateKeys = Object.keys(this.templates);
-          // this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name']; // what if no templates are set to this brand? 
-
-          // if(this.project.data.status && this.project.data.status.downscaled && !this.project.getOutroKey() ) {
-          //   // this.setProjectOutro();
-          // }
+          this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name'];
 
           this.initOutroAndLogo();
         }
@@ -192,15 +192,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
       };
       this.loadTemplates(); // depends on project data
     });
-  }
-
-  setProjectOutro(){
-    // add default outro if no annotations yet
-      if(this.defaultOutroName){
-        this.project.addOutro( this.outroTemplates[this.defaultOutroName]);
-        this.OutroKey = this.project.getAnnoKeyOfType('outro');
-        this.updateProject();
-      }
   }
 
   setSelectedTemplates() {
@@ -257,11 +248,12 @@ export class ProjectComponent implements OnInit, OnDestroy {
     } else {
       this.OutroKey = this.project.getAnnoKeyOfType('outro');
     }
-    if (!this.project.getAnnoKeyOfType('logo')) {
-      const newAnno = this.project.addLogo(this.logoTemplates[this.defaultLogoTemplate]);
-      if (newAnno) { this.selectedLogoKey = newAnno.key, this.updateProject() }
+    
+    if (!this.project.getAnnoKeyOfType('logo') && this.defaultLogoName) {
+      const newAnno = this.project.addLogo(this.logoTemplates[this.defaultLogoName]);
+      if (newAnno) { this.logoKey = newAnno.key, this.updateProject() }
     } else {
-      this.selectedLogoKey = this.project.getAnnoKeyOfType('logo');
+      this.logoKey = this.project.getAnnoKeyOfType('logo');
     }
   }
 
@@ -297,8 +289,16 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.updateProject();
   }
 
-  updateLogo(logoData) {
-    this.project.updateLogo(this.selectedLogoKey, this.logoTemplates[logoData])
+  updateLogo(logoKey) {
+    if(!this.logoKey) {
+      this.errorHandler({
+        title: 'Warning',
+        message: `Could update outro because firebase logo key has invalid value "${this.logoKey}"`
+      });
+      return;
+    }
+
+    this.project.updateLogo(this.logoKey, this.logoTemplates[logoKey])
     this.updateProject();
   }
 
