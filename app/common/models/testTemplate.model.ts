@@ -238,6 +238,10 @@ export default {
         name:'logo',
         imageUrl: './assets/logo/deredactie_01.gif',
         scale: 6,
+        offset: {
+            x: 20,
+            Y: 20
+        },
         width: 266,
         height: 130,
         type: 'logo',
@@ -249,6 +253,10 @@ export default {
         brand: 'otherBrand',
         imageUrl: './assets/logo/deredactie_01.gif',
         scale: 6,
+        offset: {
+            x: 20,
+            Y: 20
+        },
         width: 266,
         height: 130,
         type: 'logo',
