@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit, OnDestroy } from '@angular/core';
+import { Component, NgZone, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
@@ -21,6 +21,9 @@ import testTemplate from '../../../common/models/testTemplate.model';
   providers: [UploadService, BrandService, HotkeysService],
   selector: 'project-component',
   templateUrl: './project.component.html',
+  host: {
+    '(document:click)': 'onClick($event)',
+  },
 })
 
 export class ProjectComponent implements OnInit, OnDestroy {
@@ -30,7 +33,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
   uploadProgress: any;
   downScaleProgress: any;
   templateSelectorFlag: any;
-  defaultAnnotationTemplateName: string;
+  defaultAnnotationTemplate: string;
+  showBrandList: boolean;
+  showLogoList: boolean;
+  showOutroList: boolean;
 
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
@@ -52,6 +58,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   selectedTemplate: any;
   selectedOutroName: any;
   defaultLogoTemplate: any;
+  defaultAnnotationTemplateName: any;
   selectedOutroKey: any;
   selectedLogoKey: any;
   projectId: string;
@@ -75,7 +82,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private uploadService: UploadService,
     private userService: UserService,
     private BrandService: BrandService,
-    private _hotkeysService: HotkeysService) {
+    private _hotkeysService: HotkeysService,
+    private _el: ElementRef) {
+
     this.af = af;
     this.projectId =  this.route.snapshot.params['id'];
     this.selectedAnnotationKey = '';
@@ -91,7 +100,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.projectRef = this.af.database.object(`/projects/${this.projectId}`);
     
     this._hotkeysService.add(new Hotkey('ctrl+u', (event: KeyboardEvent): boolean => {
-      this.addAnnotation(); 
+      this.addAnnotation();
       return false; // Prevent bubbling
     }));
     this._hotkeysService.add(new Hotkey('space', (event: KeyboardEvent): boolean => {
@@ -176,7 +185,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.projectSub = this.projectRef.subscribe( data => { 
       this.project = new Project(data);
       this.templateFilter = { brand:this.project.data.brand };
-
       if(this.selectedAnnotationKey === '' && this.selectedOutroKey === '') { 
         this.setSelectedTemplates();
       };
@@ -238,7 +246,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
       });
   }
 
-  initOutroAndLogo(){
+  initOutroAndLogo() {
     if (!this.project.getAnnoKeyOfType('outro')) {
       const newAnno = this.project.addOutro(this.outroTemplates[this.selectedOutroName]);
       if(newAnno) { this.selectedOutroKey = newAnno.key, this.updateProject()}
@@ -247,7 +255,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     }
     if (!this.project.getAnnoKeyOfType('logo')) {
       const newAnno = this.project.addLogo(this.logoTemplates[this.defaultLogoTemplate]);
-      if(newAnno) { this.selectedLogoKey = newAnno.key, this.updateProject()}
+      if (newAnno) { this.selectedLogoKey = newAnno.key, this.updateProject() }
     } else {
       this.selectedLogoKey = this.project.getAnnoKeyOfType('logo');
     }
@@ -303,8 +311,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
       //   this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
       // }
 
-      //this.updateAnnotation(this.selectedAnnotationKey, this.selectedAnnotation);
-      //this.setSelectedAnno(this.selectedAnnotation.key);
       this.updateProject();
     }
   }
@@ -315,6 +321,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.project.data.brand = brand;
     this.user['defaultBrand'] = brand;
 
+    this.showBrandList = false;
+    
     this.updateProject();
     this.updateUser(); 
   }
@@ -332,9 +340,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
     //this.updateProject();
   }
 
-  preview(){
+  preview() {
     this.selectedAnnotationKey = '';
-    this.previewTrigger = Object.assign({}, this.previewTrigger); 
+    this.previewTrigger = Object.assign({}, this.previewTrigger);
   }
 
   addToRenderQueue() {
@@ -347,6 +355,24 @@ export class ProjectComponent implements OnInit, OnDestroy {
       return this.templateSelectorFlag = '';
     }
     this.templateSelectorFlag = key;
+  }
+
+  onClick(event) {
+    if( this.project && this.project['data']['annotations']) {
+  
+      if (!this._el.nativeElement.querySelector('#s-brand-dropdown').contains(event.target)) {
+        this.showBrandList = false;
+      }
+
+      if (!this._el.nativeElement.querySelector('#s-outro-dropdown').contains(event.target)) {
+        this.showOutroList = false;
+      }
+
+      if (!this._el.nativeElement.querySelector('#s-logo-dropdown').contains(event.target)) {
+        this.showLogoList = false;
+      }
+    }
+
   }
 
 }
