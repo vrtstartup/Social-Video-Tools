@@ -98,6 +98,9 @@ export class Project {
     }
 
     addAnnotation(template) {
+        // check if a template is properly passed
+        if(template === undefined) return; 
+
         // create annotation object if none
         if (!this.data['annotations']) this.data['annotations'] = {};
 

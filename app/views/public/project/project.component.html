@@ -189,6 +189,11 @@
 					<span>ctrl + U : Add annotation</span> 
 				</div>
 
+				<div *ngIf="notification" class="s-notifications__wrapper">
+					{{notification.title}}<br>
+					<span class="message">{{notification.message}}</span>
+				</div>
+
 				<range-slider *ngIf="selectedAnnotationKey"
 					[selectedAnnotation]="project.data.annotations[selectedAnnotationKey]" 
 					[clip]="project.data?.clip" 

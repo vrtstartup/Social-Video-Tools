@@ -312,6 +312,17 @@ project-component {
         display: none;
     }
 }
+.s-notifications__wrapper {
+    color:$s-info;
+    font-size: 10px;
+    text-align: right;
+    text-transform: uppercase;
+    padding: 1rem;
+    @media screen and (max-width:767px){
+        display: none;
+    }
+}
+
 .s-video_wrapper {
     flex: 0 0 50%;
     background: #f6f6f6;

@@ -7,7 +7,7 @@ import 'rxjs/add/operator/take';
 import { UploadService } from '../../../common/services/upload.service';
 import { Project } from '../../../common/models/project.model';
 import { UserService } from '../../../common/services/user.service';
-import { BrandService} from '../../../common/services/brands.service'
+import { BrandService} from '../../../common/services/brands.service';
 import { Brand } from '../../../common/models/brand.model';
 import { User } from '../../../common/models/user.model';
 
@@ -37,6 +37,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   showBrandList: boolean;
   showLogoList: boolean;
   showOutroList: boolean;
+  notification: any;
 
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
@@ -89,9 +90,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.projectId =  this.route.snapshot.params['id'];
     this.selectedAnnotationKey = '';
     this.selectedOutroKey = '';
-    this.defaultAnnotationTemplateName = '';
-    this.selectedOutroName = '';
-    this.defaultLogoTemplate = 'logo'; // default selected
+    this.defaultAnnotationTemplateName = false;
+    this.selectedOutroName = false;
+    this.defaultLogoTemplate = 'logo'; // #todo set by default
+    this.notification = false;
 
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
@@ -152,10 +154,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
           // #todo when selecting a different brand and opening another project this is faulty
           const arrOutroKeys = Object.keys(this.outroTemplates);
           const outroKey = arrOutroKeys[0];
-          this.selectedOutroName = this.outroTemplates[outroKey]['name']; // what if no outros are set to this brand? 
+          // this.selectedOutroName = this.outroTemplates[outroKey]['name']; // what if no outros are set to this brand? 
 
           const arrTemplateKeys = Object.keys(this.templates);
-          this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name']; // what if no templates are set to this brand? 
+          // this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name']; // what if no templates are set to this brand? 
 
           // if(this.project.data.status && this.project.data.status.downscaled && !this.project.getOutroKey() ) {
           //   // this.setProjectOutro();
@@ -194,9 +196,11 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   setProjectOutro(){
     // add default outro if no annotations yet
-      this.project.addOutro( this.outroTemplates[this.selectedOutroName]);
-      this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
-      this.updateProject();
+      if(this.selectedOutroName){
+        this.project.addOutro( this.outroTemplates[this.selectedOutroName]);
+        this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
+        this.updateProject();
+      }
   }
 
   setSelectedTemplates() {
@@ -247,7 +251,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   initOutroAndLogo() {
-    if (!this.project.getAnnoKeyOfType('outro')) {
+    if (!this.project.getAnnoKeyOfType('outro') && this.selectedOutroName) {
       const newAnno = this.project.addOutro(this.outroTemplates[this.selectedOutroName]);
       if(newAnno) { this.selectedOutroKey = newAnno.key, this.updateProject()}
     } else {
@@ -263,8 +267,16 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   addAnnotation() {
     let newAnno = this.project.addAnnotation( this.templates[this.defaultAnnotationTemplateName]);
-    this.updateProject();
-    this.setSelectedAnno(newAnno.key);
+
+    if(newAnno) {
+      this.updateProject();
+      this.setSelectedAnno(newAnno.key);
+    }else{
+      this.errorHandler({
+        title: 'Warning',
+        message: 'Could not add annotation because no templates are available'
+      });
+    }
   }
 
   updateAnnotation(key, event) {
@@ -358,19 +370,26 @@ export class ProjectComponent implements OnInit, OnDestroy {
   onClick(event) {
     if( this.project && this.project['data']['annotations']) {
   
-      if (!this._el.nativeElement.querySelector('#s-brand-dropdown').contains(event.target)) {
+      const elBrandDropdown = this._el.nativeElement.querySelector('#s-brand-dropdown');
+      const elOutroDropdown = this._el.nativeElement.querySelector('#s-outro-dropdown');
+      const elLogoDropdown = this._el.nativeElement.querySelector('#s-logo-dropdown');
+
+      if (elBrandDropdown && !elBrandDropdown.contains(event.target)) {
         this.showBrandList = false;
       }
 
-      if (!this._el.nativeElement.querySelector('#s-outro-dropdown').contains(event.target)) {
+      if (elOutroDropdown && !elOutroDropdown.contains(event.target)) {
         this.showOutroList = false;
       }
 
-      if (!this._el.nativeElement.querySelector('#s-logo-dropdown').contains(event.target)) {
+      if (elLogoDropdown && !elLogoDropdown.contains(event.target)) {
         this.showLogoList = false;
       }
     }
+  }
 
+  errorHandler(err){
+    this.notification = err;
   }
 
 }
