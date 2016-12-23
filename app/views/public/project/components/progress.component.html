@@ -1,3 +1,2 @@
 <h1>even geduld...</h1>
-<!--<p><span  *ngIf="project.lastStatus">{{project.lastStatus.text}} <span *ngIf="project.lastStatus.progress">{{project.lastStatus.progress}}%</span></span></p>-->
-<progress-bar *ngIf="project.lastStatus.progress" [task]="project.lastStatus.text" [progress]="project.lastStatus.progress"></progress-bar>
+<progress-bar *ngIf="project.data?.status?.stitchingProgress" [task]="Rendering" [progress]="project.data?.status?.stitchingProgress"></progress-bar>
