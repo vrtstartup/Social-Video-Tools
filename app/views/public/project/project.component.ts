@@ -7,6 +7,9 @@ import 'rxjs/add/operator/take';
 import { UploadService } from '../../../common/services/upload.service';
 import { Project } from '../../../common/models/project.model';
 import { UserService } from '../../../common/services/user.service';
+import { BrandService} from '../../../common/services/brands.service';
+import { Brand } from '../../../common/models/brand.model';
+import { User } from '../../../common/models/user.model';
 
 import { HotkeysService } from '../../../../node_modules/angular2-hotkeys/src/services/hotkeys.service';
 import { Hotkey } from '../../../../node_modules/angular2-hotkeys/src/models/hotkey.model';
@@ -15,7 +18,7 @@ import { Hotkey } from '../../../../node_modules/angular2-hotkeys/src/models/hot
 import testTemplate from '../../../common/models/testTemplate.model';
 
 @Component({
-  providers: [UploadService, HotkeysService],
+  providers: [UploadService, BrandService, HotkeysService],
   selector: 'project-component',
   templateUrl: './project.component.html',
   host: {
@@ -25,7 +28,7 @@ import testTemplate from '../../../common/models/testTemplate.model';
 
 export class ProjectComponent implements OnInit, OnDestroy {
 
-  userId: string;
+  user: User;
   userMessage: string = '';
   uploadProgress: any;
   downScaleProgress: any;
@@ -34,29 +37,37 @@ export class ProjectComponent implements OnInit, OnDestroy {
   showBrandList: boolean;
   showLogoList: boolean;
   showOutroList: boolean;
+  notification: any;
 
   af: AngularFire;
   ffmpegQueueRef: FirebaseListObservable<any[]>;
   templaterQueueRef: FirebaseListObservable<any[]>;
   projectRefOnce: Observable<any[]>;
   projectRef: FirebaseObjectObservable<any[]>;
+  userRef: FirebaseObjectObservable<any[]>;
   project: any;
-  selectedAnnotationKey: any = '';
+  selectedAnnotationKey: any;
   selectedAnnotation: any;
   templatesRef: FirebaseObjectObservable<any[]>;
   stylesRef: FirebaseObjectObservable<any[]>;
-  //templastes
+  possibleBrands: Array<Brand>;
+
+  //templates
   templates: any;
   logoTemplates: any;
   outroTemplates: any;
   selectedTemplate: any;
-  defaultOutroTemplate: any;
-  defaultLogoTemplate: any;
-  selectedOutroKey: any;
-  selectedLogoKey: any;
+  defaultOutroName: any;
+  defaultLogoName: any;
+  defaultAnnotationTemplateName: any;
+  OutroKey: any;
+  logoKey: any;
   projectId: string;
+  templateFilter: Object;
+
   // subscribtions
   userSub: any;
+  brandSub: any;
   projectSub: any;
   templatesSub: any;
   uploadServiceSub: any;
@@ -71,20 +82,25 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private uploadService: UploadService,
     private userService: UserService,
+    private BrandService: BrandService,
     private _hotkeysService: HotkeysService,
     private _el: ElementRef) {
 
     this.af = af;
-    this.projectId = this.route.snapshot.params['id'];
-    this.defaultAnnotationTemplate = 'defaultSubtitle';
-    this.defaultOutroTemplate = 'bumper'; // default selected
-    this.defaultLogoTemplate = 'logo'; // default selected
+    this.projectId =  this.route.snapshot.params['id'];
+    this.selectedAnnotationKey = '';
+    this.OutroKey = '';
+    this.defaultAnnotationTemplateName = false;
+    this.defaultOutroName = false;
+    this.defaultLogoName = false;
+    this.notification = false;
+
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
     this.templaterQueueRef = af.database.list('/templater-queue');
     this.templatesRef = af.database.object('/templates');
     this.projectRef = this.af.database.object(`/projects/${this.projectId}`);
-
+    
     this._hotkeysService.add(new Hotkey('ctrl+u', (event: KeyboardEvent): boolean => {
       this.addAnnotation();
       return false; // Prevent bubbling
@@ -96,45 +112,91 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // TODO remove | only for test purposes | move to server
+    // TODO remove | only for test purposes | admin
     this.templatesRef.set(testTemplate);
 
-    this.templatesSub = this.templatesRef.subscribe((data) => {
-      this.filterTemplates(data);
-    });
-
-    this.userSub = this.userService.user$.subscribe(
-      data => this.userId = data.userID,
-      err => console.log('authserviceErr', err)
-    );
+    this.loadUser();
+    this.loadBrands();
 
     this.uploadServiceSub = this.uploadService.progress$.subscribe(data => {
-      this.zone.run(() => this.uploadProgress = data); // force to trigger change
-    }, err => console.log(err));
-
-    // only firstTime when project is loaded set 
-    let onlyOnce = true;
-
-    // project subscribtion
-    this.projectSub = this.projectRef.subscribe(data => {
-      this.project = new Project(data);
-
-      this.initOutroAndLogo();
-
-      if (this.project.data.annotations && onlyOnce) {
-        // else get annotation with type outro
-        this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
-        onlyOnce = false;
-      };
-
-    });
+        this.zone.run(() => this.uploadProgress = data); // force to trigger change
+      }, console.log);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(){
     this.userSub.unsubscribe();
     this.projectSub.unsubscribe();
     this.templatesSub.unsubscribe();
     this.uploadServiceSub.unsubscribe();
+  }
+
+  loadTemplates(){
+    this.templatesSub = this.templatesRef
+      .subscribe((templates) => { 
+          // remove Firebase properties
+          delete templates['$key'];
+          delete templates['$exists'];
+          // split templates in outro | logo | annotation templateLists
+          const newAnnoList:any = {};
+          const newLogoTempList:any = {};
+          const newOutroTempList:any = {};
+
+          for (let key in templates){
+            const template = templates[key];
+            if( template['type'] === 'logo') newLogoTempList[key] = template 
+            else if( template['type'] === 'outro' ) newOutroTempList[key] = template
+            else if( template['type'] !== 'logo' && template['type'] !== 'outro') newAnnoList[key] = template;
+          }
+          this.templates = newAnnoList;
+          this.outroTemplates = newOutroTempList;
+          this.logoTemplates = newLogoTempList;
+
+          // #todo when selecting a different brand and opening another project this is faulty
+          const arrOutroKeys = Object.keys(this.outroTemplates);
+          const outroKey = arrOutroKeys[0];
+          this.defaultOutroName = this.outroTemplates[outroKey]['name'];
+
+          const arrLogoKeys = Object.keys(this.logoTemplates);
+          const logoKey = arrLogoKeys[0];
+          this.defaultLogoName = this.logoTemplates[logoKey]['name'];
+
+          const arrTemplateKeys = Object.keys(this.templates);
+          this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name'];
+
+          this.initOutroAndLogo();
+        }
+      );
+  }
+
+  loadUser(){
+    this.userSub = this.userService.user$.subscribe(
+      data =>{ 
+        this.user = data;
+        this.userRef = this.af.database.object(`/users/${this.user['$key']}`);
+      
+        // loadproject() depends on user data
+        this.loadProject();
+    },
+      err => console.log('authserviceErr', err)
+    );
+  }
+
+  loadBrands(){ this.brandSub = this.BrandService.brands$.subscribe(this.brandsHandler.bind(this), console.log) }
+
+  loadProject(){
+    this.projectSub = this.projectRef.subscribe( data => { 
+      this.project = new Project(data);
+      this.templateFilter = { brand:this.project.data.brand };
+      if(this.selectedAnnotationKey === '' && this.OutroKey === '') { 
+        this.setSelectedTemplates();
+      };
+      this.loadTemplates(); // depends on project data
+    });
+  }
+
+  setSelectedTemplates() {
+    this.OutroKey = this.project.getAnnoKeyOfType('outro');
+    this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
   }
 
   updateProject() {
@@ -143,23 +205,14 @@ export class ProjectComponent implements OnInit, OnDestroy {
     }
   }
 
-  filterTemplates(data) {
-    // remove Firebase properties
-    delete data['$key'];
-    delete data['$exists'];
-    // split data in outro | logo | annotation templateLists
-    const newAnnoList: any = {};
-    const newLogoTempList: any = {};
-    const newOutroTempList: any = {};
-
-    for (let key in data) {
-      if (data[key]['type'] === 'logo') newLogoTempList[key] = data[key]
-      else if (data[key]['type'] === 'outro') newOutroTempList[key] = data[key]
-      else if (data[key]['type'] !== 'logo' && data[key]['type'] !== 'outro') newAnnoList[key] = data[key];
+  updateUser(){
+    //#todo delete statements can be avoided by implementing User() class objects
+    if(this.userRef && this.user){
+      const user = this.user;
+      delete user['$exists'];
+      delete user['$key'];
+      this.userRef.update(user);
     }
-    this.templates = newAnnoList;
-    this.outroTemplates = newOutroTempList;
-    this.logoTemplates = newLogoTempList;
   }
 
   uploadSource($event) {
@@ -189,24 +242,33 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   initOutroAndLogo() {
-    if (!this.project.getAnnoKeyOfType('outro')) {
-      const newAnno = this.project.addOutro(this.outroTemplates[this.defaultOutroTemplate]);
-      if (newAnno) { this.selectedOutroKey = newAnno.key, this.updateProject() }
+    if (!this.project.getAnnoKeyOfType('outro') && this.defaultOutroName) {
+      const newAnno = this.project.addOutro(this.outroTemplates[this.defaultOutroName]);
+      if(newAnno) { this.OutroKey = newAnno.key, this.updateProject()}
     } else {
-      this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
+      this.OutroKey = this.project.getAnnoKeyOfType('outro');
     }
-    if (!this.project.getAnnoKeyOfType('logo')) {
-      const newAnno = this.project.addLogo(this.logoTemplates[this.defaultLogoTemplate]);
-      if (newAnno) { this.selectedLogoKey = newAnno.key, this.updateProject() }
+    
+    if (!this.project.getAnnoKeyOfType('logo') && this.defaultLogoName) {
+      const newAnno = this.project.addLogo(this.logoTemplates[this.defaultLogoName]);
+      if (newAnno) { this.logoKey = newAnno.key, this.updateProject() }
     } else {
-      this.selectedLogoKey = this.project.getAnnoKeyOfType('logo');
+      this.logoKey = this.project.getAnnoKeyOfType('logo');
     }
   }
 
   addAnnotation() {
-    let newAnno = this.project.addAnnotation(this.templates[this.defaultAnnotationTemplate]);
-    this.updateProject();
-    this.setSelectedAnno(newAnno.key);
+    let newAnno = this.project.addAnnotation( this.templates[this.defaultAnnotationTemplateName]);
+
+    if(newAnno) {
+      this.updateProject();
+      this.setSelectedAnno(newAnno.key);
+    }else{
+      this.errorHandler({
+        title: 'Warning',
+        message: `Could not add annotation because default template has invalid value "${this.defaultAnnotationTemplateName}"`
+      });
+    }
   }
 
   updateAnnotation(key, event) {
@@ -214,13 +276,29 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.updateProject();
   }
 
-  updateOutro(outroData) {
-    this.project.updateOutro(this.selectedOutroKey, this.outroTemplates[outroData])
+  updateOutro(outroKey) {
+    if(!this.OutroKey) {
+      this.errorHandler({
+        title: 'Warning',
+        message: `Could update outro because firebase outro key has invalid value "${this.OutroKey}"`
+      });
+      return;
+    }
+
+    this.project.updateOutro(this.OutroKey, this.outroTemplates[outroKey])
     this.updateProject();
   }
 
-  updateLogo(logoData) {
-    this.project.updateLogo(this.selectedLogoKey, this.logoTemplates[logoData])
+  updateLogo(logoKey) {
+    if(!this.logoKey) {
+      this.errorHandler({
+        title: 'Warning',
+        message: `Could update outro because firebase logo key has invalid value "${this.logoKey}"`
+      });
+      return;
+    }
+
+    this.project.updateLogo(this.logoKey, this.logoTemplates[logoKey])
     this.updateProject();
   }
 
@@ -257,6 +335,18 @@ export class ProjectComponent implements OnInit, OnDestroy {
     }
   }
 
+  brandsHandler(brands: Array<Brand>){ this.possibleBrands = brands }
+
+  changeBrand(brand){
+    this.project.data.brand = brand;
+    this.user['defaultBrand'] = brand;
+
+    this.showBrandList = false;
+    
+    this.updateProject();
+    this.updateUser(); 
+  }
+
   // TODO
   onBlur(input) {
     this.project.data.annotations[this.selectedAnnotationKey].data.text[input.key] = input;
@@ -288,19 +378,27 @@ export class ProjectComponent implements OnInit, OnDestroy {
   onClick(event) {
     if( this.project && this.project['data']['annotations']) {
   
-      if (!this._el.nativeElement.querySelector('#s-brand-dropdown').contains(event.target)) {
+      const elBrandDropdown = this._el.nativeElement.querySelector('#s-brand-dropdown');
+      const elOutroDropdown = this._el.nativeElement.querySelector('#s-outro-dropdown');
+      const elLogoDropdown = this._el.nativeElement.querySelector('#s-logo-dropdown');
+
+      if (elBrandDropdown && !elBrandDropdown.contains(event.target)) {
         this.showBrandList = false;
       }
 
-      if (!this._el.nativeElement.querySelector('#s-outro-dropdown').contains(event.target)) {
+      if (elOutroDropdown && !elOutroDropdown.contains(event.target)) {
         this.showOutroList = false;
       }
 
-      if (!this._el.nativeElement.querySelector('#s-logo-dropdown').contains(event.target)) {
+      if (elLogoDropdown && !elLogoDropdown.contains(event.target)) {
         this.showLogoList = false;
       }
     }
+  }
 
+  errorHandler(err){
+    this.notification = err;
+    console.log(err);
   }
 
 }
