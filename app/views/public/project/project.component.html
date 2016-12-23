@@ -62,7 +62,7 @@
 							
 						</button>
 						<ul class="s-templateSelector__dropdown-list s-slideIn" *ngIf="showOutroList">
-							<li class="s-templateSelector__dropdown-item" *ngFor="let outro of outroTemplates | list" (click)="updateOutro(outro.key)">
+							<li class="s-templateSelector__dropdown-item" *ngFor="let outro of outroTemplates | list | filter:templateFilter" (click)="updateOutro(outro.key)">
 								<div (mouseover)="outro.preview=true" (mouseout)="outro.preview=false">
 									<img *ngIf="!outro.preview" [src]="outro.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
 									<img *ngIf="outro.preview" [src]="outro.imageUrl" alt="">						
@@ -81,7 +81,7 @@
 							<div class="s-templateSelector__button-label"> Logo <md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon></div>
 						</button>
 						<ul class="s-templateSelector__dropdown-list s-slideIn" *ngIf="showLogoList">
-							<li class="s-templateSelector__dropdown-item" *ngFor="let logo of logoTemplates | list" (click)="updateLogo(logo.key)">
+							<li class="s-templateSelector__dropdown-item" *ngFor="let logo of logoTemplates | list | filter:templateFilter" (click)="updateLogo(logo.key)">
 								<div (mouseover)="logo.preview=true" (mouseout)="logo.preview=false">
 									<img *ngIf="!logo.preview" [src]="logo.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
 									<img *ngIf="logo.preview" [src]="logo.imageUrl" alt="">						

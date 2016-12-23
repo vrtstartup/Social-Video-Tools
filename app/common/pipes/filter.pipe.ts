@@ -13,6 +13,6 @@ export class FilterPipe implements PipeTransform {
         const val = args[prop]; 
 
         // just filter on first args property
-        return items.filter(item => item.brand.indexOf(val) !== -1);
+        return items.filter(item => item.brand.indexOf(val) !== -1 );
     }
 }

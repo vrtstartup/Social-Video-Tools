@@ -246,6 +246,7 @@ export default {
     },
     logo2: {
         key:'logo2',
+        brand: 'otherBrand',
         imageUrl: './assets/logo/deredactie_01.gif',
         scale: 6,
         width: 266,
