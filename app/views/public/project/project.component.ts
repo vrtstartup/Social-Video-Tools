@@ -57,10 +57,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
   logoTemplates: any;
   outroTemplates: any;
   selectedTemplate: any;
-  selectedOutroName: any;
+  defaultOutroName: any;
   defaultLogoTemplate: any;
   defaultAnnotationTemplateName: any;
-  selectedOutroKey: any;
+  OutroKey: any;
   selectedLogoKey: any;
   projectId: string;
   templateFilter: Object;
@@ -89,9 +89,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.af = af;
     this.projectId =  this.route.snapshot.params['id'];
     this.selectedAnnotationKey = '';
-    this.selectedOutroKey = '';
+    this.OutroKey = '';
     this.defaultAnnotationTemplateName = false;
-    this.selectedOutroName = false;
+    this.defaultOutroName = false;
     this.defaultLogoTemplate = 'logo'; // #todo set by default
     this.notification = false;
 
@@ -154,7 +154,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
           // #todo when selecting a different brand and opening another project this is faulty
           const arrOutroKeys = Object.keys(this.outroTemplates);
           const outroKey = arrOutroKeys[0];
-          // this.selectedOutroName = this.outroTemplates[outroKey]['name']; // what if no outros are set to this brand? 
+          // this.defaultOutroName = this.outroTemplates[outroKey]['name']; // what if no outros are set to this brand? 
 
           const arrTemplateKeys = Object.keys(this.templates);
           // this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name']; // what if no templates are set to this brand? 
@@ -187,7 +187,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.projectSub = this.projectRef.subscribe( data => { 
       this.project = new Project(data);
       this.templateFilter = { brand:this.project.data.brand };
-      if(this.selectedAnnotationKey === '' && this.selectedOutroKey === '') { 
+      if(this.selectedAnnotationKey === '' && this.OutroKey === '') { 
         this.setSelectedTemplates();
       };
       this.loadTemplates(); // depends on project data
@@ -196,15 +196,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   setProjectOutro(){
     // add default outro if no annotations yet
-      if(this.selectedOutroName){
-        this.project.addOutro( this.outroTemplates[this.selectedOutroName]);
-        this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
+      if(this.defaultOutroName){
+        this.project.addOutro( this.outroTemplates[this.defaultOutroName]);
+        this.OutroKey = this.project.getAnnoKeyOfType('outro');
         this.updateProject();
       }
   }
 
   setSelectedTemplates() {
-    this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
+    this.OutroKey = this.project.getAnnoKeyOfType('outro');
     this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
   }
 
@@ -251,11 +251,11 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   initOutroAndLogo() {
-    if (!this.project.getAnnoKeyOfType('outro') && this.selectedOutroName) {
-      const newAnno = this.project.addOutro(this.outroTemplates[this.selectedOutroName]);
-      if(newAnno) { this.selectedOutroKey = newAnno.key, this.updateProject()}
+    if (!this.project.getAnnoKeyOfType('outro') && this.defaultOutroName) {
+      const newAnno = this.project.addOutro(this.outroTemplates[this.defaultOutroName]);
+      if(newAnno) { this.OutroKey = newAnno.key, this.updateProject()}
     } else {
-      this.selectedOutroKey = this.project.getAnnoKeyOfType('outro');
+      this.OutroKey = this.project.getAnnoKeyOfType('outro');
     }
     if (!this.project.getAnnoKeyOfType('logo')) {
       const newAnno = this.project.addLogo(this.logoTemplates[this.defaultLogoTemplate]);
@@ -274,7 +274,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     }else{
       this.errorHandler({
         title: 'Warning',
-        message: 'Could not add annotation because no templates are available'
+        message: `Could not add annotation because default template has invalid value "${this.defaultAnnotationTemplateName}"`
       });
     }
   }
@@ -285,7 +285,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   updateOutro(outroKey) {
-    this.project.updateOutro(this.selectedOutroKey, this.outroTemplates[outroKey])
+    if(!this.OutroKey) {
+      this.errorHandler({
+        title: 'Warning',
+        message: `Could update outro because firebase outro key has invalid value "${this.OutroKey}"`
+      });
+      return;
+    }
+
+    this.project.updateOutro(this.OutroKey, this.outroTemplates[outroKey])
     this.updateProject();
   }
 
@@ -390,6 +398,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   errorHandler(err){
     this.notification = err;
+    console.log(err);
   }
 
 }
