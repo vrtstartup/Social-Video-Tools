@@ -2,24 +2,35 @@
 
 <div class="socialvideotool">
 	<div class="s-menu-project">
-		<div>
-			<div *ngIf="!project?.data?.status?.downscaled">
-				<label class="s-btn btn-upload">
-					<input type="file" name="video" (change)="uploadSource($event)">uploadSource
-				</label>
-			</div>
-			<div *ngIf="project?.data?.status?.downscaled">
-				<div class="s-btn">brand selector ></div>
-				<label class="s-btn s-btn--outline btn-upload">
-					<input type="file" name="video" (change)="uploadSource($event)">Update Source
-				</label>
-				<button class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
-				<button class="s-btn" type="button" (click)="addToRenderQueue()">Render Movie</button>
-			</div>
+		<div *ngIf="!project?.data?.status?.downscaled">
+			<label class="s-btn btn-upload">
+				<input type="file" name="video" (change)="uploadSource($event)">uploadSource
+			</label>
+		</div>
 
+		<div class="s-menu-project__left" *ngIf="project?.data?.status?.downscaled">
+			<div class="s-brand__selector" id="s-brand-dropdown">
+				<div class="s-brand__trigger" (click)="showBrandList ? showBrandList = false : showBrandList = true">
+					<span class="s-brand__label">Select brand</span> 
+					<span class="s-brand__selected">{{project?.data.brand}}</span> 
+					<md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon>
+				</div>
+
+				<ul class="s-brand__dropdown-list s-slideIn" *ngIf="showBrandList">
+					<li *ngFor="let brand of possibleBrands" (click)="changeBrand(brand.key)">{{brand.data.name}}</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="s-menu-project__right" *ngIf="project?.data?.status?.downscaled">
+			<label class="s-btn s-btn--outline btn-upload">
+				<input type="file" name="video" (change)="uploadSource($event)">Update Source
+			</label>
+			<button class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
+			<button class="s-btn" type="button" (click)="addToRenderQueue()">Render Movie</button>
 		</div>
 	</div>
-
+	
 	<div *ngIf="project?.data">
 		<progress-bar *ngIf="uploadProgress > 0 && uploadProgress < 100" [task]="'uploading'" [progress]="uploadProgress"></progress-bar>
 		<progress-bar *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100" [task]="'downscaling'" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
@@ -28,47 +39,77 @@
 
 	<progress-dialog *ngIf="project && project.isRendering()" [project]="project"></progress-dialog>
 
-	<div class="s-submenu" *ngIf="project && !project.isRendering()">
-		<!--once downscaled show controls-->
-		<div *ngIf="project?.data?.status?.downscaled">
-			<button type="button" class="s-btn" (click)="addAnnotation()">Add Annotation(U)</button>
-		</div>
-		<div *ngIf="project?.data?.status?.downscaled && outroTemplates">
-			<select class="form-control" [(ngModel)]="defaultOutroTemplate" (change)="updateOutro($event)">
-				<option *ngFor="let outro of outroTemplates | list" 
-				[value]="outro.key">
-					{{ outro.key }}
-				</option>
-			</select>
-		</div>
-	</div>
-
-	<!--outros-->
-	<div class="s-anno-item" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">            
-		<small> {{ project.data.annotations[selectedOutroKey]?.data?.key }} | {{ selectedOutroKey}} </small>
-	</div>
-
-	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
-		
+	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering() && templates && project">
 		<!--annotations-->
 		<div class="s-anno__wrapper">
+			<div class="s-submenu" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
+				<!--once downscaled show controls-->
+				<div class="s-submenu__left">
+					<div>
+						<button type="button" class="s-btn" (click)="addAnnotation()">Add Annotation(U)</button>
+					</div>
+				</div>
+
+				<div class="s-submenu__right">
+					<div id="s-outro-dropdown" class="s-templateSelector" *ngIf="outroTemplates" 
+						(click)="showOutroList ? showOutroList = false : showOutroList = true">
+						<button type="button" class="s-templateSelector__button">
+							<div class="s-templateSelector__button-img" *ngIf="project.getAnnoKeyOfType('outro') && OutroKey" (mouseover)="outroPreview=true" (mouseout)="outroPreview=false">
+								<img *ngIf="!outroPreview" [src]="project.data.annotations[OutroKey].data.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
+								<img *ngIf="outroPreview" [src]="project.data.annotations[OutroKey].data.imageUrl" alt="">
+							</div>
+							<div class="s-templateSelector__button-label"> Bumper <md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon> </div>
+							
+						</button>
+						<ul class="s-templateSelector__dropdown-list s-slideIn" *ngIf="showOutroList">
+							<li class="s-templateSelector__dropdown-item" *ngFor="let outro of outroTemplates | list | filter:templateFilter" (click)="updateOutro(outro.key)">
+								<div (mouseover)="outro.preview=true" (mouseout)="outro.preview=false">
+									<img *ngIf="!outro.preview" [src]="outro.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
+									<img *ngIf="outro.preview" [src]="outro.imageUrl" alt="">						
+								</div>
+							</li>
+						</ul>
+					</div>
+				
+					<div id="s-logo-dropdown" class="s-templateSelector" *ngIf="logoTemplates" 
+						(click)="showLogoList ? showLogoList = false : showLogoList = true">
+						<button type="button" class="s-templateSelector__button">
+							<div class="s-templateSelector__button-img" *ngIf="project.getAnnoKeyOfType('logo') && logoKey" (mouseover)="logoPreview=true" (mouseout)="logoPreview=false">
+								<img style="width:100%;" *ngIf="!logoPreview" [src]="project.data.annotations[logoKey].data.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="" >
+								<img style="width:100%;" *ngIf="logoPreview" [src]="project.data.annotations[logoKey].data.imageUrl" alt="" >
+							</div>
+							<div class="s-templateSelector__button-label"> Logo <md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon></div>
+						</button>
+						<ul class="s-templateSelector__dropdown-list s-slideIn" *ngIf="showLogoList">
+							<li class="s-templateSelector__dropdown-item" *ngFor="let logo of logoTemplates | list | filter:templateFilter" (click)="updateLogo(logo.key)">
+								<div (mouseover)="logo.preview=true" (mouseout)="logo.preview=false">
+									<img *ngIf="!logo.preview" [src]="logo.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
+									<img *ngIf="logo.preview" [src]="logo.imageUrl" alt="">						
+								</div>
+							</li>
+						</ul>
+					</div>
+
+				</div>
+			</div>
+
 			<!--annotations column-->
 			<div class="s-anno-items">
 				<!--Annos-->
 				<div *ngIf="project.data.annotations">
-					<div *ngFor="let annotation of (project.data.annotations | exclude:'outro' | list | sortByProp:'end') " 
+					<div *ngFor="let annotation of (project.data.annotations | exclude:'outro' | exclude:'logo' | list | sortByProp:'end') " 
 						(click)="selectedAnnotationKey !== annotation.key && setSelectedAnno(annotation.key)"
 						[class.active]="selectedAnnotationKey === annotation.key"
 						class="s-anno-item">
-
 						<div class="s-anno-item__controls">
 							
 							<div class="s-anno-item__info">
 								<label class="s-anno-inputs__label">{{annotation.start | json}}-{{annotation.end | json}} </label>
-								<div *ngIf="selectedAnnotationKey === annotation.key">
-									<img (click)="toggleTemplateSelector(annotation.key)" 
-										*ngIf="annotation.data.imageUrl"
-										[src]="templates[annotation.data.key].imageUrl.slice(0, -4) + '_static' + '.gif'" >
+								<div *ngIf="selectedAnnotationKey === annotation.key" 
+									(click)="toggleTemplateSelector(annotation.key)"
+									class="s-anno-item__preview">
+									<img *ngIf="annotation.imageUrl" [src]="templates[annotation.data.key].imageUrl.slice(0, -4) + '_static' + '.gif'" >
+									<span><md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon></span>
 								</div>
 							</div>
 
@@ -87,9 +128,18 @@
 									<form  *ngIf="project.data.annotations[selectedAnnotationKey].data.text">
 										<div *ngFor="let input of (project.data.annotations[selectedAnnotationKey].data.text | list); let i = index">
 											<label class="s-anno-inputs__label" for="">{{i}}-{{input.label}}</label>
-											<input class="s-anno-inputs__input" type="text" [(ngModel)]="input.text"
+											<input class="s-anno-inputs__input" type="text" 
+												*ngIf="annotation.data.type !== 'subtitle'"
+												[(ngModel)]="input.text"
 												(keyup)="onKeyUp(input)" 
 												(blur)="onBlur(input)" [ngModelOptions]="{standalone: true}">
+											<textarea class="s-anno-inputs__input" type="text" rows="2" 
+												style="height:60px; resize: none;"
+												*ngIf="annotation.data.type === 'subtitle'"
+												[(ngModel)]="input.text"
+												(keyup)="onKeyUp(input)" 
+												(blur)="onBlur(input)" [ngModelOptions]="{standalone: true}">
+											</textarea>											
 										</div>
 									</form>
 								</div>
@@ -103,7 +153,7 @@
 						
 						<!--template column-->
 						<div class="s-anno-templates" *ngIf="annotation.key === templateSelectorFlag">
-							<div *ngFor="let template of (templates | list)"
+							<div *ngFor="let template of (templates | list | filter:templateFilter)"
 								(click)="updateTemplate(template)"
 								[class.active]="template.key === selectedAnnotationKey"
 								class="s-anno-template">
@@ -124,16 +174,30 @@
 
 		<!--video-->
 		<div class="s-video_wrapper">
+			
 			<div class="s-video">
 				<vrtvideo-player
-					[clip]="project.data.clip"
+					[previewTrigger]="previewTrigger"
+					[pausePlayTrigger]="pausePlayTrigger"
+					[clip]="project.data?.clip"
 					[annotations]="project.data?.annotations"
 					[selectedAnnotationKey]="selectedAnnotationKey">
 				</vrtvideo-player>
+				<div class="s-shortcuts__wrapper">
+					Shortcuts: <br>
+					<span>space : play/pause</span> <br>
+					<span>ctrl + U : Add annotation</span> 
+				</div>
+
+				<div *ngIf="notification" class="s-notifications__wrapper">
+					{{notification.title}}<br>
+					<span class="message">{{notification.message}}</span>
+				</div>
 
 				<range-slider *ngIf="selectedAnnotationKey"
 					[selectedAnnotation]="project.data.annotations[selectedAnnotationKey]" 
-					[clip]="project.data.clip" (changeAnno)="updateAnnotation( selectedAnnotationKey, $event)">
+					[clip]="project.data?.clip" 
+					(changeAnno)="updateAnnotation( selectedAnnotationKey, $event)">
 				</range-slider>
 			</div>
 		</div>

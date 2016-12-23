@@ -10,10 +10,11 @@ import { VgOverlayPlayModule } from "videogular2/overlay-play";
 import { VgBufferingModule } from "videogular2/buffering";
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
-import{ routing } from './common/services/routing.service';
+import { routing } from './common/services/routing.service';
 import { ProjectService } from './common/services/project.service';
 import { UserService } from './common/services/user.service';
+import { HotkeyModule } from 'angular2-hotkeys';
+//import { HotkeysService } from '../node_modules/angular2-hotkeys/src/services/hotkeys.service'
 
 // import firebaseConfig from './config/firebase.config';
 import { RoleGuard } from './common/guards/role.guard';
@@ -38,6 +39,7 @@ import { MaterialModule } from '@angular/material';
 import 'hammerjs';
 
 import { ExcludePipe } from './common/pipes/exclude.pipe';
+import { FilterPipe } from './common/pipes/filter.pipe';
 import { ListPipe } from './common/pipes/list.pipe';
 import { SortByPropPipe } from './common/pipes/sortByProp.pipe';
 import { KeysPipe } from './common/pipes/keys.pipe';
@@ -72,6 +74,7 @@ const firebaseAuthConfig = {
         ListPipe,
         SortByPropPipe,
         KeysPipe,
+        FilterPipe,
         ParseEmailPipe,
         NgInitDir,
     ],
@@ -86,8 +89,9 @@ const firebaseAuthConfig = {
         VgOverlayPlayModule, 
         VgBufferingModule,
         HttpModule,
-        AngularFireModule.initializeApp( firebaseAppConfig, firebaseAuthConfig  ),
+        AngularFireModule.initializeApp( firebaseAppConfig, firebaseAuthConfig),
         routing,
+        HotkeyModule.forRoot(),
     ],
     exports: [
         FormsModule,

@@ -8,6 +8,8 @@ import * as $ from 'jquery';
     templateUrl: './vrtvideo-player.html'
 })
 export class VrtVideoPlayer implements OnChanges, OnInit {
+    @Input() previewTrigger;
+    @Input() pausePlayTrigger;
     @Input() clip;
     @Input() selectedAnnotationKey;
     @Input() annotations;
@@ -21,100 +23,130 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
     fsAPI: VgFullscreenAPI;
     currentTime: number;
     selectedAnnotation: any;
+    play: boolean;
 
     constructor() {
         this.fsAPI = VgFullscreenAPI;
         this.sources = [];
         this.currentTime = 1;
         this.apiLoaded = false;
+        this.play = false; // keeps playing-state
     }
 
-    onPlayerReady(api:VgAPI) {
+    ngOnInit() { }
+
+    onPlayerReady(api: VgAPI) {
         this.api = api;
         this.apiLoaded = true;
-        this.setSeekTime();
-    }
-
-    ngOnInit(){
-        
     }
 
     ngOnChanges(changes: SimpleChanges) {
 
-        if(this.selectedAnnotationKey && this.annotations){
+        //console.log('changes', changes);
+
+        if (this.annotations && this.selectedAnnotationKey) {
             this.selectedAnnotation = this.annotations[this.selectedAnnotationKey];
         }
 
-        this.setSeekTime();
+        if (this.apiLoaded) {
 
-        if(changes.hasOwnProperty('clip')) { // input 'clip' changed
-            const prev = changes['clip']['previousValue'];
-            const curr = changes['clip']['currentValue'];
+            if (changes.hasOwnProperty('previewTrigger')) {
+                this.play = true ; //alway play on preview
+                // prevent play()-pause() race-condition issue
+                setTimeout(() => { this.api.seekTime(0), this.api.play() }, 200);
+            }
 
-            if(curr.hasOwnProperty('lowResUrl') && (!this.sources.length || curr['lowResUrl'] != this.sources[0]['lowResUrl'])){
-                this.sources = [this.clip];
+            if (changes.hasOwnProperty('selectedAnnotationKey')) {
+                this.togglePlay()
+
+                this.api.seekTime(parseFloat(this.selectedAnnotation['start']));
+                this.startPlaying();
+                return
+            }
+
+            if (changes.hasOwnProperty('pausePlayTrigger')) {
+                
+                this.togglePlay()
+
+                if (this.play) {
+                    if(this.selectedAnnotationKey){
+                        // if playhead is not between anno range set it
+                        if( this.api.currentTime < parseFloat(this.selectedAnnotation.start || parseFloat(this.selectedAnnotation.end) > this.api.currentTime) ){
+                            this.api.seekTime(parseFloat(this.selectedAnnotation['start'])); 
+                        }
+                        this.startPlaying(); 
+                        return
+                    } 
+                    // prevent play()-pause() race-condition issue
+                    setTimeout(() => this.api.play(), 200);
+
+                } else {
+                    this.api.pause() 
+                }
             }
         }
 
-        if(changes.hasOwnProperty('selectedAnnotation') && changes['selectedAnnotation']['currentValue'] && this.apiLoaded) { // input 'selectedAnnotation' changed && VG api loaded?
-            const prev = changes['selectedAnnotation']['previousValue'];
-            const curr = changes['selectedAnnotation']['currentValue'];
 
-            if(prev != null && curr !=null && prev['key'] != curr['key']) this.setSeekTime();
-        } 
+        // sources update
+        if (changes.hasOwnProperty('clip')) { // input 'clip' changed
+            const prev = changes['clip']['previousValue'];
+            const curr = changes['clip']['currentValue'];
 
+            if (curr.hasOwnProperty('lowResUrl') && (!this.sources.length || curr['lowResUrl'] != this.sources[0]['lowResUrl'])) {
+                this.sources = [this.clip];
+            }
+        }
     }
 
-    setSeekTime(){
+    togglePlay(){
+        this.play = !this.play;
+    }
+
+    startPlaying() {
         // position the seek time according to the selected annotation
-        //  subscribe to seek time to reset seek position whenever it goes out of the bounds defined by the scrub handles 
-        if(this.selectedAnnotation && this.apiLoaded) {
-            let seekTime = Number(this.selectedAnnotation['start']);
-            this.api.seekTime(seekTime);
+        // subscribe to seek time to reset seek position whenever it goes out of the bounds defined by the scrub handles
+        this.currentTime = this.api.currentTime;
 
-            // loop between scrub handles
-            this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(() => {
-                this.currentTime = Number(this.api.currentTime);
+        setTimeout(() => this.api.play(), 200)
 
-                this.api.play();
 
+        // loop between scrub handles
+        this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(() => {
+            
+            this.currentTime = Number(this.api.currentTime);
+
+            if (this.selectedAnnotation) {
                 if (this.api.currentTime >= parseFloat(this.selectedAnnotation.end)) {
                     this.api.seekTime(parseFloat(this.selectedAnnotation.start));
                     this.api.play();
                 }
-            });
-        }
+            }
 
+        });
     }
 
     parseHtml(annotation) {
-        // value in template e.g '<div>%keyValue%</div>' will be replaced by 
-        // the textvalue of corresponding keyValue
 
-        // JSON.stringify(this.selectedAnnotation.data.text) !== JSON.stringify(annotation.data.text)
+        // value in template e.g '<div>%keyValue%</div>' will be replaced by 
+        //  the textvalue of corresponding keyValue
+
         if (annotation.data.text) {
-            
+
             let parsedHtml = annotation.data.templateHtml;
 
-            for(let i in annotation.data.text) {
+            for (let i in annotation.data.text) {
                 let input = '';
                 input = annotation.data.text[i]['text'];
                 parsedHtml = parsedHtml.replace(`%${i}%`, input);
             }
-            
-            let templateHtml = annotation.data.templateCss + parsedHtml;
-            
+
+            let templateHtml = `<div>${annotation.data.templateCss}${parsedHtml}</div>`;
+
             // inject it
-            $(`#${annotation.key}`).replaceWith(templateHtml);
+            $(`#${annotation.key} > div`).replaceWith(templateHtml);
         }
-        
-        // for text: replace html string with text values
-        if(annotation.data.layer){
 
-        }
-    }
-
-    isEmptyObject(obj){ 
-        return (typeof obj === 'object') ? (Object.keys(obj).length === 0) : true;
+        // TODO for layers: replace html string with text values
+        if (annotation.data.layer) { }
     }
 }

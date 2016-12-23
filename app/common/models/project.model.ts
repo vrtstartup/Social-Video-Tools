@@ -21,12 +21,11 @@ export class Project {
     }
 
     getSortedAnnoKey(sortVal) {
-        // sorted by end-value
-        // optional parms: '' (returns default first) or 'last'
 
-        // filter annotations
+        // sorted by end-value: optional parms: '' (returns default first) or 'last'
         let returnVal;
         let filteredAnnoArray = new ExcludePipe().transform(this.data['annotations'], 'outro');
+        filteredAnnoArray = new ExcludePipe().transform(filteredAnnoArray, 'logo');
 
         if (this.data.hasOwnProperty('annotations') && Object.keys(filteredAnnoArray).length > 0) { // there's annotations available
 
@@ -45,49 +44,69 @@ export class Project {
     }
 
     addOutro(template) {
-        // create annotation object if none
-        if (!this.data['annotations']) {
-            this.data['annotations'] = {};
-        };
+        if(!template) return; 
+    
+        if( this.data.clip && this.data.clip['movieLength']) {
+            // create annotation object if none
+            if (!this.data['annotations']) this.data['annotations'] = {};
 
-        let newKey = this.makeKey();
+            let newKey = this.makeKey();
+            let strtTm = this.data['clip']['movieLength'] - template.transitionDuration;
+            let endTm = this.data['clip']['movieLength'] - template.transitionDuration + template.duration;
 
-        // IF BUMPER add bumper to end
-        let strtTm = this.data['clip']['movieLength'] - template.transitionDuration;
-        let endTm = this.data['clip']['movieLength'] - template.transitionDuration + template.duration;
+            let newAnno = { key: newKey, start: strtTm, end: endTm, data: template, };
 
-        let newAnno = {
-            key: newKey,
-            start: strtTm,
-            end: endTm,
-            data: template,
-        };
+            this.updateAnnotation(newKey, newAnno);
 
-        this.updateAnnotation(newKey, newAnno);
-
-        return newAnno;
+            return newAnno;
+        }
+        return null;
     }
 
     updateOutro(key, obj){
         this.data['annotations'][`${key}`]['data'] = obj;
     }
 
-    getOutroKey(){
+    addLogo(template){
+        if(!template) return; 
+
+        if( this.data.clip && this.data.clip['movieLength']) {
+            if (!this.data['annotations']) this.data['annotations'] = {};
+
+            let newKey = this.makeKey();
+            let strtTm = 0;
+            let endTm = this.data['clip']['movieLength'];
+
+            let newAnno = { key: newKey, start: strtTm, end: endTm, data: template, };
+
+            this.updateAnnotation(newKey, newAnno);
+
+            return newAnno;
+        }        
+        return null;
+    }
+
+    updateLogo(key, obj){
+        this.data['annotations'][`${key}`]['data'] = obj;
+    } 
+
+    getAnnoKeyOfType(type){
         if( this.data.annotations ) {
             for(let i in this.data.annotations){
-                if ( this.data.annotations[i]['data']['type'] === 'outro'){
+                if ( this.data.annotations[i]['data']['type'] === type){
                     return this.data.annotations[i]['key'];
                 }
             }
         }
         return false;
-    }    
+    }
 
     addAnnotation(template) {
+        // check if a template is properly passed
+        if(template === undefined) return; 
+
         // create annotation object if none
-        if (!this.data['annotations']) {
-            this.data['annotations'] = {};
-        }
+        if (!this.data['annotations']) this.data['annotations'] = {};
 
         let newKey = this.makeKey();
 
@@ -96,6 +115,8 @@ export class Project {
         let spanTm = 4; // default spanTm if none provided
 
         let filteredAnnoArray = new ExcludePipe().transform(this.data['annotations'], 'outro');
+        filteredAnnoArray = new ExcludePipe().transform(filteredAnnoArray, 'logo');
+
         if (template.duration) { spanTm = template.duration; }
 
         // if min one annotation
