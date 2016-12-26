@@ -255,7 +255,7 @@ export default {
         scale: 6,
         offset: {
             x: 20,
-            Y: 20
+            y: 20
         },
         width: 266,
         height: 130,

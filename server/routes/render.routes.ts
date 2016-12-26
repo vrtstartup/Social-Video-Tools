@@ -21,7 +21,7 @@ router.post('/stitch', (req, res) => {
       const operation = project.hasOverlays() ? 'render-assets' : 'render';
 
       // update state to 'rendering' so user gets feedback
-      state.updateState(project, 'rendering', true);
+      state.updateState(project, 'queued', true);
 
       // continue processing the render request 
       jobService.queue(queue, projectId, operation);

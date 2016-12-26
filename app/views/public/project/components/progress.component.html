@@ -1,5 +1,10 @@
 <section class="progress-dialog">
   <h2>Hold on...</h2>
+
+  <div class="task-queued" *ngIf="project.data?.status?.queued">
+    <h3>Your project has been queued for processing. Please hold on...</h3>
+  </div>
+
   <div class="task-upload-source" *ngIf="uploadProgress > 0 && uploadProgress < 100">
     <h3>Uploading source file...</h3>
     <progress-bar [task]="" [progress]="uploadProgress"></progress-bar>

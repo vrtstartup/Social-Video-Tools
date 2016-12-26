@@ -117,7 +117,8 @@ function processLowResJob(project, job) {
     */
 
     return new Promise((resolve, reject) => {
-      ffprobe(project)
+      stateService.updateState(project, 'rendering', true)
+        .then(ffprobe)
         .then(project => projectService.updateProject(project, { 
           clip: project['data']['clip']
         }))
@@ -144,10 +145,10 @@ function processRenderJob(project,job) {
     */
 
     return new Promise((resolve, reject) => {
-        handleSubtitles(project)
+        stateService.updateState(project, 'rendering', true)
+          .then(handleSubtitles)
           .then(project => storage.uploadFile(project, 'ass'))
           .then(project => stitch(project, job, progressHandler))
-          // store
           .then((project:Project) => stateService.updateState(project, 'storing', true))
           .then(project => storage.uploadFile(project, 'render'))
           .then((project:Project) => stateService.updateState(project, 'render', true))

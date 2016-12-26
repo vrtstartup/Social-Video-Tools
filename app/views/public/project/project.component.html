@@ -34,7 +34,7 @@
 
 	<progress-dialog *ngIf="project && isProcessing()" [project]="project" [uploadProgress]="uploadProgress"></progress-dialog>
 
-	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering() && !uploading && templates && project">
+	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !isProcessing() && templates && project">
 		<!--annotations-->
 		<div class="s-anno__wrapper">
 			<div class="s-submenu" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">

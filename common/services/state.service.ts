@@ -33,9 +33,6 @@ export class State {
     return new Promise((resolve, reject) => {
       switch (type) {
         case 'uploaded':
-          // set project to currently rendering 
-          this.projectService.setProjectProperty(project.data.id, `status/rendering`, true);
-
           // queue render job
           this.projectService.updateProject(project, {
             files: {
@@ -43,6 +40,7 @@ export class State {
             }
           })
           .then(project => this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres'))
+          .then(this.projectService.setProjectProperty(project.data.id, 'status/queued', true))
           .then(this.projectService.removeProjectProperty(project.data.id, 'status/downscaled'))
           .then(this.projectService.removeProjectProperty(project.data.id, 'status/render'))
           .then(resolve)
@@ -83,11 +81,16 @@ export class State {
         break;
 
         case 'templater':
-        break; 
+        break;
+
+        case 'queued':
+          resolve(project);
+        break;  
 
         case 'rendering':
           // is the project currently being rendered? 
-          resolve(project);
+          this.projectService.removeProjectProperty(project.data.id, 'status/queued')
+          .then(data => resolve(project));
         break;
 
         case 'render':

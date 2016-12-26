@@ -333,13 +333,13 @@ export class ProjectComponent implements OnInit, OnDestroy {
       const uploadingSource = this.uploading;
       const rendering = this.project.isRendering();
 
-      const hasStatus = this.project.hasOwnProperty(status);
+      const hasStatus = this.project.data.hasOwnProperty('status');
 
+      const queued = hasStatus ? this.project.data.status.queued : false;
       const uploadingRemote = hasStatus ? this.project.data.status.storing : false;
       const scaling = hasStatus ? this.project.data.status.downScaleProgress > 0 && this.project.data.status.downScaleProgress < 100 : false;
-      
 
-      return (rendering || uploadingSource || uploadingRemote || scaling);
+      return (queued || rendering || uploadingSource || uploadingRemote || scaling);
   }
 
   updateTemplate(template) {
