@@ -17,6 +17,7 @@ router.post('/update', (req, res) => {
   projectService.getProjectById(id)
     .then( project => stateService.updateState(project, state, value))
     .then( data => res.json({status: 200}))
+    .catch(errorHandler);
 });
 
 function errorHandler(error) { 
