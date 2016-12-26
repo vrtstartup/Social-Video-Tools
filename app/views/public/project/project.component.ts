@@ -231,7 +231,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
               projectId: this.projectId,
               state: 'uploaded',
               value: true
-            }).subscribe((data) => { });
+            }).subscribe((data) => {});
           },
           err => {
             console.log('error: makeFileRequest:', err);

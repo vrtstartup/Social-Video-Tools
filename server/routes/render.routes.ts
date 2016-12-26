@@ -34,10 +34,7 @@ router.post('/lowres', (req, res) => {
   const projectId = req.body.projectId;
   
   projectService.getProjectById(projectId)
-    .then((project) => {
-      jobService.queue('ffmpeg-queue', projectId, 'lowres')
-        .then(stateService.updateState(project, 'uploaded', true))
-    })
+    .then((project) => jobService.queue('ffmpeg-queue', projectId, 'lowres'))
     .then(data => res.json({status: 'success'}));
 });
 

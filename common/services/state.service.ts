@@ -37,10 +37,10 @@ export class State {
             files: {
               'baseDir': project.data.id
             }
-          }).then(project => {
-            this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres')
-               .then(this.updateState(project, 'downscaled', false))
-          });
+          })
+          .then(project => this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres'))
+          .then(this.updateState(project, 'downscaled', false))
+          .then(resolve)
         break;
 
         case 'storingDownScaled':
