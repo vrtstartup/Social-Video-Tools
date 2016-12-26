@@ -2,9 +2,9 @@
 
 <div class="socialvideotool">
 	<div class="s-menu-project">
-		<div *ngIf="!project?.data?.status?.downscaled">
+		<div *ngIf="!project?.data?.status?.downscaled && !project?.isRendering()">
 			<label class="s-btn btn-upload">
-				<input type="file" name="video" (change)="uploadSource($event)">uploadSource
+				<input type="file" name="video" (change)="uploadSource($event)">Upload Video
 			</label>
 		</div>
 
