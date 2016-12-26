@@ -44,6 +44,7 @@ export class State {
           })
           .then(project => this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres'))
           .then(this.projectService.removeProjectProperty(project.data.id, 'status/downscaled'))
+          .then(this.projectService.removeProjectProperty(project.data.id, 'status/render'))
           .then(resolve)
         break;
 

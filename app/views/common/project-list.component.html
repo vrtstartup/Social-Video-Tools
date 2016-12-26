@@ -70,7 +70,7 @@
 
     <!--controls-->
     <div class="s-project-item__controls">
-      <button class="s-btn" type="button" (click)="downloadFile(project.key)">Download</button>
+      <button *ngIf="project.data?.status?.render" class="s-btn" type="button" (click)="downloadFile(project.key)">Download</button>
       <button class="s-btn s-btn--secondary" type="button" (click)="open(project.key)">Edit</button>
     </div>
 

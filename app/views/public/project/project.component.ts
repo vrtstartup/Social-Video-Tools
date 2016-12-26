@@ -381,6 +381,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.templateSelectorFlag = key;
   }
 
+  downloadFile(projectKey: string) { location.href = `api/file/download/${projectKey}` }
+
   onClick(event) {
     if( this.project && this.project['data']['annotations']) {
   

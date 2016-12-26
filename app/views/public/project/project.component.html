@@ -28,6 +28,7 @@
 			</label>
 			<button class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
 			<button class="s-btn" type="button" (click)="addToRenderQueue()">Render Movie</button>
+			<button *ngIf="project.data?.status?.render" class="s-btn" type="button" (click)="downloadFile(project.key)">Download</button>
 		</div>
 	</div>
 	
