@@ -1,2 +1,27 @@
-<h1>even geduld...</h1>
-<progress-bar *ngIf="project.data?.status?.stitchingProgress" [task]="Rendering" [progress]="project.data?.status?.stitchingProgress"></progress-bar>
+<section class="progress-dialog">
+  <h2>Hold on...</h2>
+
+  <div class="task-queued" *ngIf="project.data?.status?.queued">
+    <h3>Your project has been queued for processing. Please hold on...</h3>
+  </div>
+
+  <div class="task-upload-source" *ngIf="uploadProgress > 0 && uploadProgress < 100">
+    <h3>Uploading source file...</h3>
+    <progress-bar [task]="" [progress]="uploadProgress"></progress-bar>
+  </div>
+
+  <div class="task-scaling" *ngIf="project.data?.status?.downScaleProgress > 0 && !project.data?.status?.storing">
+    <h3>Scaling video...</h3>
+    <progress-bar [task]="" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
+  </div>
+
+  <div class="task-rendering" *ngIf="project.data?.status?.stitchingProgress > 0 && !project.data?.status?.storing">
+    <h3>Rendering video...</h3>
+    <progress-bar  [task]="" [progress]="project.data?.status?.stitchingProgress"></progress-bar>
+  </div>
+
+  <div class="task-uploading-remote" *ngIf="project.data?.status?.storing">
+    <h3>Storing video file...</h3>
+    <span>Uploading to Amazon S3 <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
+  </div>
+</section>

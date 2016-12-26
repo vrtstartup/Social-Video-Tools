@@ -74,6 +74,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
   pausePlayTrigger: any;
   previewTrigger: any;
 
+  // application state, AKA what should the UI show and when? 
+  uploading: boolean;
+
   constructor(
     af: AngularFire,
     private zone: NgZone,
@@ -94,6 +97,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.defaultOutroName = false;
     this.defaultLogoName = false;
     this.notification = false;
+
+    // application state 
+    this.uploading = false;
 
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
@@ -216,8 +222,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   uploadSource($event) {
-    // file-ref to upload
-    let sourceFile = $event.target.files[0];
+    this.uploading = true;
+    let sourceFile = $event.target.files[0]; // file-ref to upload
     // upload video
     this.uploadService.getSignedRequest(sourceFile, this.projectId)
       .then((data: Object) => {
@@ -231,7 +237,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
               projectId: this.projectId,
               state: 'uploaded',
               value: true
-            }).subscribe((data) => { });
+            }).subscribe((data) => this.uploading = false);
           },
           err => {
             console.log('error: makeFileRequest:', err);
@@ -316,6 +322,26 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.updateProject();
   }
 
+  isProcessing(): boolean {
+      // returns a boolean indication wether any form of processing is being done on the project  
+      // and wether or not, as a result, a progress dialog should be shwon to the user. 
+      // types of processing include :
+      //      * uploading to s3
+      //      * scaling sown source video
+      //      * stitching assets to render final video 
+
+      const uploadingSource = this.uploading;
+      const rendering = this.project.isRendering();
+
+      const hasStatus = this.project.data.hasOwnProperty('status');
+
+      const queued = hasStatus ? this.project.data.status.queued : false;
+      const uploadingRemote = hasStatus ? this.project.data.status.storing : false;
+      const scaling = hasStatus ? this.project.data.status.downScaleProgress > 0 && this.project.data.status.downScaleProgress < 100 : false;
+
+      return (queued || rendering || uploadingSource || uploadingRemote || scaling);
+  }
+
   updateTemplate(template) {
     // only update if you select a different template for the annotation
     if (template.key != this.selectedAnnotationKey) {
@@ -365,7 +391,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   addToRenderQueue() {
     this.http.post('api/render/stitch', { projectId: this.projectId })
-      .subscribe((data) => { });
+      .subscribe((data) => {});
   }
 
   toggleTemplateSelector(key?) {
@@ -374,6 +400,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
     }
     this.templateSelectorFlag = key;
   }
+
+  downloadFile(projectKey: string) { location.href = `api/file/download/${projectKey}` }
 
   onClick(event) {
     if( this.project && this.project['data']['annotations']) {

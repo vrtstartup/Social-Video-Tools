@@ -33,46 +33,38 @@ export class State {
     return new Promise((resolve, reject) => {
       switch (type) {
         case 'uploaded':
+          // queue render job
           this.projectService.updateProject(project, {
             files: {
               'baseDir': project.data.id
             }
-          }).then(project => {
-            this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres')
-               .then(this.updateState(project, 'downscaled', false))
-          });
+          })
+          .then(project => this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres'))
+          .then(this.projectService.setProjectProperty(project.data.id, 'status/queued', true))
+          .then(this.projectService.removeProjectProperty(project.data.id, 'status/downscaled'))
+          .then(this.projectService.removeProjectProperty(project.data.id, 'status/render'))
+          .then(resolve)
         break;
 
-        case 'storingDownScaled':
-            if(!value){
-              this.projectService.removeProjectProperty(project.data.id, 'status/storingDownScaled')
-                .then(status => resolve(project), this.errorHandler);
-            }
-          resolve(project);
-        break;
-
-        case 'storingRender':
-            if(!value){
-              this.projectService.removeProjectProperty(project.data.id, 'status/storingRender')
-                .then(status => resolve(project), this.errorHandler);
-            }
+        case 'storing':
+          // is the project currently being uploaded to S3? 
           resolve(project);
         break;
 
         case 'downscaled':
           // salt link to trigger angular change detection
           const lowResUrl = resolver.storageUrl('lowres', project.data.id) + `?${Date.now()}${Math.floor(Math.random() * 1000000000)}`;
+          this.projectService.removeProjectProperty(project.data.id, 'status/rendering')
 
-          // only true if 'uploaded downscaled & stored'
-          if(value) {
-            // remove statuses
-            this.projectService.removeProjectProperty(project.data.id, 'status/uploaded')
-              .then(status => resolve(project), this.errorHandler);
-            this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress')
-              .then(status => resolve(project), this.errorHandler);
+          // remove statuses
+          const arrProms = [];
 
-            this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl);
-          }
+          arrProms.push(this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress'));
+          arrProms.push(this.projectService.removeProjectProperty(project.data.id, 'status/storing'));
+          arrProms.push(this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl));
+
+          Promise.all(arrProms).then(arrResults => resolve(project), this.errorHandler);
+
           
           resolve(project);
         break;
@@ -89,11 +81,24 @@ export class State {
         break;
 
         case 'templater':
-        break; 
+        break;
+
+        case 'queued':
+          resolve(project);
+        break;  
+
+        case 'rendering':
+          // is the project currently being rendered? 
+          this.projectService.removeProjectProperty(project.data.id, 'status/queued')
+          .then(data => resolve(project));
+        break;
 
         case 'render':
-        const renderUrl = resolver.storageUrl('render', project.data.id);
-
+          // is there a render file available for this project? 
+          const renderUrl = resolver.storageUrl('render', project.data.id);
+          this.projectService.removeProjectProperty(project.data.id, 'status/storing')
+          this.projectService.removeProjectProperty(project.data.id, 'status/rendering')
+        
           // send email 
           this.projectService.removeProjectProperty(project.data.id, 'status/stitchingProgress')
             .then( status => this.projectService.setProjectProperty(project.data.id, 'clip/renderUrl', renderUrl))

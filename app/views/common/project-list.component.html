@@ -45,7 +45,7 @@
             <span><progress-bar [progress]="project.data?.status?.downScaleProgress"></progress-bar></span>
           </div>
           <div class="s-project-item__statussubprocess">
-            <span *ngIf="project.data?.status?.storingDownScaled">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
+            <span *ngIf="project.data?.status?.storing">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
           </div>
 
           <!--templater-->
@@ -70,7 +70,7 @@
 
     <!--controls-->
     <div class="s-project-item__controls">
-      <button class="s-btn" type="button" (click)="downloadFile(project.key)">Download</button>
+      <button *ngIf="project.data?.status?.render" class="s-btn" type="button" (click)="downloadFile(project.key)">Download</button>
       <button class="s-btn s-btn--secondary" type="button" (click)="open(project.key)">Edit</button>
     </div>
 

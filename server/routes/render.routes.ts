@@ -19,8 +19,12 @@ router.post('/stitch', (req, res) => {
     .then( project => {
       const queue = project.hasOverlays() ? 'templater-queue' : 'ffmpeg-queue';
       const operation = project.hasOverlays() ? 'render-assets' : 'render';
-      state.updateState(project, 'render', false)
-        .then(data => jobService.queue(queue, projectId, operation));
+
+      // update state to 'rendering' so user gets feedback
+      state.updateState(project, 'queued', true);
+
+      // continue processing the render request 
+      jobService.queue(queue, projectId, operation);
     }).then(data => res.json({status: 'success'}));
 });
 
@@ -34,10 +38,7 @@ router.post('/lowres', (req, res) => {
   const projectId = req.body.projectId;
   
   projectService.getProjectById(projectId)
-    .then((project) => {
-      jobService.queue('ffmpeg-queue', projectId, 'lowres')
-        .then(stateService.updateState(project, 'uploaded', true))
-    })
+    .then((project) => jobService.queue('ffmpeg-queue', projectId, 'lowres'))
     .then(data => res.json({status: 'success'}));
 });
 

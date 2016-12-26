@@ -2,9 +2,9 @@
 
 <div class="socialvideotool">
 	<div class="s-menu-project">
-		<div *ngIf="!project?.data?.status?.downscaled">
+		<div *ngIf="!project?.data?.status?.downscaled && !project?.isRendering()">
 			<label class="s-btn btn-upload">
-				<input type="file" name="video" (change)="uploadSource($event)">uploadSource
+				<input type="file" name="video" (change)="uploadSource($event)">Upload Video
 			</label>
 		</div>
 
@@ -22,24 +22,19 @@
 			</div>
 		</div>
 
-		<div class="s-menu-project__right" *ngIf="project?.data?.status?.downscaled">
+		<div class="s-menu-project__right" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
 			<label class="s-btn s-btn--outline btn-upload">
 				<input type="file" name="video" (change)="uploadSource($event)">Update Source
 			</label>
-			<button class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
+			<button *ngIf="project.hasAnnotations()" class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
 			<button class="s-btn" type="button" (click)="addToRenderQueue()">Render Movie</button>
+			<button *ngIf="project.data?.status?.render" class="s-btn" type="button" (click)="downloadFile(project.key)">Download</button>
 		</div>
 	</div>
-	
-	<div *ngIf="project?.data">
-		<progress-bar *ngIf="uploadProgress > 0 && uploadProgress < 100" [task]="'uploading'" [progress]="uploadProgress"></progress-bar>
-		<progress-bar *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100" [task]="'downscaling'" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
-		<span *ngIf="project.data?.status?.storingDownScaled">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
-	</div>
 
-	<progress-dialog *ngIf="project && project.isRendering()" [project]="project"></progress-dialog>
+	<progress-dialog *ngIf="project && isProcessing()" [project]="project" [uploadProgress]="uploadProgress"></progress-dialog>
 
-	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering() && templates && project">
+	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !isProcessing() && templates && project">
 		<!--annotations-->
 		<div class="s-anno__wrapper">
 			<div class="s-submenu" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">

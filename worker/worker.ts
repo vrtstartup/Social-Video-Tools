@@ -117,15 +117,14 @@ function processLowResJob(project, job) {
     */
 
     return new Promise((resolve, reject) => {
-      ffprobe(project)
+      stateService.updateState(project, 'rendering', true)
+        .then(ffprobe)
         .then(project => projectService.updateProject(project, { 
           clip: project['data']['clip']
         }))
-        .then((project:Project) => stateService.updateState(project, 'downscaled', false))
         .then(project => scaleDown(project, progressHandler, job))
-        .then((project:Project) => stateService.updateState(project, 'storingDownScaled', true))
+        .then((project:Project) => stateService.updateState(project, 'storing', true))
         .then(project => storage.uploadFile(project, 'lowres'))
-        .then((project:Project) => stateService.updateState(project, 'storingDownScaled', false))
         .then((project:Project) => stateService.updateState(project, 'downscaled', true))
         .then(project => generateThumb(project))
         .then(project => storage.uploadFile(project, 'thumb'))
@@ -146,13 +145,12 @@ function processRenderJob(project,job) {
     */
 
     return new Promise((resolve, reject) => {
-        handleSubtitles(project)
+        stateService.updateState(project, 'rendering', true)
+          .then(handleSubtitles)
           .then(project => storage.uploadFile(project, 'ass'))
           .then(project => stitch(project, job, progressHandler))
-          // store
-          .then((project:Project) => stateService.updateState(project, 'storingRender', true))
+          .then((project:Project) => stateService.updateState(project, 'storing', true))
           .then(project => storage.uploadFile(project, 'render'))
-          .then((project:Project) => stateService.updateState(project, 'storingRender', false))
           .then((project:Project) => stateService.updateState(project, 'render', true))
           .catch(err => jobService.kill(job.id, err))
           .then(resolve);
