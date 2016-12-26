@@ -26,7 +26,7 @@
 			<label class="s-btn s-btn--outline btn-upload">
 				<input type="file" name="video" (change)="uploadSource($event)">Update Source
 			</label>
-			<button class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
+			<button *ngIf="project.hasAnnotations()" class="s-btn s-btn--outline" type="button" (click)="preview()">preview</button>
 			<button class="s-btn" type="button" (click)="addToRenderQueue()">Render Movie</button>
 			<button *ngIf="project.data?.status?.render" class="s-btn" type="button" (click)="downloadFile(project.key)">Download</button>
 		</div>

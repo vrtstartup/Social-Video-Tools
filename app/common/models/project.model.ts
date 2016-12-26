@@ -20,6 +20,20 @@ export class Project {
         return this.data.annotations;
     }
 
+    getAnnotationsByType(type:string){
+        let collection = {};
+
+        if(this.data.hasOwnProperty('annotations') && this.data.annotations !== null && this.data.annotations !== undefined){
+        let annotations = this.data.annotations;
+        Object.keys(annotations).forEach( key =>{
+            let obj = annotations[key];
+            if( obj['data']['type'] === type) collection[key] = obj;
+        });
+        }
+        
+        return Object.keys(collection).length === 0 ? false : collection;
+    }
+
     getSortedAnnoKey(sortVal) {
 
         // sorted by end-value: optional parms: '' (returns default first) or 'last'
@@ -221,6 +235,12 @@ export class Project {
 
     isRendering() {
         return (this.data.hasOwnProperty('status') && this.data.status.hasOwnProperty('rendering'))
+    }
+
+    hasAnnotations() { 
+        const arrSubKeys = Object.keys(this.getAnnotationsByType('subtitle'));
+        const arrOverlayKeys = Object.keys(this.getAnnotationsByType('overlay'));
+        return arrSubKeys.concat(arrOverlayKeys).length > 0;
     }
 
     private checkStatus(status: Object) {
