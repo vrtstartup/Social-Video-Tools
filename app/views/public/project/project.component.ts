@@ -322,6 +322,26 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.updateProject();
   }
 
+  isProcessing(): boolean {
+      // returns a boolean indication wether any form of processing is being done on the project  
+      // and wether or not, as a result, a progress dialog should be shwon to the user. 
+      // types of processing include :
+      //      * uploading to s3
+      //      * scaling sown source video
+      //      * stitching assets to render final video 
+
+      const uploadingSource = this.uploading;
+      const rendering = this.project.isRendering();
+
+      const hasStatus = this.project.hasOwnProperty(status);
+
+      const uploadingRemote = hasStatus ? this.project.data.status.storing : false;
+      const scaling = hasStatus ? this.project.data.status.downScaleProgress > 0 && this.project.data.status.downScaleProgress < 100 : false;
+      
+
+      return (rendering || uploadingSource || uploadingRemote || scaling);
+  }
+
   updateTemplate(template) {
     // only update if you select a different template for the annotation
     if (template.key != this.selectedAnnotationKey) {

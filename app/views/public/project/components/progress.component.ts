@@ -9,6 +9,7 @@ import { Project } from '../../../../common/models/project.model';
 export class ProgressComponent implements OnInit {
 
   @Input() project: Project;
+  @Input() uploadProgress: any;
 
   constructor() {}
 

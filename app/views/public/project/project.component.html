@@ -31,14 +31,8 @@
 			<button *ngIf="project.data?.status?.render" class="s-btn" type="button" (click)="downloadFile(project.key)">Download</button>
 		</div>
 	</div>
-	
-	<div *ngIf="project?.data">
-		<progress-bar *ngIf="uploadProgress > 0 && uploadProgress < 100" [task]="'uploading'" [progress]="uploadProgress"></progress-bar>
-		<progress-bar *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100" [task]="'downscaling'" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
-		<span *ngIf="project.data?.status?.storing">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
-	</div>
 
-	<progress-dialog *ngIf="project && project.isRendering()" [project]="project"></progress-dialog>
+	<progress-dialog *ngIf="project && isProcessing()" [project]="project" [uploadProgress]="uploadProgress"></progress-dialog>
 
 	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering() && !uploading && templates && project">
 		<!--annotations-->
