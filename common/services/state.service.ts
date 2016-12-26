@@ -33,36 +33,39 @@ export class State {
     return new Promise((resolve, reject) => {
       switch (type) {
         case 'uploaded':
+          // set project to currently rendering 
+          this.projectService.setProjectProperty(project.data.id, `status/rendering`, true);
+
+          // queue render job
           this.projectService.updateProject(project, {
             files: {
               'baseDir': project.data.id
             }
           })
           .then(project => this.jobService.queue('ffmpeg-queue', project.data.id, 'lowres'))
-          .then(this.updateState(project, 'downscaled', false))
+          .then(this.projectService.removeProjectProperty(project.data.id, 'status/downscaled'))
           .then(resolve)
         break;
 
         case 'storing':
+          // is the project currently being uploaded to S3? 
           resolve(project);
         break;
 
         case 'downscaled':
           // salt link to trigger angular change detection
           const lowResUrl = resolver.storageUrl('lowres', project.data.id) + `?${Date.now()}${Math.floor(Math.random() * 1000000000)}`;
+          this.projectService.removeProjectProperty(project.data.id, 'status/rendering')
 
-          // only true if 'uploaded downscaled & stored'
-          if(value) {
-            // remove statuses
-            const arrProms = [];
+          // remove statuses
+          const arrProms = [];
 
-            arrProms.push(this.projectService.removeProjectProperty(project.data.id, 'status/uploaded'));
-            arrProms.push(this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress'));
-            arrProms.push(this.projectService.removeProjectProperty(project.data.id, 'status/storing'));
-            arrProms.push(this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl));
+          arrProms.push(this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress'));
+          arrProms.push(this.projectService.removeProjectProperty(project.data.id, 'status/storing'));
+          arrProms.push(this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl));
 
-            Promise.all(arrProms).then(arrResults => resolve(project), this.errorHandler);
-          }
+          Promise.all(arrProms).then(arrResults => resolve(project), this.errorHandler);
+
           
           resolve(project);
         break;
@@ -81,9 +84,16 @@ export class State {
         case 'templater':
         break; 
 
+        case 'rendering':
+          // is the project currently being rendered? 
+          resolve(project);
+        break;
+
         case 'render':
-        const renderUrl = resolver.storageUrl('render', project.data.id);
-        this.projectService.removeProjectProperty(project.data.id, 'status/storing')
+          // is there a render file available for this project? 
+          const renderUrl = resolver.storageUrl('render', project.data.id);
+          this.projectService.removeProjectProperty(project.data.id, 'status/storing')
+          this.projectService.removeProjectProperty(project.data.id, 'status/rendering')
         
           // send email 
           this.projectService.removeProjectProperty(project.data.id, 'status/stitchingProgress')

@@ -22,7 +22,7 @@
 			</div>
 		</div>
 
-		<div class="s-menu-project__right" *ngIf="project?.data?.status?.downscaled">
+		<div class="s-menu-project__right" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">
 			<label class="s-btn s-btn--outline btn-upload">
 				<input type="file" name="video" (change)="uploadSource($event)">Update Source
 			</label>
@@ -39,7 +39,7 @@
 
 	<progress-dialog *ngIf="project && project.isRendering()" [project]="project"></progress-dialog>
 
-	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering() && templates && project">
+	<div class="s-anno-controls" *ngIf="project?.data?.status?.downscaled && !project.isRendering() && !uploading && templates && project">
 		<!--annotations-->
 		<div class="s-anno__wrapper">
 			<div class="s-submenu" *ngIf="project?.data?.status?.downscaled && !project.isRendering()">

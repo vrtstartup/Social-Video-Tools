@@ -220,7 +220,7 @@ export class Project {
     }
 
     isRendering() {
-        return (this.data.hasOwnProperty('status') && this.data.status.hasOwnProperty('stitchingProgress') && this.data.status.hasOwnProperty('stitchingProgress') !== null)
+        return (this.data.hasOwnProperty('status') && this.data.status.hasOwnProperty('rendering'))
     }
 
     private checkStatus(status: Object) {

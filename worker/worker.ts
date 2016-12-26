@@ -121,7 +121,6 @@ function processLowResJob(project, job) {
         .then(project => projectService.updateProject(project, { 
           clip: project['data']['clip']
         }))
-        .then((project:Project) => stateService.updateState(project, 'downscaled', false))
         .then(project => scaleDown(project, progressHandler, job))
         .then((project:Project) => stateService.updateState(project, 'storing', true))
         .then(project => storage.uploadFile(project, 'lowres'))

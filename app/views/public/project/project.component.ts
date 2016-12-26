@@ -74,6 +74,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
   pausePlayTrigger: any;
   previewTrigger: any;
 
+  // application state, AKA what should the UI show and when? 
+  uploading: boolean;
+
   constructor(
     af: AngularFire,
     private zone: NgZone,
@@ -94,6 +97,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.defaultOutroName = false;
     this.defaultLogoName = false;
     this.notification = false;
+
+    // application state 
+    this.uploading = false;
 
     // general Firebase-references
     this.ffmpegQueueRef = af.database.list('/ffmpeg-queue');
@@ -216,8 +222,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   uploadSource($event) {
-    // file-ref to upload
-    let sourceFile = $event.target.files[0];
+    this.uploading = true;
+    let sourceFile = $event.target.files[0]; // file-ref to upload
     // upload video
     this.uploadService.getSignedRequest(sourceFile, this.projectId)
       .then((data: Object) => {
@@ -231,7 +237,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
               projectId: this.projectId,
               state: 'uploaded',
               value: true
-            }).subscribe((data) => {});
+            }).subscribe((data) => this.uploading = false);
           },
           err => {
             console.log('error: makeFileRequest:', err);
@@ -365,7 +371,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   addToRenderQueue() {
     this.http.post('api/render/stitch', { projectId: this.projectId })
-      .subscribe((data) => { });
+      .subscribe((data) => {});
   }
 
   toggleTemplateSelector(key?) {
