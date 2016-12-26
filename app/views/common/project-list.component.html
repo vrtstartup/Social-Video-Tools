@@ -45,7 +45,7 @@
             <span><progress-bar [progress]="project.data?.status?.downScaleProgress"></progress-bar></span>
           </div>
           <div class="s-project-item__statussubprocess">
-            <span *ngIf="project.data?.status?.storingDownScaled">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
+            <span *ngIf="project.data?.status?.storing">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
           </div>
 
           <!--templater-->

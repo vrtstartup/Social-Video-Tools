@@ -43,19 +43,7 @@ export class State {
           .then(resolve)
         break;
 
-        case 'storingDownScaled':
-            if(!value){
-              this.projectService.removeProjectProperty(project.data.id, 'status/storingDownScaled')
-                .then(status => resolve(project), this.errorHandler);
-            }
-          resolve(project);
-        break;
-
-        case 'storingRender':
-            if(!value){
-              this.projectService.removeProjectProperty(project.data.id, 'status/storingRender')
-                .then(status => resolve(project), this.errorHandler);
-            }
+        case 'storing':
           resolve(project);
         break;
 
@@ -66,12 +54,14 @@ export class State {
           // only true if 'uploaded downscaled & stored'
           if(value) {
             // remove statuses
-            this.projectService.removeProjectProperty(project.data.id, 'status/uploaded')
-              .then(status => resolve(project), this.errorHandler);
-            this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress')
-              .then(status => resolve(project), this.errorHandler);
+            const arrProms = [];
 
-            this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl);
+            arrProms.push(this.projectService.removeProjectProperty(project.data.id, 'status/uploaded'));
+            arrProms.push(this.projectService.removeProjectProperty(project.data.id, 'status/downScaleProgress'));
+            arrProms.push(this.projectService.removeProjectProperty(project.data.id, 'status/storing'));
+            arrProms.push(this.projectService.setProjectProperty(project.data.id, 'clip/lowResUrl', lowResUrl));
+
+            Promise.all(arrProms).then(arrResults => resolve(project), this.errorHandler);
           }
           
           resolve(project);
@@ -93,7 +83,8 @@ export class State {
 
         case 'render':
         const renderUrl = resolver.storageUrl('render', project.data.id);
-
+        this.projectService.removeProjectProperty(project.data.id, 'status/storing')
+        
           // send email 
           this.projectService.removeProjectProperty(project.data.id, 'status/stitchingProgress')
             .then( status => this.projectService.setProjectProperty(project.data.id, 'clip/renderUrl', renderUrl))

@@ -34,7 +34,7 @@
 	<div *ngIf="project?.data">
 		<progress-bar *ngIf="uploadProgress > 0 && uploadProgress < 100" [task]="'uploading'" [progress]="uploadProgress"></progress-bar>
 		<progress-bar *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100" [task]="'downscaling'" [progress]="project.data?.status?.downScaleProgress"></progress-bar>
-		<span *ngIf="project.data?.status?.storingDownScaled">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
+		<span *ngIf="project.data?.status?.storing">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
 	</div>
 
 	<progress-dialog *ngIf="project && project.isRendering()" [project]="project"></progress-dialog>
