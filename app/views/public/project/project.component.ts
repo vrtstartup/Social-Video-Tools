@@ -57,11 +57,11 @@ export class ProjectComponent implements OnInit, OnDestroy {
   logoTemplates: any;
   outroTemplates: any;
   selectedTemplate: any;
-  defaultOutroName: any;
-  defaultLogoName: any;
   defaultAnnotationTemplateName: any;
-  OutroKey: any;
+  outroKey: any;
   logoKey: any;
+  defaultOutroKey: any;
+  defaultLogoKey: any;
   projectId: string;
   templateFilter: Object;
 
@@ -92,10 +92,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.af = af;
     this.projectId =  this.route.snapshot.params['id'];
     this.selectedAnnotationKey = '';
-    this.OutroKey = '';
+    this.defaultOutroKey = '';
+    this.defaultLogoKey = '';
     this.defaultAnnotationTemplateName = false;
-    this.defaultOutroName = false;
-    this.defaultLogoName = false;
     this.notification = false;
 
     // application state 
@@ -158,14 +157,12 @@ export class ProjectComponent implements OnInit, OnDestroy {
           this.logoTemplates = newLogoTempList;
 
           // #todo when selecting a different brand and opening another project this is faulty
-          // set template defaults 
+          // get and store default templates from brand
           const arrOutroKeys = Object.keys(this.outroTemplates);
-          const outroKey = arrOutroKeys[0];
-          this.defaultOutroName = this.outroTemplates[outroKey]['name'];
+          this.defaultOutroKey = arrOutroKeys[0];
 
           const arrLogoKeys = Object.keys(this.logoTemplates);
-          const logoKey = arrLogoKeys[0];
-          this.defaultLogoName = this.logoTemplates[logoKey]['name'];
+          this.defaultLogoKey = arrLogoKeys[0];
 
           const arrTemplateKeys = Object.keys(this.templates);
           this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name'];
@@ -190,18 +187,24 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   loadProject(){
     this.projectSub = this.projectRef.subscribe( data => { 
+      // store updated project data
       this.project = new Project(data);
+
+      // set tempalte filter to brand
       this.templateFilter = { brand:this.project.data.brand };
-      if(this.selectedAnnotationKey === '' && this.OutroKey === '') { 
-        this.setSelectedTemplates();
-      };
+
+      if(this.selectedAnnotationKey === '') this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
+
+      // set default logo and bumper 
+      if( !this.project.data.hasOwnProperty('defaultsSet') && this.project.data.clip && this.project.data.clip['movieLength']) {
+        if(this.defaultLogoKey) this.updateLogo(this.defaultLogoKey);
+        if(this.defaultOutroKey) this.updateOutro(this.defaultOutroKey);
+        this.project.data.defaultsSet = true;
+        this.updateProject();
+      }
+
       this.loadTemplates(); // depends on project data
     });
-  }
-
-  setSelectedTemplates() {
-    this.OutroKey = this.project.getAnnoKeyOfType('outro');
-    this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
   }
 
   updateProject() {
@@ -266,7 +269,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   updateOutro(outroKey) {
-    this.OutroKey = this.project.setOutro(this.outroTemplates[outroKey]);
+    this.outroKey = this.project.setOutro(this.outroTemplates[outroKey]);
     this.updateProject();
   }
 
@@ -324,14 +327,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
       // update selectedAnno with new template
       this.project.data.annotations[this.selectedAnnotationKey].data = template;
       this.toggleTemplateSelector();
-
-      // if (template.duration) {
-      //   // if duration exceeds movieLength
-      //   if (this.selectedAnnotation.start + template.duration > this.project.data.clip.movieLength) {
-      //     this.selectedAnnotation.start = this.project.data.clip.movieLength - template.duration;
-      //   }
-      //   this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
-      // }
 
       this.updateProject();
     }
