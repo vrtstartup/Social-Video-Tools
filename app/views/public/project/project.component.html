@@ -49,7 +49,7 @@
 					<div id="s-outro-dropdown" class="s-templateSelector" *ngIf="outroTemplates" 
 						(click)="showOutroList ? showOutroList = false : showOutroList = true">
 						<button type="button" class="s-templateSelector__button">
-							<div class="s-templateSelector__button-img" *ngIf="project.getAnnoKeyOfType('outro') && OutroKey" (mouseover)="outroPreview=true" (mouseout)="outroPreview=false">
+							<div class="s-templateSelector__button-img" *ngIf="project.getAnnoKeyOfType('outro') && project.data.annotations[OutroKey]" (mouseover)="outroPreview=true" (mouseout)="outroPreview=false">
 								<img *ngIf="!outroPreview" [src]="project.data.annotations[OutroKey].data.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
 								<img *ngIf="outroPreview" [src]="project.data.annotations[OutroKey].data.imageUrl" alt="">
 							</div>
@@ -61,6 +61,13 @@
 								<div (mouseover)="outro.preview=true" (mouseout)="outro.preview=false">
 									<img *ngIf="!outro.preview" [src]="outro.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
 									<img *ngIf="outro.preview" [src]="outro.imageUrl" alt="">						
+								</div>
+							</li>
+
+
+							<li class="s-templateSelector__dropdown-item" (click)="deleteOutro()">
+								<div class="s-deleteOutro">
+									<md-icon svgSrc="assets/icons/icon-cross.svg"></md-icon>
 								</div>
 							</li>
 						</ul>

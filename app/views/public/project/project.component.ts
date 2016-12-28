@@ -74,7 +74,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   pausePlayTrigger: any;
   previewTrigger: any;
 
-  // application state, AKA what should the UI show and when? 
+  // application state
   uploading: boolean;
 
   constructor(
@@ -158,6 +158,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
           this.logoTemplates = newLogoTempList;
 
           // #todo when selecting a different brand and opening another project this is faulty
+          // set template defaults 
           const arrOutroKeys = Object.keys(this.outroTemplates);
           const outroKey = arrOutroKeys[0];
           this.defaultOutroName = this.outroTemplates[outroKey]['name'];
@@ -168,8 +169,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
           const arrTemplateKeys = Object.keys(this.templates);
           this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name'];
-
-          this.initOutroAndLogo();
         }
       );
   }
@@ -247,22 +246,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
       });
   }
 
-  initOutroAndLogo() {
-    if (!this.project.getAnnoKeyOfType('outro') && this.defaultOutroName) {
-      const newAnno = this.project.addOutro(this.outroTemplates[this.defaultOutroName]);
-      if(newAnno) { this.OutroKey = newAnno.key, this.updateProject()}
-    } else {
-      this.OutroKey = this.project.getAnnoKeyOfType('outro');
-    }
-    
-    if (!this.project.getAnnoKeyOfType('logo') && this.defaultLogoName) {
-      const newAnno = this.project.addLogo(this.logoTemplates[this.defaultLogoName]);
-      if (newAnno) { this.logoKey = newAnno.key, this.updateProject() }
-    } else {
-      this.logoKey = this.project.getAnnoKeyOfType('logo');
-    }
-  }
-
   addAnnotation() {
     let newAnno = this.project.addAnnotation( this.templates[this.defaultAnnotationTemplateName]);
 
@@ -283,15 +266,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   updateOutro(outroKey) {
-    if(!this.OutroKey) {
-      this.errorHandler({
-        title: 'Warning',
-        message: `Could update outro because firebase outro key has invalid value "${this.OutroKey}"`
-      });
-      return;
-    }
-
-    this.project.updateOutro(this.OutroKey, this.outroTemplates[outroKey])
+    this.OutroKey = this.project.setOutro(this.outroTemplates[outroKey]);
     this.updateProject();
   }
 
@@ -320,6 +295,11 @@ export class ProjectComponent implements OnInit, OnDestroy {
     }
     delete this.project.data['annotations'][`${key}`];
     this.updateProject();
+  }
+
+  deleteOutro(){
+      const outroKey = this.project.getAnnoKeyOfType('outro');
+      if(outroKey) this.deleteAnnotation(outroKey);
   }
 
   isProcessing(): boolean {

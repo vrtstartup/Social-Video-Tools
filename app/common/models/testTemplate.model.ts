@@ -225,6 +225,15 @@ export default {
         brand: 'deredactie',
         fileName: 'deredactie_1'
     },
+    nogeenbumper: {
+        name: 'nogeenbumper', 
+        imageUrl: './assets/bumper/deredactie_01.gif',
+        duration: 5,
+        transitionDuration: 2,
+        type: 'outro',
+        brand: 'deredactie',
+        fileName: 'deredactie_1'
+    },
     bumper2: {
         name: 'bumper2', 
         imageUrl: './assets/bumper/deredactie_01.gif',
