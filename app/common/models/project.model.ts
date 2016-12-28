@@ -64,7 +64,6 @@ export class Project {
             // create annotation object if none
             if (!this.data['annotations']) this.data['annotations'] = {};
 
-            // let newKey = this.makeKey();
             let strtTm = this.data['clip']['movieLength'] - template.transitionDuration;
             let endTm = this.data['clip']['movieLength'] - template.transitionDuration + template.duration;
 
@@ -92,27 +91,37 @@ export class Project {
         return newKey;
     }
 
-    addLogo(template){
+    addLogo(key, template){
         if(!template) return; 
 
         if( this.data.clip && this.data.clip['movieLength']) {
             if (!this.data['annotations']) this.data['annotations'] = {};
 
-            let newKey = this.makeKey();
-            let strtTm = 0;
+            let strtTm = 3;
             let endTm = this.data['clip']['movieLength'];
 
-            let newAnno = { key: newKey, start: strtTm, end: endTm, data: template, };
+            let newAnno = { key: key, start: strtTm, end: endTm, data: template, };
 
-            this.updateAnnotation(newKey, newAnno);
+            this.updateAnnotation(key, newAnno);
 
             return newAnno;
         }        
         return null;
     }
 
-    updateLogo(key, obj){
-        this.data['annotations'][`${key}`]['data'] = obj;
+    setLogo(obj): string{
+        // delete existing logo
+        const oldKey = this.getAnnoKeyOfType('logo');
+        if(oldKey) delete this.data['annotations'][`${oldKey}`];
+
+        // create annotation object if it doesnt exist
+        if (!this.data['annotations']) this.data['annotations'] = {};
+
+        // add new outro
+        const newKey = this.makeKey();
+        this.addLogo(newKey, obj);
+
+        return newKey;
     } 
 
     getAnnoKeyOfType(type){

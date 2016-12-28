@@ -271,15 +271,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   updateLogo(logoKey) {
-    if(!this.logoKey) {
-      this.errorHandler({
-        title: 'Warning',
-        message: `Could update outro because firebase logo key has invalid value "${this.logoKey}"`
-      });
-      return;
-    }
-
-    this.project.updateLogo(this.logoKey, this.logoTemplates[logoKey])
+    this.logoKey = this.project.setLogo(this.logoTemplates[logoKey])
     this.updateProject();
   }
 
@@ -302,6 +294,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
       if(outroKey) this.deleteAnnotation(outroKey);
   }
 
+  deleteLogo(){
+      const outroKey = this.project.getAnnoKeyOfType('logo');
+      if(outroKey) this.deleteAnnotation(outroKey);
+  }
   isProcessing(): boolean {
       // returns a boolean indication wether any form of processing is being done on the project  
       // and wether or not, as a result, a progress dialog should be shwon to the user. 

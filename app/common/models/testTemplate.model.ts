@@ -257,6 +257,20 @@ export default {
         brand: 'deredactie',
         fileName: 'deredactie_1'
     },
+    anderLogo: {
+        name:'Anderlogo',
+        imageUrl: './assets/logo/deredactie_01.gif',
+        scale: 8,
+        offset: {
+            x: 20,
+            y: 20
+        },
+        width: 266,
+        height: 130,
+        type: 'logo',
+        brand: 'deredactie',
+        fileName: 'deredactie_1'
+    },
     logo2: {
         key:'logo2',
         brand: 'otherBrand',

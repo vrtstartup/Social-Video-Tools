@@ -64,7 +64,6 @@
 								</div>
 							</li>
 
-
 							<li class="s-templateSelector__dropdown-item" (click)="deleteOutro()">
 								<div class="s-deleteOutro">
 									<md-icon svgSrc="assets/icons/icon-cross.svg"></md-icon>
@@ -87,6 +86,12 @@
 								<div (mouseover)="logo.preview=true" (mouseout)="logo.preview=false">
 									<img *ngIf="!logo.preview" [src]="logo.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
 									<img *ngIf="logo.preview" [src]="logo.imageUrl" alt="">						
+								</div>
+							</li>
+
+							<li class="s-templateSelector__dropdown-item" (click)="deleteLogo()">
+								<div class="s-deleteOutro">
+									<md-icon svgSrc="assets/icons/icon-cross.svg"></md-icon>
 								</div>
 							</li>
 						</ul>
