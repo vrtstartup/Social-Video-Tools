@@ -4,6 +4,7 @@ import { Projects } from '../common/services/projects.service';
 import { Jobs } from '../common/services/jobs.service';
 import { Templates } from '../common/services/templates.service';
 import { State } from '../common/services/state.service';
+import { Message } from '../common/services/message.service';
 import { resolve } from 'path';
 import { config } from '../common/config';
 
@@ -21,6 +22,7 @@ const projects = new Projects();
 const state = new State();
 const jobs = new Jobs();
 const templates = new Templates();
+const message = new Message();
 
 // init server
 const server = express();
@@ -31,9 +33,11 @@ const fileRoutes:any = require('./routes/file.routes');
 const templaterRoutes:any = require('./routes/templater.routes');
 const renderRoutes:any = require('./routes/render.routes');
 const stateRoutes:any = require('./routes/state.routes');
+const messageRoutes:any = require('./routes/message.routes');
 
 server.set('projects', projects);
 server.set('state', state);
+server.set('message', message);
 server.set('jobs', jobs);
 server.set('templates', templates);
 server.use(bodyParser());
@@ -63,6 +67,7 @@ server.use('/api/file', fileRoutes);
 server.use('/api/templater', templaterRoutes);
 server.use('/api/render', renderRoutes);
 server.use('/api/state', stateRoutes);
+server.use('/api/message', messageRoutes);
 
 server.use('*', express.static(pathToClient));
 

@@ -14,9 +14,6 @@ import { routing } from './common/services/routing.service';
 import { ProjectService } from './common/services/project.service';
 import { UserService } from './common/services/user.service';
 import { HotkeyModule } from 'angular2-hotkeys';
-//import { HotkeysService } from '../node_modules/angular2-hotkeys/src/services/hotkeys.service'
-
-// import firebaseConfig from './config/firebase.config';
 import { RoleGuard } from './common/guards/role.guard';
 
 import { AppComponent } from './app.component';
