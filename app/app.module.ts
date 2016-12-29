@@ -14,9 +14,6 @@ import { routing } from './common/services/routing.service';
 import { ProjectService } from './common/services/project.service';
 import { UserService } from './common/services/user.service';
 import { HotkeyModule } from 'angular2-hotkeys';
-//import { HotkeysService } from '../node_modules/angular2-hotkeys/src/services/hotkeys.service'
-
-// import firebaseConfig from './config/firebase.config';
 import { RoleGuard } from './common/guards/role.guard';
 
 import { AppComponent } from './app.component';
@@ -26,6 +23,7 @@ import { ProjectComponent } from './views/public/project/project.component';
 import { VrtVideoPlayer } from "./views/public/project/components/vrtvideo-player";
 import { ProgressComponent } from './views/public/project/components/progress.component';
 import { ProgressBarComponent } from './views/common/progressbar.component';
+import { PreloadImageComponent } from './views/common/preload-image.component';
 import { RangeSliderComponent } from './views/public/project/components/range-slider.component';
 import { AdminComponent } from './views/admin/admin.component';
 import { DashboardComponent } from './views/admin/dashboard.component';
@@ -67,6 +65,7 @@ const firebaseAuthConfig = {
         UsersComponent,
         ProjectsComponent,
         ProjectListComponent,
+        PreloadImageComponent,
         MenuComponent,
         RangeSliderComponent,
         LoginComponent,

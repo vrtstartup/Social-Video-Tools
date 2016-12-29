@@ -2,7 +2,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFire, FirebaseApp, FirebaseAuth, FirebaseAuthState } from 'angularfire2';
-import { BrandService} from '../../../common/services/brands.service'
+import { BrandService} from '../../../common/services/brands.service';
+import { UserService } from '../../../common/services/user.service';
 import { Brand } from '../../../common/models/brand.model';
 
 @Component({
@@ -22,7 +23,10 @@ export class LoginComponent implements OnInit {
   private requestPassForm: FormGroup;
   private registerFlag: Boolean = false;
   private possibleBrands: Array<Brand>;
-    brandSub: any;
+  private brandSub: any;
+  private userSub: any;
+  private showRegistrationForm: boolean;
+  private registerButtonText: string; 
 
   constructor(
     af: AngularFire,
@@ -30,10 +34,12 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private BrandService: BrandService,
+    private userService: UserService,
     @Inject(FirebaseApp) firebaseApp: any) {
     this.af = af;
     this.fbAuth = firebaseApp.auth();
-
+    this.showRegistrationForm = true;
+    this.registerButtonText = 'Create Account';
     this.possibleBrands = [];    
   }
 
@@ -57,17 +63,21 @@ export class LoginComponent implements OnInit {
     this.loginForm.valueChanges.subscribe(value => {});
 
     this.brandSub = this.BrandService.brands$.subscribe(this.brandsHandler.bind(this), this.errorHandler);
+
+    // check if there's a logged in user
+    this.userSub = this.userService.user$.subscribe(this.handleUser.bind(this), this.errorHandler);
   }
 
   onSetActiveFromGroup(formGroupName) {
     // toggles visibility of different forms
+    this.showRegistrationForm = true;
+    this.registerButtonText = 'Create Account';
     this.errorMessage = '';
     this.activeFormGroup = formGroupName;
   }
 
   validateEmail(fromControl: FormControl) {
-    let EMAIL_REGEXP = /(.+)@(.+){2,}\.(.+){2,}/
-    //let EMAIL_REGEXP = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/ ;
+    let EMAIL_REGEXP = /(.+)@vrt.be/
     return EMAIL_REGEXP.test(fromControl.value) ? null : { validateEmail: { valid: false}};
   }
 
@@ -78,7 +88,7 @@ export class LoginComponent implements OnInit {
       const credentials = { email: this.loginForm.value.email, password: this.loginForm.value.password};
 
       this.auth.login(credentials)
-        .then(user => this.router.navigate(['projects']))
+        .then(this.handleLoginSucess.bind(this))
         .catch(err => this.errorHandler(err))
     }
   }
@@ -91,21 +101,45 @@ export class LoginComponent implements OnInit {
 
       this.auth.createUser(credentials)
         .then(user => {
-          console.log('setting additional data');
+          // store aditional user data in FireBase Property 
           this.af.database.object(`/users/${user.uid}/role`).set('0'); // set user role
           this.af.database.object(`/users/${user.uid}/email`).set(user.auth.email); //set user email
           
           if(this.possibleBrands.length > 0){
             this.af.database.object(`/users/${user.uid}/defaultBrand`).set(this.possibleBrands[0]['key']); 
           }else{
-            console.log('No brands have been fetched, registering user without default brand');
+            console.log('No brands could be fetched, registering user without default brand');
           }
 
-          this.router.navigate(['projects'])
+          // send account verification email
+          user.auth.sendEmailVerification()
+            .then(this.handleRegistrationSuccess.bind(this), this.errorHandler);
         })
         .catch(err => this.errorHandler(err));
     }
   }
+
+  handleRegistrationSuccess(data) {
+    this.showRegistrationForm = false; 
+    this.errorMessage = 'Registration successful! Please check your inbox for our confirmation mail'
+  }
+
+  handleLoginSucess(user) {
+    const verified = user.auth.emailVerified;
+
+    if(verified) {
+      this.router.navigateByUrl('/projects');
+    }else{ 
+      this.errorMessage = 'Seems this email hasn\'t been verified yet. Check your inbox for our confirmation mail' ;
+      this.auth.logout();
+    }
+  }
+
+  handleUser(user) { if(user && user.verified) this.router.navigateByUrl('/projects') }
+
+  brandsHandler(brands: Array<Brand>){ this.possibleBrands = brands }
+
+  clickRegisterButton() { this.registerButtonText = 'Hold on...' }
 
   requestPasswordResetEmail(event){
     event.preventDefault();
@@ -120,15 +154,13 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  brandsHandler(brands: Array<Brand>){ this.possibleBrands = brands }
-
   errorHandler(err) {
     if (err.code === 'auth/user-not-found') {
       this.errorMessage = 'Oops: We couldn\'t find that email address';
     } else if (err.code === 'auth/email-already-in-use') {
       this.errorMessage = 'This email is already in use';
     } else {
-      this.errorMessage = 'authentication failed wrong';
+      this.errorMessage = 'authentication failed! Something went terribly wrong.';
     }
   }
 

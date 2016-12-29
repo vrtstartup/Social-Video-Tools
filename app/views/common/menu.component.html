@@ -14,7 +14,19 @@
         </ul>
     </div>
     <div class="s-menu-bar__item">
-        <md-icon svgSrc="assets/icons/icon-feedback.svg"></md-icon>
+        <md-icon svgSrc="assets/icons/icon-feedback.svg" (click)="toggleMessageDialog()"></md-icon>
+
+        <div class="s-user-menu__items s-message-dialog" *ngIf="showMessageDialog" >
+            <div class="form" *ngIf="!messageSuccess">
+                <h3>Your Feedback</h3>
+                <textarea name="" id="" cols="30" rows="10" [(ngModel)]="message" (focus)="clearMessage()" (focusout)="setDefaultMessage()"></textarea>
+                <button class="s-btn s-btn--primary" type="button" (click)="sendUserFeedback()">Send</button>
+            </div>
+
+            <div class="confirmation" *ngIf="messageSuccess">
+                <h3>Thanks for submitting your feedback, we'll get back to you soon!</h3>
+            </div>
+        </div>
     </div>
     
 </div>

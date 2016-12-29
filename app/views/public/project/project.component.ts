@@ -57,11 +57,11 @@ export class ProjectComponent implements OnInit, OnDestroy {
   logoTemplates: any;
   outroTemplates: any;
   selectedTemplate: any;
-  defaultOutroName: any;
-  defaultLogoName: any;
   defaultAnnotationTemplateName: any;
-  OutroKey: any;
+  outroKey: any;
   logoKey: any;
+  defaultOutroKey: any;
+  defaultLogoKey: any;
   projectId: string;
   templateFilter: Object;
 
@@ -74,8 +74,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
   pausePlayTrigger: any;
   previewTrigger: any;
 
-  // application state, AKA what should the UI show and when? 
+  // application state
   uploading: boolean;
+  seek: number;
 
   constructor(
     af: AngularFire,
@@ -88,14 +89,13 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private BrandService: BrandService,
     private _hotkeysService: HotkeysService,
     private _el: ElementRef) {
-
+    this.seek = 0;
     this.af = af;
     this.projectId =  this.route.snapshot.params['id'];
     this.selectedAnnotationKey = '';
-    this.OutroKey = '';
+    this.defaultOutroKey = '';
+    this.defaultLogoKey = '';
     this.defaultAnnotationTemplateName = false;
-    this.defaultOutroName = false;
-    this.defaultLogoName = false;
     this.notification = false;
 
     // application state 
@@ -125,7 +125,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.loadBrands();
 
     this.uploadServiceSub = this.uploadService.progress$.subscribe(data => {
-        this.zone.run(() => this.uploadProgress = data); // force to trigger change
+        this.zone.run(() => this.uploadProgress = data); // trigger change detecton
       }, console.log);
   }
 
@@ -158,18 +158,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
           this.logoTemplates = newLogoTempList;
 
           // #todo when selecting a different brand and opening another project this is faulty
+          // get and store default templates from brand
           const arrOutroKeys = Object.keys(this.outroTemplates);
-          const outroKey = arrOutroKeys[0];
-          this.defaultOutroName = this.outroTemplates[outroKey]['name'];
+          this.defaultOutroKey = arrOutroKeys[0];
 
           const arrLogoKeys = Object.keys(this.logoTemplates);
-          const logoKey = arrLogoKeys[0];
-          this.defaultLogoName = this.logoTemplates[logoKey]['name'];
+          this.defaultLogoKey = arrLogoKeys[0];
 
           const arrTemplateKeys = Object.keys(this.templates);
           this.defaultAnnotationTemplateName = this.templates[arrTemplateKeys[0]]['name'];
-
-          this.initOutroAndLogo();
         }
       );
   }
@@ -191,18 +188,28 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   loadProject(){
     this.projectSub = this.projectRef.subscribe( data => { 
+      // store updated project data
       this.project = new Project(data);
+
+      // set tempalte filter to brand
       this.templateFilter = { brand:this.project.data.brand };
-      if(this.selectedAnnotationKey === '' && this.OutroKey === '') { 
-        this.setSelectedTemplates();
-      };
+
+      if(this.selectedAnnotationKey === '') this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
+
+      // set default logo and bumper 
+      if( !this.project.data.hasOwnProperty('defaultsSet') && this.project.data.clip && this.project.data.clip['movieLength']) {
+        if(this.defaultLogoKey) this.updateLogo(this.defaultLogoKey);
+        if(this.defaultOutroKey) this.updateOutro(this.defaultOutroKey);
+        this.project.data.defaultsSet = true;
+        this.updateProject();
+      }else{
+        // logoKey and outoKey do need to be set 
+        this.logoKey = this.project.getAnnoKeyOfType('logo');
+        this.outroKey = this.project.getAnnoKeyOfType('outro');
+      }
+
       this.loadTemplates(); // depends on project data
     });
-  }
-
-  setSelectedTemplates() {
-    this.OutroKey = this.project.getAnnoKeyOfType('outro');
-    this.setSelectedAnno(this.project.getSortedAnnoKey('last'));
   }
 
   updateProject() {
@@ -247,22 +254,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
       });
   }
 
-  initOutroAndLogo() {
-    if (!this.project.getAnnoKeyOfType('outro') && this.defaultOutroName) {
-      const newAnno = this.project.addOutro(this.outroTemplates[this.defaultOutroName]);
-      if(newAnno) { this.OutroKey = newAnno.key, this.updateProject()}
-    } else {
-      this.OutroKey = this.project.getAnnoKeyOfType('outro');
-    }
-    
-    if (!this.project.getAnnoKeyOfType('logo') && this.defaultLogoName) {
-      const newAnno = this.project.addLogo(this.logoTemplates[this.defaultLogoName]);
-      if (newAnno) { this.logoKey = newAnno.key, this.updateProject() }
-    } else {
-      this.logoKey = this.project.getAnnoKeyOfType('logo');
-    }
-  }
-
   addAnnotation() {
     let newAnno = this.project.addAnnotation( this.templates[this.defaultAnnotationTemplateName]);
 
@@ -278,33 +269,18 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   updateAnnotation(key, event) {
+    this.seek = event.start; // set seek position to annotation start time
     this.project.updateAnnotation(key, event)
     this.updateProject();
   }
 
   updateOutro(outroKey) {
-    if(!this.OutroKey) {
-      this.errorHandler({
-        title: 'Warning',
-        message: `Could update outro because firebase outro key has invalid value "${this.OutroKey}"`
-      });
-      return;
-    }
-
-    this.project.updateOutro(this.OutroKey, this.outroTemplates[outroKey])
+    this.outroKey = this.project.setOutro(this.outroTemplates[outroKey]);
     this.updateProject();
   }
 
   updateLogo(logoKey) {
-    if(!this.logoKey) {
-      this.errorHandler({
-        title: 'Warning',
-        message: `Could update outro because firebase logo key has invalid value "${this.logoKey}"`
-      });
-      return;
-    }
-
-    this.project.updateLogo(this.logoKey, this.logoTemplates[logoKey])
+    this.logoKey = this.project.setLogo(this.logoTemplates[logoKey])
     this.updateProject();
   }
 
@@ -322,6 +298,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.updateProject();
   }
 
+  deleteOutro(){
+      const outroKey = this.project.getAnnoKeyOfType('outro');
+      if(outroKey) this.deleteAnnotation(outroKey);
+  }
+
+  deleteLogo(){
+      const outroKey = this.project.getAnnoKeyOfType('logo');
+      if(outroKey) this.deleteAnnotation(outroKey);
+  }
   isProcessing(): boolean {
       // returns a boolean indication wether any form of processing is being done on the project  
       // and wether or not, as a result, a progress dialog should be shwon to the user. 
@@ -345,17 +330,20 @@ export class ProjectComponent implements OnInit, OnDestroy {
   updateTemplate(template) {
     // only update if you select a different template for the annotation
     if (template.key != this.selectedAnnotationKey) {
-      // update selectedAnno with new template
-      this.project.data.annotations[this.selectedAnnotationKey].data = template;
-      this.toggleTemplateSelector();
+      // we want to preserve any user input and map it to the new template. 
+      // if both the old the old and the new template have one input field, remap users content
+      const oldTemplate = this.project.data.annotations[this.selectedAnnotationKey].data;
+      const newTemplate = template; 
 
-      // if (template.duration) {
-      //   // if duration exceeds movieLength
-      //   if (this.selectedAnnotation.start + template.duration > this.project.data.clip.movieLength) {
-      //     this.selectedAnnotation.start = this.project.data.clip.movieLength - template.duration;
-      //   }
-      //   this.selectedAnnotation.end = this.selectedAnnotation.start + template.duration;
-      // }
+      const arrKeysOld = Object.keys(oldTemplate['text']);
+      const arrKeysNew = Object.keys(newTemplate['text']);
+
+      if(arrKeysNew.length === 1 && arrKeysOld.length === arrKeysNew.length){
+        newTemplate['text'][arrKeysNew[0]]['text'] = oldTemplate['text'][arrKeysOld[0]]['text'];
+    }
+      // update selectedAnno with new template
+      this.project.data.annotations[this.selectedAnnotationKey].data = newTemplate;
+      this.toggleTemplateSelector();
 
       this.updateProject();
     }
