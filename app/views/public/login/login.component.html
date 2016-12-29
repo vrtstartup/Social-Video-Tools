@@ -4,7 +4,7 @@
     </div>
 
     <div class="s-login__signin">    
-        <a *ngIf="activeFormGroup === 'loginForm'" class="s-btn s-btn--outline" (click)="onSetActiveFromGroup('registerForm')">Sign In</a>
+        <a *ngIf="activeFormGroup === 'loginForm'" class="s-btn s-btn--outline" (click)="onSetActiveFromGroup('registerForm')">Create Account</a>
         <a *ngIf="activeFormGroup === 'registerForm' || activeFormGroup === 'requestPassForm'" class="s-btn s-btn--outline" (click)="onSetActiveFromGroup('loginForm')">Login</a>
     </div>
 
@@ -60,7 +60,7 @@
                     </p>
                 </div>
                 <div class="">
-                    <button class="s-btn s-btn--large s-btn--display-block" type="submit">Register</button>
+                    <button class="s-btn s-btn--large s-btn--display-block" type="submit">Create Account</button>
                 </div>
             </form>
         </div>
