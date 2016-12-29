@@ -328,8 +328,19 @@ export class ProjectComponent implements OnInit, OnDestroy {
   updateTemplate(template) {
     // only update if you select a different template for the annotation
     if (template.key != this.selectedAnnotationKey) {
+      // we want to preserve any user input and map it to the new template. 
+      // if both the old the old and the new template have one input field, remap users content
+      const oldTemplate = this.project.data.annotations[this.selectedAnnotationKey].data;
+      const newTemplate = template; 
+
+      const arrKeysOld = Object.keys(oldTemplate['text']);
+      const arrKeysNew = Object.keys(newTemplate['text']);
+
+      if(arrKeysNew.length === 1 && arrKeysOld.length === arrKeysNew.length){
+        newTemplate['text'][arrKeysNew[0]]['text'] = oldTemplate['text'][arrKeysOld[0]]['text'];
+    }
       // update selectedAnno with new template
-      this.project.data.annotations[this.selectedAnnotationKey].data = template;
+      this.project.data.annotations[this.selectedAnnotationKey].data = newTemplate;
       this.toggleTemplateSelector();
 
       this.updateProject();
