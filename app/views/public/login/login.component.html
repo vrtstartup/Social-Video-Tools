@@ -4,7 +4,7 @@
     </div>
 
     <div class="s-login__signin">    
-        <a *ngIf="activeFormGroup === 'loginForm'" class="s-btn s-btn--outline" (click)="onSetActiveFromGroup('registerForm')">Sign In</a>
+        <a *ngIf="activeFormGroup === 'loginForm'" class="s-btn s-btn--outline" (click)="onSetActiveFromGroup('registerForm')">Create Account</a>
         <a *ngIf="activeFormGroup === 'registerForm' || activeFormGroup === 'requestPassForm'" class="s-btn s-btn--outline" (click)="onSetActiveFromGroup('loginForm')">Login</a>
     </div>
 
@@ -20,7 +20,7 @@
                 <div class="">
                     <input formControlName="email" type="email" placeholder="Your email">
                     <p class="s-form__error" *ngIf="loginForm.controls.email.errors && loginForm.controls.email.touched">
-                        Oops, Please provide a valid email address!
+                        Oops, you should use your @vrt.be email address to log in. 
                     </p>
                 </div>
 
@@ -45,11 +45,11 @@
 
             <div class="s-info">{{ errorMessage }}</div>
 
-            <form [formGroup]="registerForm" (submit)="register($event)" autocomplete="nope" novalidate>
+            <form [formGroup]="registerForm" (submit)="register($event)" autocomplete="nope" novalidate *ngIf="showRegistrationForm">
                 <div class="">
                     <input formControlName="email" type="email" placeholder="Your email">
-                    <p class="s-form__error" *ngIf="registerForm.controls.email.errors && loginForm.controls.email.touched">
-                        Oops, PleaseProvide a valid email address!
+                    <p class="s-form__error" *ngIf="registerForm.controls.email.errors">
+                        Oops, you should use your @vrt.be email address to sign up.
                     </p>
                 </div>
 
@@ -60,7 +60,7 @@
                     </p>
                 </div>
                 <div class="">
-                    <button class="s-btn s-btn--large s-btn--display-block" type="submit">Register</button>
+                    <button class="s-btn s-btn--large s-btn--display-block" type="submit" (click)="clickRegisterButton()">{{registerButtonText}}</button>
                 </div>
             </form>
         </div>
