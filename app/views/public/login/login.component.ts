@@ -66,8 +66,7 @@ export class LoginComponent implements OnInit {
   }
 
   validateEmail(fromControl: FormControl) {
-    let EMAIL_REGEXP = /(.+)@(.+){2,}\.(.+){2,}/
-    //let EMAIL_REGEXP = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/ ;
+    let EMAIL_REGEXP = /(.+)@vrt.be/
     return EMAIL_REGEXP.test(fromControl.value) ? null : { validateEmail: { valid: false}};
   }
 
@@ -91,17 +90,22 @@ export class LoginComponent implements OnInit {
 
       this.auth.createUser(credentials)
         .then(user => {
-          console.log('setting additional data');
+          // store aditional user data in FireBase Property 
           this.af.database.object(`/users/${user.uid}/role`).set('0'); // set user role
           this.af.database.object(`/users/${user.uid}/email`).set(user.auth.email); //set user email
           
           if(this.possibleBrands.length > 0){
             this.af.database.object(`/users/${user.uid}/defaultBrand`).set(this.possibleBrands[0]['key']); 
           }else{
-            console.log('No brands have been fetched, registering user without default brand');
+            console.log('No brands could be fetched, registering user without default brand');
           }
 
-          this.router.navigate(['projects'])
+          // send account verification email
+          user.auth.sendEmailVerification()
+            .then(console.log, this.errorHandler);
+
+          // do this when register is complete
+          // this.router.navigate(['projects'])
         })
         .catch(err => this.errorHandler(err));
     }
@@ -128,7 +132,7 @@ export class LoginComponent implements OnInit {
     } else if (err.code === 'auth/email-already-in-use') {
       this.errorMessage = 'This email is already in use';
     } else {
-      this.errorMessage = 'authentication failed wrong';
+      this.errorMessage = 'authentication failed! Something went terribly wrong.';
     }
   }
 

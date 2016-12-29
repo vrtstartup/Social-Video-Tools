@@ -20,7 +20,7 @@
                 <div class="">
                     <input formControlName="email" type="email" placeholder="Your email">
                     <p class="s-form__error" *ngIf="loginForm.controls.email.errors && loginForm.controls.email.touched">
-                        Oops, Please provide a valid email address!
+                        Oops, you should use your @vrt.be email address to log in. 
                     </p>
                 </div>
 
@@ -48,8 +48,8 @@
             <form [formGroup]="registerForm" (submit)="register($event)" autocomplete="nope" novalidate>
                 <div class="">
                     <input formControlName="email" type="email" placeholder="Your email">
-                    <p class="s-form__error" *ngIf="registerForm.controls.email.errors && loginForm.controls.email.touched">
-                        Oops, PleaseProvide a valid email address!
+                    <p class="s-form__error" *ngIf="registerForm.controls.email.errors">
+                        Oops, you should use your @vrt.be email address to sign up.
                     </p>
                 </div>
 
