@@ -1,7 +1,8 @@
 export default {
     defaultSubtitle: {
         name: 'defaultSubtitle',
-        imageUrl: './assets/overlay/title_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif',
         brand: 'deredactie',
         ass: {
             fontname: 'arial',
@@ -30,7 +31,8 @@ export default {
     },
     subtitleTwo: {
         name: 'subtitleTwo',
-        imageUrl: './assets/overlay/title_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif',
         brand: 'otherBrand',
         ass: {
             fontname: 'arial',
@@ -59,7 +61,8 @@ export default {
     },
     subtitleThree: {
         name: 'subtitleThree',
-        imageUrl: './assets/overlay/title_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif',
         brand: 'otherBrand',
         ass: {
             fontname: 'arial',
@@ -88,7 +91,8 @@ export default {
     },
     lowText: { 
         name: 'lowText',
-        imageUrl: './assets/overlay/title_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif',
         type: 'overlay',
         duration: 5,
         brand: 'deredactie',
@@ -118,7 +122,8 @@ export default {
     },
     highText: { 
         name: 'highText',
-        imageUrl: './assets/overlay/title_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif',
         type: 'overlay',
         duration: 7,
         brand: 'deredactie',
@@ -149,7 +154,8 @@ export default {
 
     bigText: { 
         name: 'bigText',
-        imageUrl: './assets/overlay/title_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif',
         type: 'overlay',
         duration: 7,
         brand: 'deredactie',
@@ -180,7 +186,8 @@ export default {
 
     highlightText: { 
         name: 'highlightText',
-        imageUrl: './assets/overlay/title_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif',
         type: 'overlay',
         duration: 7,
         brand: 'deredactie',
@@ -218,7 +225,8 @@ export default {
     
     bumper: {
         name: 'bumper', 
-        imageUrl: './assets/bumper/deredactie_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: './assets/bumper/deredactie_01.gif',
         duration: 7,
         transitionDuration: 3,
         type: 'outro',
@@ -227,7 +235,8 @@ export default {
     },
     nogeenbumper: {
         name: 'nogeenbumper', 
-        imageUrl: './assets/bumper/deredactie_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: './assets/bumper/deredactie_01.gif',
         duration: 5,
         transitionDuration: 2,
         type: 'outro',
@@ -236,7 +245,8 @@ export default {
     },
     bumper2: {
         name: 'bumper2', 
-        imageUrl: './assets/bumper/deredactie_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: './assets/bumper/deredactie_01.gif',
         duration: 10,
         transitionDuration: 2,
         type: 'outro',
@@ -245,7 +255,8 @@ export default {
     },
     logo: {
         name:'logo',
-        imageUrl: './assets/logo/deredactie_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: './assets/logo/deredactie_01.gif',
         scale: 6,
         offset: {
             x: 20,
@@ -259,7 +270,8 @@ export default {
     },
     anderLogo: {
         name:'Anderlogo',
-        imageUrl: './assets/logo/deredactie_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: './assets/logo/deredactie_01.gif',
         scale: 8,
         offset: {
             x: 20,
@@ -274,7 +286,8 @@ export default {
     logo2: {
         key:'logo2',
         brand: 'otherBrand',
-        imageUrl: './assets/logo/deredactie_01.gif',
+        imageUrl: 'https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif',
+        imageUrlStatic: './assets/logo/deredactie_01.gif',
         scale: 6,
         offset: {
             x: 20,

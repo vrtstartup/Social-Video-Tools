@@ -50,7 +50,7 @@
 						(click)="showOutroList ? showOutroList = false : showOutroList = true">
 						<button type="button" class="s-templateSelector__button">
 							<div class="s-templateSelector__button-img" *ngIf="project.getAnnoKeyOfType('outro') && project.data.annotations[outroKey]" (mouseover)="outroPreview=true" (mouseout)="outroPreview=false">
-								<img *ngIf="!outroPreview" [src]="project.data.annotations[outroKey].data.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
+								<img *ngIf="!outroPreview" [src]="project.data.annotations[outroKey].data.imageUrlStatic" alt="">
 								<img *ngIf="outroPreview" [src]="project.data.annotations[outroKey].data.imageUrl" alt="">
 							</div>
 							<div class="s-templateSelector__button-label"> Bumper <md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon> </div>
@@ -76,7 +76,7 @@
 						(click)="showLogoList ? showLogoList = false : showLogoList = true">
 						<button type="button" class="s-templateSelector__button">
 							<div class="s-templateSelector__button-img" *ngIf="project.getAnnoKeyOfType('logo') && defaultLogoKey" (mouseover)="logoPreview=true" (mouseout)="logoPreview=false">
-								<img style="width:100%;" *ngIf="!logoPreview" [src]="project.data.annotations[logoKey].data.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="" >
+								<img style="width:100%;" *ngIf="!logoPreview" [src]="project.data.annotations[logoKey].data.imageUrlStatic" alt="" >
 								<img style="width:100%;" *ngIf="logoPreview" [src]="project.data.annotations[logoKey].data.imageUrl" alt="" >
 							</div>
 							<div class="s-templateSelector__button-label"> Logo <md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon></div>
