@@ -201,6 +201,10 @@ export class ProjectComponent implements OnInit, OnDestroy {
         if(this.defaultOutroKey) this.updateOutro(this.defaultOutroKey);
         this.project.data.defaultsSet = true;
         this.updateProject();
+      }else{
+        // logoKey and outoKey do need to be set 
+        this.logoKey = this.project.getAnnoKeyOfType('logo');
+        this.outroKey = this.project.getAnnoKeyOfType('outro');
       }
 
       this.loadTemplates(); // depends on project data
