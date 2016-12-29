@@ -1,7 +1,7 @@
 export const routingConfig = {
   fileServer: {
     protocol: 'http',
-    domain: 'social-video-tools.herokuapp.com',
+    domain: '35.156.200.8',
     port: '3000'
   }
 }

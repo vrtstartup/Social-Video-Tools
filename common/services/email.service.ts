@@ -13,7 +13,7 @@ export class Email {
         "From": `${config.mail.from}`,
         "To": targetAddress,
         "Subject": `Your projects's ${type} job has been completed!`, 
-        "TextBody": `You can download your file here: ${config.routing.fileServer.protocol}://${config.routing.fileServer.domain}:${config.routing.fileServer.port}/download/${encodeURIComponent(projectId)}`
+        "TextBody": `You can download your file here: ${config.routing.fileServer.protocol}://${config.routing.fileServer.domain}/api/file/download/${encodeURIComponent(projectId)}`
       }, (err, result) => err ? reject(err) : resolve(result))
     });
     
