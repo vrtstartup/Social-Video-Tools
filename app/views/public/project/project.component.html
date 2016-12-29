@@ -111,7 +111,7 @@
 								<div *ngIf="selectedAnnotationKey === annotation.key" 
 									(click)="toggleTemplateSelector(annotation.key)"
 									class="s-anno-item__preview">
-									<img *ngIf="annotation.data?.imageUrlStatic" [src]="templates[annotation.data.key].imageUrlStatic" >
+									<img *ngIf="annotation.data?.imageUrlStatic" [src]="templates[annotation.data.name]?.imageUrlStatic" >
 									<span><md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon></span>
 								</div>
 							</div>
