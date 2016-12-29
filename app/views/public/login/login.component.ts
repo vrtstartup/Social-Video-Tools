@@ -22,7 +22,9 @@ export class LoginComponent implements OnInit {
   private requestPassForm: FormGroup;
   private registerFlag: Boolean = false;
   private possibleBrands: Array<Brand>;
-    brandSub: any;
+  private brandSub: any;
+  private showRegistrationForm: boolean;
+  private registerButtonText: string; 
 
   constructor(
     af: AngularFire,
@@ -33,7 +35,8 @@ export class LoginComponent implements OnInit {
     @Inject(FirebaseApp) firebaseApp: any) {
     this.af = af;
     this.fbAuth = firebaseApp.auth();
-
+    this.showRegistrationForm = true;
+    this.registerButtonText = 'Create Account';
     this.possibleBrands = [];    
   }
 
@@ -61,6 +64,8 @@ export class LoginComponent implements OnInit {
 
   onSetActiveFromGroup(formGroupName) {
     // toggles visibility of different forms
+    this.showRegistrationForm = true;
+    this.registerButtonText = 'Create Account';
     this.errorMessage = '';
     this.activeFormGroup = formGroupName;
   }
@@ -102,14 +107,18 @@ export class LoginComponent implements OnInit {
 
           // send account verification email
           user.auth.sendEmailVerification()
-            .then(console.log, this.errorHandler);
-
-          // do this when register is complete
-          // this.router.navigate(['projects'])
+            .then(this.handleRegistrationSuccess.bind(this), this.errorHandler);
         })
         .catch(err => this.errorHandler(err));
     }
   }
+
+  handleRegistrationSuccess(data) {
+    this.showRegistrationForm = false; 
+    this.errorMessage = 'Registration successful! Please check your inbox for our confirmation mail'
+  }
+
+  clickRegisterButton() { this.registerButtonText = 'Hold on...' }
 
   requestPasswordResetEmail(event){
     event.preventDefault();

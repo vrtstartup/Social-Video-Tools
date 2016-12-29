@@ -45,7 +45,7 @@
 
             <div class="s-info">{{ errorMessage }}</div>
 
-            <form [formGroup]="registerForm" (submit)="register($event)" autocomplete="nope" novalidate>
+            <form [formGroup]="registerForm" (submit)="register($event)" autocomplete="nope" novalidate *ngIf="showRegistrationForm">
                 <div class="">
                     <input formControlName="email" type="email" placeholder="Your email">
                     <p class="s-form__error" *ngIf="registerForm.controls.email.errors">
@@ -60,7 +60,7 @@
                     </p>
                 </div>
                 <div class="">
-                    <button class="s-btn s-btn--large s-btn--display-block" type="submit">Create Account</button>
+                    <button class="s-btn s-btn--large s-btn--display-block" type="submit" (click)="clickRegisterButton()">{{registerButtonText}}</button>
                 </div>
             </form>
         </div>
