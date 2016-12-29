@@ -82,7 +82,7 @@ export class LoginComponent implements OnInit {
       const credentials = { email: this.loginForm.value.email, password: this.loginForm.value.password};
 
       this.auth.login(credentials)
-        .then(user => this.router.navigate(['projects']))
+        .then(this.handleLoginSucess.bind(this))
         .catch(err => this.errorHandler(err))
     }
   }
@@ -118,6 +118,16 @@ export class LoginComponent implements OnInit {
     this.errorMessage = 'Registration successful! Please check your inbox for our confirmation mail'
   }
 
+  handleLoginSucess(user) {
+    const verified = user.auth.emailVerified;
+
+    if(verified) {
+      this.router.navigateByUrl('/projects');
+    }else{ 
+      this.errorMessage = 'Seems this email hasn\'t been verified yet. Check your inbox for our confirmation mail' ;
+      this.auth.logout();
+    }
+  }
   clickRegisterButton() { this.registerButtonText = 'Hold on...' }
 
   requestPasswordResetEmail(event){
