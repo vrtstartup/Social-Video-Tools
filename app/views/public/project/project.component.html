@@ -50,8 +50,7 @@
 						(click)="showOutroList ? showOutroList = false : showOutroList = true">
 						<button type="button" class="s-templateSelector__button">
 							<div class="s-templateSelector__button-img" *ngIf="project.getAnnoKeyOfType('outro') && project.data.annotations[outroKey]" (mouseover)="outroPreview=true" (mouseout)="outroPreview=false">
-								<img *ngIf="!outroPreview" [src]="project.data.annotations[outroKey].data.imageUrlStatic" alt="">
-								<img *ngIf="outroPreview" [src]="project.data.annotations[outroKey].data.imageUrl" alt="">
+								<preload-img [srcStatic]="project.data.annotations[outroKey].data.imageUrlStatic" [srcAnimated]="project.data.annotations[outroKey].data.imageUrl" [preview]="outroPreview" [padding]="false"></preload-img>
 							</div>
 							<div class="s-templateSelector__button-label"> Bumper <md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon> </div>
 							
@@ -59,8 +58,7 @@
 						<ul class="s-templateSelector__dropdown-list s-slideIn" *ngIf="showOutroList">
 							<li class="s-templateSelector__dropdown-item" *ngFor="let outro of outroTemplates | list | filter:templateFilter" (click)="updateOutro(outro.key)">
 								<div (mouseover)="outro.preview=true" (mouseout)="outro.preview=false">
-									<img *ngIf="!outro.preview" [src]="outro.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
-									<img *ngIf="outro.preview" [src]="outro.imageUrl" alt="">						
+									<preload-img [srcStatic]="outro.imageUrlStatic" [srcAnimated]="outro.imageUrl" [preview]="outro.preview" [padding]="false"></preload-img>					
 								</div>
 							</li>
 
@@ -76,16 +74,14 @@
 						(click)="showLogoList ? showLogoList = false : showLogoList = true">
 						<button type="button" class="s-templateSelector__button">
 							<div class="s-templateSelector__button-img" *ngIf="project.getAnnoKeyOfType('logo') && defaultLogoKey" (mouseover)="logoPreview=true" (mouseout)="logoPreview=false">
-								<img style="width:100%;" *ngIf="!logoPreview" [src]="project.data.annotations[logoKey].data.imageUrlStatic" alt="" >
-								<img style="width:100%;" *ngIf="logoPreview" [src]="project.data.annotations[logoKey].data.imageUrl" alt="" >
+								<preload-img [srcStatic]="project.data.annotations[logoKey].data.imageUrlStatic" [srcAnimated]="project.data.annotations[logoKey].data.imageUrl" [preview]="logoPreview" [padding]="false"></preload-img>
 							</div>
 							<div class="s-templateSelector__button-label"> Logo <md-icon svgSrc="assets/icons/icon-arrow-down.svg"></md-icon></div>
 						</button>
 						<ul class="s-templateSelector__dropdown-list s-slideIn" *ngIf="showLogoList">
 							<li class="s-templateSelector__dropdown-item" *ngFor="let logo of logoTemplates | list | filter:templateFilter" (click)="updateLogo(logo.key)">
 								<div (mouseover)="logo.preview=true" (mouseout)="logo.preview=false">
-									<img *ngIf="!logo.preview" [src]="logo.imageUrl.slice(0, -4) + '_static' + '.gif'" alt="">
-									<img *ngIf="logo.preview" [src]="logo.imageUrl" alt="">						
+									<preload-img [srcStatic]="logo.imageUrlStatic" [srcAnimated]="logo.imageUrl" [preview]="logo.preview" [padding]="false"></preload-img>					
 								</div>
 							</li>
 
@@ -165,8 +161,7 @@
 								[class.active]="template.key === selectedAnnotationKey"
 								class="s-anno-template">
 									<div (mouseover)="template.preview=true" (mouseout)="template.preview=false">
-										<img *ngIf="!template.preview" class="s-anno-template__thumb" [src]="template.imageUrl.slice(0, -4) + '_static' + '.gif'" >
-										<img *ngIf="template.preview" class="s-anno-template__thumb" [src]="template.imageUrl">
+										<preload-img [srcStatic]="template.imageUrlStatic" [srcAnimated]="template.imageUrl" [preview]="template.preview" [padding]="true"></preload-img>
 									</div>
 							
 							</div>
