@@ -2,8 +2,10 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFire, FirebaseApp, FirebaseAuth, FirebaseAuthState } from 'angularfire2';
-import { BrandService} from '../../../common/services/brands.service'
+import { BrandService} from '../../../common/services/brands.service';
+import { UserService } from '../../../common/services/user.service';
 import { Brand } from '../../../common/models/brand.model';
+import { User } from '../../../common/models/user.model';
 
 @Component({
   providers: [BrandService],
@@ -23,6 +25,7 @@ export class LoginComponent implements OnInit {
   private registerFlag: Boolean = false;
   private possibleBrands: Array<Brand>;
   private brandSub: any;
+  private userSub: any;
   private showRegistrationForm: boolean;
   private registerButtonText: string; 
 
@@ -32,6 +35,7 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private BrandService: BrandService,
+    private userService: UserService,
     @Inject(FirebaseApp) firebaseApp: any) {
     this.af = af;
     this.fbAuth = firebaseApp.auth();
@@ -60,6 +64,9 @@ export class LoginComponent implements OnInit {
     this.loginForm.valueChanges.subscribe(value => {});
 
     this.brandSub = this.BrandService.brands$.subscribe(this.brandsHandler.bind(this), this.errorHandler);
+
+    // check if there's a logged in user
+    this.userSub = this.userService.user$.subscribe(this.handleUser.bind(this), this.errorHandler);
   }
 
   onSetActiveFromGroup(formGroupName) {
@@ -128,6 +135,11 @@ export class LoginComponent implements OnInit {
       this.auth.logout();
     }
   }
+
+  handleUser(user: User) { if(user) this.router.navigateByUrl('/projects') }
+
+  brandsHandler(brands: Array<Brand>){ this.possibleBrands = brands }
+
   clickRegisterButton() { this.registerButtonText = 'Hold on...' }
 
   requestPasswordResetEmail(event){
@@ -142,8 +154,6 @@ export class LoginComponent implements OnInit {
         .catch( err => this.errorHandler(err))
     }
   }
-
-  brandsHandler(brands: Array<Brand>){ this.possibleBrands = brands }
 
   errorHandler(err) {
     if (err.code === 'auth/user-not-found') {

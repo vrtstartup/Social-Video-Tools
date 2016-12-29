@@ -11,7 +11,6 @@ export class UserService {
            
         this.user$ = this.af.auth.flatMap(auth => {
             if (!auth) {
-                console.log('not authenticated');
                 return Observable.create( observer => {
                     observer.next();
                     //observer.complete();
