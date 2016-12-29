@@ -89,7 +89,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     private BrandService: BrandService,
     private _hotkeysService: HotkeysService,
     private _el: ElementRef) {
-
+    this.seek = 0;
     this.af = af;
     this.projectId =  this.route.snapshot.params['id'];
     this.selectedAnnotationKey = '';
@@ -123,8 +123,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
     this.loadUser();
     this.loadBrands();
-
-    this.seek = 0;
 
     this.uploadServiceSub = this.uploadService.progress$.subscribe(data => {
         this.zone.run(() => this.uploadProgress = data); // trigger change detecton
