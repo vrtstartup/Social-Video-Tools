@@ -13,6 +13,7 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
     @Input() clip;
     @Input() selectedAnnotationKey;
     @Input() annotations;
+    @Input() seek;
 
     sources: Array<Object>;
     controls: boolean = false;
@@ -33,11 +34,23 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
         this.play = false; // keeps playing-state
     }
 
-    ngOnInit() { }
+    ngOnInit() {}
 
     onPlayerReady(api: VgAPI) {
         this.api = api;
         this.apiLoaded = true;
+
+        // loop between scrub handles
+        this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(() => {
+            this.currentTime = Number(this.api.currentTime);
+            if (this.selectedAnnotation) {
+                if (this.api.currentTime >= parseFloat(this.selectedAnnotation.end)) {
+                    this.api.seekTime(parseFloat(this.selectedAnnotation.start));
+                    this.api.play();
+                }
+            }
+
+        });
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -49,6 +62,8 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
         }
 
         if (this.apiLoaded) {
+
+            if (changes.hasOwnProperty('seek')) this.api.seekTime(this.seek);
 
             if (changes.hasOwnProperty('previewTrigger')) {
                 this.play = true ; //alway play on preview
@@ -108,21 +123,6 @@ export class VrtVideoPlayer implements OnChanges, OnInit {
         this.currentTime = this.api.currentTime;
 
         setTimeout(() => this.api.play(), 200)
-
-
-        // loop between scrub handles
-        this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(() => {
-            
-            this.currentTime = Number(this.api.currentTime);
-
-            if (this.selectedAnnotation) {
-                if (this.api.currentTime >= parseFloat(this.selectedAnnotation.end)) {
-                    this.api.seekTime(parseFloat(this.selectedAnnotation.start));
-                    this.api.play();
-                }
-            }
-
-        });
     }
 
     parseHtml(annotation) {

@@ -76,6 +76,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   // application state
   uploading: boolean;
+  seek: number;
 
   constructor(
     af: AngularFire,
@@ -122,6 +123,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
     this.loadUser();
     this.loadBrands();
+
+    this.seek = 0;
 
     this.uploadServiceSub = this.uploadService.progress$.subscribe(data => {
         this.zone.run(() => this.uploadProgress = data); // trigger change detecton
@@ -268,6 +271,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   updateAnnotation(key, event) {
+    this.seek = event.start; // set seek position to annotation start time
     this.project.updateAnnotation(key, event)
     this.updateProject();
   }
