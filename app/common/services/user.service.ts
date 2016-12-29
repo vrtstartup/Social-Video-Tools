@@ -22,7 +22,7 @@ export class UserService {
             return this.af.database.object(`/users/${auth['uid']}`).map(userData => {
                 userData.userID = auth.uid;
                 userData.email = auth.auth.email;
-                
+                userData.verified = auth.auth.emailVerified;
                 return userData;
             });
         });

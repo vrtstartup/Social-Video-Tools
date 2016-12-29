@@ -5,7 +5,6 @@ import { AngularFire, FirebaseApp, FirebaseAuth, FirebaseAuthState } from 'angul
 import { BrandService} from '../../../common/services/brands.service';
 import { UserService } from '../../../common/services/user.service';
 import { Brand } from '../../../common/models/brand.model';
-import { User } from '../../../common/models/user.model';
 
 @Component({
   providers: [BrandService],
@@ -136,7 +135,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  handleUser(user: User) { if(user) this.router.navigateByUrl('/projects') }
+  handleUser(user) { if(user && user.verified) this.router.navigateByUrl('/projects') }
 
   brandsHandler(brands: Array<Brand>){ this.possibleBrands = brands }
 
