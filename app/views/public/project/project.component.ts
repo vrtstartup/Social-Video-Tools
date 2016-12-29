@@ -124,7 +124,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.loadBrands();
 
     this.uploadServiceSub = this.uploadService.progress$.subscribe(data => {
-        this.zone.run(() => this.uploadProgress = data); // force to trigger change
+        this.zone.run(() => this.uploadProgress = data); // trigger change detecton
       }, console.log);
   }
 
