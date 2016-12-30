@@ -18,15 +18,10 @@ module.exports = function () {
         plugins: [
             new webpack.DefinePlugin({
                 'FIREBASE_CONFIG': JSON.stringify(frontConfig['firebaseApp']['production'])
-            })
+            }),
+            new webpack.optimize.DedupePlugin(),
+            new webpack.optimize.UglifyJsPlugin(),
+            new webpack.optimize.AggressiveMergingPlugin()
         ],
-
-        devServer: {
-            contentBase: './',
-            historyApiFallback: true,
-            proxy: {
-                "**": "http://localhost:" + frontConfig.port
-            }
-        }
     });
 };
