@@ -15,6 +15,7 @@ const morgan:any = require('morgan');
 const path:any = require('path');
 const cors:any = require('cors');
 const bodyParser:any = require('body-parser');
+const compression  = require('compression');
 
 // init firebase
 // const db = FireBase.database();
@@ -40,6 +41,8 @@ server.set('state', state);
 server.set('message', message);
 server.set('jobs', jobs);
 server.set('templates', templates);
+
+server.use(compression());
 server.use(bodyParser());
 
 let publicPath = config.filesystem.workingDirectory;
