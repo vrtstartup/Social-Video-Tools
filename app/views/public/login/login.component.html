@@ -48,14 +48,14 @@
             <form [formGroup]="registerForm" (submit)="register($event)" autocomplete="nope" novalidate *ngIf="showRegistrationForm">
                 <div class="">
                     <input formControlName="email" type="email" placeholder="Your email">
-                    <p class="s-form__error" *ngIf="registerForm.controls.email.errors">
+                    <p class="s-form__error" *ngIf="registerForm.controls.email.errors && registerForm.controls.email.touched">
                         Oops, you should use your @vrt.be email address to sign up.
                     </p>
                 </div>
 
                 <div class="">
                 <input formControlName="password" type="password" placeholder="Your password">
-                    <p class="s-form__error" *ngIf="registerForm.controls.password.errors && loginForm.controls.password.touched">
+                    <p class="s-form__error" *ngIf="registerForm.controls.password.errors && registerForm.controls.password.touched">
                         Min 6 characters!
                     </p>
                 </div>

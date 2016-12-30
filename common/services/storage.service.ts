@@ -31,6 +31,7 @@ export function uploadFile(project, fileType: string){
           if(err) logger.error(err);
           
           resolve(project);
+          if(fileType !== 'ass') deleteFile(filePath);
         }).on('httpUploadProgress', progress => {
           logger.info(progress.loaded + " of " + progress.total + " bytes: ", (progress.loaded / progress.total)*100 + '%');
         });
@@ -86,3 +87,5 @@ export function getReadStream(fileType:string, projectId: string){
     });
   });
 }
+
+function deleteFile(filePath: string){ fs.unlink(filePath) }
