@@ -9,7 +9,5 @@
 - up & down arrow: select next en previous annotation
 
 ## other
-- feedback functionality
 - admin role selector
-- ... 
 

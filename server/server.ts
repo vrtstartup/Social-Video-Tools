@@ -45,8 +45,8 @@ server.set('templates', templates);
 server.use(compression());
 server.use(bodyParser());
 
-let publicPath = config.filesystem.workingDirectory;
-server.use('/video', express.static(publicPath)); 
+const logsPath = resolve('logs');
+server.use('/logs', express.static(logsPath)); 
 
 // when getting root, serve angular client
 const pathToClient = path.join(__dirname, '../dist');
