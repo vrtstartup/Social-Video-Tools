@@ -31,7 +31,7 @@ export function uploadFile(project, fileType: string){
           if(err) logger.error(err);
           
           resolve(project);
-          deleteFile(filePath);
+          if(fileType !== 'ass') deleteFile(filePath);
         }).on('httpUploadProgress', progress => {
           logger.info(progress.loaded + " of " + progress.total + " bytes: ", (progress.loaded / progress.total)*100 + '%');
         });
