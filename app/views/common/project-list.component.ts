@@ -39,7 +39,9 @@ export class ProjectListComponent implements OnInit {
   }
 
   ngOnInit() {
-    // subscribe to user$
+    this.projectsSub = this.projectService.projects$.subscribe(projects => this.projects = projects );
+    this.projectsByUserSub = this.projectService.projectsByUser$.subscribe(projectsbyuser => this.projects = projectsbyuser );
+
     this.userSub = this.userService.user$.subscribe( user => {
         if(user){
           this.userEmail = user['email'];
@@ -47,18 +49,7 @@ export class ProjectListComponent implements OnInit {
           this.role = user['role'];
         }  
       }, err => console.log('authserviceErr', err)
-     );
-
-    // subsribe to projects$
-    this.projectsSub = this.projectService.projects$.subscribe(projects => {
-      this.projects = projects;
-    })
-
-    // subsribe to projectsByUser$
-    this.projectsByUserSub = this.projectService.projectsByUser$.subscribe(projectsbyuser => {
-      // check TODO in projectService: .map triggers multiple times
-      this.projects = projectsbyuser;
-    });
+    );
   }
 
   ngOnDestroy() {
