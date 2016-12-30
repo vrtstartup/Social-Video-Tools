@@ -14,9 +14,6 @@ import { User } from '../../../common/models/user.model';
 import { HotkeysService } from '../../../../node_modules/angular2-hotkeys/src/services/hotkeys.service';
 import { Hotkey } from '../../../../node_modules/angular2-hotkeys/src/models/hotkey.model';
 
-// TODO remove | only for test purposes
-import testTemplate from '../../../common/models/testTemplate.model';
-
 @Component({
   providers: [UploadService, BrandService, HotkeysService],
   selector: 'project-component',
@@ -118,9 +115,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // TODO remove | only for test purposes | admin
-    this.templatesRef.set(testTemplate);
-
     this.loadUser();
     this.loadBrands();
 
