@@ -33,37 +33,51 @@
       <div class="s-project-item__status">
         <div *ngIf="project.data.status">
           <!--downscaling-->
-          <div class="s-project-item__statusprocess">
-            <span *ngIf="project.data?.status?.downscaled"><md-icon svgSrc="assets/icons/icon-check.svg"></md-icon></span>
-            <span *ngIf="project.data?.status?.downscaled != null">Downscale Process</span> 
-          </div>
-          <div class="s-project-item__statussubprocess">
-            <span *ngIf="project.status?.uploaded"><i>Uploaded:</i> {{project.status?.uploaded}}</span>
-          </div>
-          <div class="s-project-item__statussubprocess" *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100">
-            <span>Downscaling</span>
-            <span><progress-bar [progress]="project.data?.status?.downScaleProgress"></progress-bar></span>
-          </div>
-          <div class="s-project-item__statussubprocess">
-            <span *ngIf="project.data?.status?.storing">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
+          <div class="s-project-item__statusprocess" *ngIf="project.data?.status?.downscaled">
+            <span><md-icon svgSrc="assets/icons/icon-check.svg"></md-icon></span>
+            <span>Scale source video</span> 
           </div>
 
+          <div class="s-project-item__statusdetails" *ngIf="!project.data?.status?.downscaled">
+            <div class="s-project-item__statussubprocess" *ngIf="project.data.status?.uploaded">
+              <span><i>source file has been successfully uploaded!</i></span>
+            </div>
+
+            <div class="s-project-item__statussubprocess" *ngIf="project.data.status?.queued">
+              <span><i>project is queued for processing, hold on...</i></span>
+            </div>
+
+            <div class="s-project-item__statussubprocess" *ngIf="project.data?.status?.downScaleProgress > 0 && project.data?.status?.downScaleProgress < 100">
+              <span>Downscaling</span>
+              <span><progress-bar [progress]="project.data?.status?.downScaleProgress"></progress-bar></span>
+            </div>
+
+            <div class="s-project-item__statussubprocess">
+              <span *ngIf="project.data?.status?.storing">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
+            </div>
+          </div>
           <!--templater-->
           <!--<div>Templater:<span>Templater progress here</span></div>
 
           <!--stitiching-->
-          <div class="s-project-item__statusprocess">
-            <span *ngIf="project.data?.status?.render"><md-icon svgSrc="assets/icons/icon-check.svg"></md-icon></span>
-            <span *ngIf="project.data?.status?.render != null">Rendering Process</span>
+          <div class="s-project-item__statusprocess" *ngIf="project.data?.status?.render">
+            <span><md-icon svgSrc="assets/icons/icon-check.svg"></md-icon></span>
+            <span>Rendering Process</span>
           </div>
-          <div class="s-project-item__statussubprocess" *ngIf="project.data?.status?.stitchingProgress > 0 && project.data?.status?.stitchingProgress < 100">
-            <span>Rendering Movie</span>
-            <span><progress-bar [progress]="project.data?.status?.stitchingProgress"></progress-bar></span>
+
+          <div class="s-project-item__statusdetails" *ngIf="!project.data?.status?.render">
+            <div class="s-project-item__statussubprocess" *ngIf="project.data.status?.queued">
+              <span><i>project is queued for processing, hold on...</i></span>
+            </div>
+
+            <div class="s-project-item__statussubprocess" *ngIf="project.data?.status?.stitchingProgress > 0 && project.data?.status?.stitchingProgress < 100">
+              <span>Rendering Movie</span>
+              <span><progress-bar [progress]="project.data?.status?.stitchingProgress"></progress-bar></span>
+            </div>
+            <div class="s-project-item__statussubprocess">
+              <span *ngIf="project.data?.status?.storingRender">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
+            </div>
           </div>
-          <div class="s-project-item__statussubprocess">
-            <span *ngIf="project.data?.status?.storingRender">storing <md-icon svgSrc="assets/icons/icon-spinner-ring.svg"></md-icon></span>
-          </div>
-          
         </div>
       </div>
     </div>
