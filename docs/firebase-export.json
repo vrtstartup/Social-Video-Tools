@@ -1,0 +1,329 @@
+{
+  "brands" : {
+    "deredactie" : {
+      "name" : "De Redactie",
+      "templates" : {
+        "bigText" : true,
+        "bumper_redactie_1" : true,
+        "highText" : true,
+        "highlightText" : true,
+        "logo_redactie_1" : true,
+        "lowText" : true,
+        "subtitle" : true
+      }
+    },
+    "otherBrand" : {
+      "name" : "Some Other Brand",
+      "templates" : {
+        "subtitle" : true,
+        "subtitleThree" : true,
+        "subtitleTwo" : true
+      }
+    }
+  },
+  "templates" : {
+    "anderLogo" : {
+      "brand" : "deredactie",
+      "fileName" : "deredactie_1",
+      "height" : 130,
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/logo_deredactie_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/logo_deredactie_01_static.gif",
+      "name" : "Anderlogo",
+      "offset" : {
+        "x" : 20,
+        "y" : 20
+      },
+      "scale" : 8,
+      "type" : "logo",
+      "width" : 266
+    },
+    "bigText" : {
+      "bot" : {
+        "bot" : "render",
+        "color1" : "1B2A36",
+        "color2" : "4CBF23",
+        "module" : "jpg2000",
+        "render-status" : "ready"
+      },
+      "brand" : "deredactie",
+      "duration" : 7,
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif",
+      "layers" : {
+        "BigText" : true,
+        "HighText" : false,
+        "HighlightText" : false,
+        "LowText" : false
+      },
+      "name" : "bigText",
+      "templateCss" : "<style>#bigText.wrapper{ background: rgba(0,0,0,0); color:white; }</style>",
+      "templateHtml" : "<div id=\"bigText\" class=\"wrapper\"><div>%Text2DR%</div></div>",
+      "text" : {
+        "Text2DR" : {
+          "key" : "Text2DR",
+          "label" : "Title",
+          "layerId" : "Text2DR",
+          "text" : "bigText"
+        }
+      },
+      "type" : "overlay"
+    },
+    "bumper" : {
+      "brand" : "deredactie",
+      "duration" : 7,
+      "fileName" : "deredactie_1",
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/bumper_deredactie_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/bumper_deredactie_01_static.gif",
+      "name" : "bumper",
+      "transitionDuration" : 3,
+      "type" : "outro"
+    },
+    "bumper2" : {
+      "brand" : "otherBrand",
+      "duration" : 10,
+      "fileName" : "deredactie_2",
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/bumper_deredactie_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/bumper_deredactie_01_static.gif",
+      "name" : "bumper2",
+      "transitionDuration" : 2,
+      "type" : "outro"
+    },
+    "defaultSubtitle" : {
+      "aeTemplate" : "./testTemplate.aep",
+      "ass" : {
+        "backColour" : "0x000000",
+        "bold" : false,
+        "fontname" : "arial",
+        "fontsize" : 24,
+        "italic" : false,
+        "outlineColour" : "0xFFFFFF",
+        "primaryColour" : "0xFFFFFF",
+        "secondaryColour" : "0xFFFFFF",
+        "strikeout" : false,
+        "underline" : false
+      },
+      "brand" : "deredactie",
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif",
+      "name" : "defaultSubtitle",
+      "templateCss" : "<style>#defaultSubtitle.wrapper{ background: rgba(0,0,0,0); color:white; }</style>",
+      "templateHtml" : "<div id=\"defaultSubtitle\" class=\"wrapper\"><div>%textInpt01%</div></div>",
+      "text" : {
+        "textInpt01" : {
+          "key" : "textInpt01",
+          "label" : "Title",
+          "layerId" : "textInpt01",
+          "text" : "defaultSubtitle"
+        }
+      },
+      "type" : "subtitle"
+    },
+    "highText" : {
+      "bot" : {
+        "bot" : "render",
+        "color1" : "1B2A36",
+        "color2" : "4CBF23",
+        "module" : "jpg2000",
+        "render-status" : "ready"
+      },
+      "brand" : "deredactie",
+      "duration" : 7,
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif",
+      "layers" : {
+        "BigText" : false,
+        "HighText" : true,
+        "HighlightText" : false,
+        "LowText" : false
+      },
+      "name" : "highText",
+      "templateCss" : "<style>#highText.wrapper{ background: rgba(0,0,0,0); color:white; }</style>",
+      "templateHtml" : "<div id=\"highText\" class=\"wrapper\"><div>%Text2DR%</div></div>",
+      "text" : {
+        "Text2DR" : {
+          "key" : "Text2DR",
+          "label" : "Title",
+          "layerId" : "Text2DR",
+          "text" : "highText"
+        }
+      },
+      "type" : "overlay"
+    },
+    "highlightText" : {
+      "bot" : {
+        "aep" : "D:\\videoTemplater\\dropbox\\ae\\Templater\\template.aep",
+        "bot" : "render",
+        "color1" : "1B2A36",
+        "color2" : "4CBF23",
+        "module" : "jpg2000",
+        "render-status" : "ready"
+      },
+      "brand" : "deredactie",
+      "duration" : 7,
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif",
+      "layers" : {
+        "BigText" : false,
+        "HighText" : false,
+        "HighlightText" : true,
+        "LowText" : false
+      },
+      "name" : "highlightText",
+      "templateCss" : "<style>#bigText.wrapper{ background: rgba(0,0,0,0); color:white; }</style>",
+      "templateHtml" : "<div id=\"bigText\" class=\"wrapper\"><div>%Text2DR%</div><div>%Text3%</div></div>",
+      "text" : {
+        "Text2DR" : {
+          "key" : "Text2DR",
+          "label" : "Title",
+          "layerId" : "Text2DR",
+          "text" : "highlightText"
+        },
+        "Text3" : {
+          "key" : "Text3",
+          "label" : "Subtitle",
+          "layerId" : "Text2DR",
+          "text" : "highlightText"
+        }
+      },
+      "type" : "overlay"
+    },
+    "logo" : {
+      "brand" : "deredactie",
+      "fileName" : "deredactie_1",
+      "height" : 130,
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/logo_deredactie_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/logo_deredactie_01_static.gif",
+      "name" : "logo",
+      "offset" : {
+        "x" : 20,
+        "y" : 20
+      },
+      "scale" : 6,
+      "type" : "logo",
+      "width" : 266
+    },
+    "logo2" : {
+      "brand" : "otherBrand",
+      "fileName" : "deredactie_1",
+      "height" : 130,
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/logo_deredactie_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/logo_deredactie_01_static.gif",
+      "key" : "logo2",
+      "offset" : {
+        "x" : 20,
+        "y" : 20
+      },
+      "scale" : 6,
+      "type" : "logo",
+      "width" : 266
+    },
+    "lowText" : {
+      "bot" : {
+        "bot" : "render",
+        "color1" : "1B2A36",
+        "color2" : "4CBF23",
+        "module" : "jpg2000",
+        "render-status" : "ready"
+      },
+      "brand" : "deredactie",
+      "duration" : 5,
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif",
+      "layers" : {
+        "BigText" : false,
+        "HighText" : false,
+        "HighlightText" : false,
+        "LowText" : true
+      },
+      "name" : "lowText",
+      "templateCss" : "<style>#lowText.wrapper{ background: rgba(0,0,0,0.25); color:white; }</style>",
+      "templateHtml" : "<div id=\"lowText\" class=\"wrapper\"><div>%Text2DR%</div>></div>",
+      "text" : {
+        "Text2DR" : {
+          "key" : "Text2DR",
+          "label" : "Title",
+          "layerId" : "Text2DR",
+          "text" : "lowText"
+        }
+      },
+      "type" : "overlay"
+    },
+    "nogeenbumper" : {
+      "brand" : "deredactie",
+      "duration" : 5,
+      "fileName" : "deredactie_1",
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/bumper_deredactie_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/bumper_deredactie_01_static.gif",
+      "name" : "nogeenbumper",
+      "transitionDuration" : 2,
+      "type" : "outro"
+    },
+    "subtitleThree" : {
+      "aeTemplate" : "./testTemplate.aep",
+      "ass" : {
+        "backColour" : "0x000000",
+        "bold" : true,
+        "fontname" : "arial",
+        "fontsize" : 28,
+        "italic" : true,
+        "outlineColour" : "0xFFFFFF",
+        "primaryColour" : "0xFFFFFF",
+        "secondaryColour" : "0xFFFFFF",
+        "strikeout" : false,
+        "underline" : false
+      },
+      "brand" : "otherBrand",
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif",
+      "name" : "subtitleThree",
+      "templateCss" : "<style>#subtitleThree.wrapper{ background: rgba(0,0,0,0); color:white; }</style>",
+      "templateHtml" : "<div id=\"subtitleThree\" class=\"wrapper\"><div>%textInpt01%</div></div>",
+      "text" : {
+        "textInpt01" : {
+          "key" : "textInpt01",
+          "label" : "Title",
+          "layerId" : "textInpt01",
+          "text" : "subtitleThree"
+        }
+      },
+      "type" : "subtitle"
+    },
+    "subtitleTwo" : {
+      "aeTemplate" : "./testTemplate.aep",
+      "ass" : {
+        "backColour" : "0x000000",
+        "bold" : false,
+        "fontname" : "arial",
+        "fontsize" : 24,
+        "italic" : false,
+        "outlineColour" : "0xFFFFFF",
+        "primaryColour" : "0xFFFFFF",
+        "secondaryColour" : "0xFFFFFF",
+        "strikeout" : false,
+        "underline" : false
+      },
+      "brand" : "otherBrand",
+      "imageUrl" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01.gif",
+      "imageUrlStatic" : "https://social-video-tools.s3.amazonaws.com/assets/images/title_01_static.gif",
+      "name" : "subtitleTwo",
+      "templateCss" : "<style>#subtitleTwo.wrapper{ background: rgba(0,0,0,0); color:white; }</style>",
+      "templateHtml" : "<div id=\"subtitleTwo\" class=\"wrapper\"><div>%textInpt01%</div></div>",
+      "text" : {
+        "textInpt01" : {
+          "key" : "textInpt01",
+          "label" : "Title",
+          "layerId" : "textInpt01",
+          "text" : "subtitleTwo"
+        }
+      },
+      "type" : "subtitle"
+    }
+  },
+  "users" : {
+    "7HUH03TIaGak8a4msclRQobJsL52" : {
+      "defaultBrand" : "deredactie",
+      "email" : "maarten.lauwaert@vrt.be",
+      "role" : "2"
+    }
+  }
+}
