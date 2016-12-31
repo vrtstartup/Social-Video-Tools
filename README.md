@@ -71,6 +71,7 @@ most of the application's non-sensitive configuration lives in the `common/confi
 ### running the application
 
 `npm run server` runs the webserver
+
 `npm run worker` runs the worker app responsible for video processing
 
 and you're good to go.
