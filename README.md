@@ -81,4 +81,4 @@ We've provided a webpack development server for doing development work on the cl
 `npm run dev-server`
 
 ### License
-MIT
+GNU GPLv3
