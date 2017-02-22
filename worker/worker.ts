@@ -177,6 +177,9 @@ function handleSubtitles(project) {
 function done(job) {
   // go to idle state
   logger.verbose("Done, new job possible");
+
+  storage.checkStorageLeft();
+  
   if(job['operation'] === 'render') busyProcessingStitch = false;
   if(job['operation'] === 'lowres') busyProcessingLowres = false;
 

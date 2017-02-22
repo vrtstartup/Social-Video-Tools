@@ -5,6 +5,9 @@ import { Project } from '../../common/classes/project';
 import { logger } from '../../common/config/winston';
 import { fileConfig } from '../../common/config/files';
 import { storage } from  '../../common/config/s3'
+import { db } from '../../common/services/firebase.service';
+
+var diskspace = require('diskspace');
 
 aws.config.update({region: storage.region}); //#todo move to configuration file
 
@@ -89,3 +92,29 @@ export function getReadStream(fileType:string, projectId: string){
 }
 
 function deleteFile(filePath: string){ fs.unlink(filePath) }
+
+export function checkStorageLeft(){
+  const infoRef = db.ref('info/disk');
+
+  diskspace.check('/', (err, total, free, status) =>{
+    if(err) {
+      console.error('could not check remaining disk space');
+      return;
+    }
+
+    const pctFree = (free/total)*100;
+
+    infoRef.set({
+      percentageFree: Math.round(pctFree),
+      err: err,
+      meta: {
+        total: total,
+        free: free,
+        status: status
+      }
+      
+    }).then(
+      () => console.info('updated disk space'), 
+      () => {console.error('could not update disk space')});
+  });
+}
