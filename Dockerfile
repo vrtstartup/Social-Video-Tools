@@ -1,5 +1,6 @@
 # node as base image
-FROM node
+FROM node:6.9.5
+run node -v
 
 # dependencies
 RUN apt-get update 
