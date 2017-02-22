@@ -6,3 +6,4 @@ worker/bin
 npm-debug.log
 logs
 data
+node_modules
