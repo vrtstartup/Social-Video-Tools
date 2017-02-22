@@ -7,7 +7,7 @@ RUN apt-get install -y zip curl
 
 # ffmpeg
 RUN mkdir -p /data/bin
-RUN curl https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz >> /data/bin/ffmpeg-git-64bit-static.tar.xz
+RUN curl https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-64bit-static.tar.xz >> /data/bin/ffmpeg-git-64bit-static.tar.xz
 RUN tar -xJf /data/bin/ffmpeg-git-64bit-static.tar.xz -C /data/bin
 
 # env
@@ -26,7 +26,7 @@ RUN cd data && tsc && npm run build-prod && cp -R dist/ build/dist
 EXPOSE 80
 
 # start worker
-# CMD cd data && node /data/build/worker/worker.js
+CMD cd data && node /data/build/worker/worker.js
 
 # start server
-CMD cd data && node /data/build/server/server.js
+# CMD cd data && node /data/build/server/server.js
