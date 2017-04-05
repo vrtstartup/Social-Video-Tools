@@ -2,4 +2,5 @@
 {
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 5000,
+    "vsicons.presets.angular": true,
 }

@@ -80,5 +80,9 @@ We've provided a webpack development server for doing development work on the cl
 
 `npm run dev-server`
 
+### Opportunities
+
+* Use ffmpeg.js for client side trimming of video before uploading [github repo]https://github.com/Kagami/ffmpeg.js/tree/master
+
 ### License
 GNU GPLv3
